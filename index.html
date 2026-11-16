@@ -532,6 +532,61 @@ details.members tr.tbd td {
   min-height: 36px;
   font-size: 14px;
 }
+.mapdock {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 170px;
+  z-index: 6;
+  pointer-events: auto;
+  width: min(300px, calc(100% - 24px));
+  background: rgba(13, 10, 16, .94);
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .55);
+  overflow: hidden;
+}
+.mapdock[hidden] {
+  display: none;
+}
+.mapdock-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 38px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.mapdock-bar:hover {
+  background: rgba(255, 255, 255, .06);
+}
+.mapdock-arw {
+  transition: transform .2s;
+  transform: rotate(-90deg);
+  color: var(--accent);
+}
+.mapdock-bar[aria-expanded=true] .mapdock-arw {
+  transform: none;
+}
+.mapdock-body {
+  padding: 0 8px 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.mapdock-body[hidden] {
+  display: none;
+}
+.mapdock-body #map {
+  border-radius: 6px;
+}
 .modewrap {
   flex-basis: 100%;
   display: flex;
@@ -1502,6 +1557,10 @@ details.members tr.tbd td {
     <select id="svNum" aria-label="號"></select>
     <span>看舞台</span>
     <select id="svProps" aria-label="觀眾應援物"><option value="all">粉絲拿應援物</option><option value="none">粉絲空手</option></select>
+  </div>
+  <div id="mapDock" class="mapdock idol-only" hidden>
+    <button type="button" id="mapDockBar" class="mapdock-bar" aria-expanded="false" aria-controls="mapDockBody"><span>座位圖</span><span class="mapdock-arw" aria-hidden="true">▾</span></button>
+    <div id="mapDockBody" class="mapdock-body" hidden></div>
   </div>
   <div id="gToast" class="toast" role="status" hidden></div>
   <div id="missMarks" class="marks" hidden></div>
@@ -5597,6 +5656,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     closeResult();
     S.overview = m === "over";
     $("seatBar").hidden = m !== "seat";
+    setMapDock(m === "seat");
     if (m === "seat") {
       fillSeatView();
       setMySeat(S.my, true);
@@ -5696,7 +5756,37 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     }
     var sb = $("seatBar");
     if (sb.style.top !== gt) sb.style.top = gt;
+    var md = $("mapDock");
+    if (!md.hidden) {
+      var dt = Math.round(top + (sb.hidden ? 0 : sb.offsetHeight + 6)) + "px";
+      if (md.style.top !== dt) md.style.top = dt;
+      var mh = Math.max(120, vh - (top + (sb.hidden ? 0 : sb.offsetHeight + 6)) - 38 - 16) + "px";
+      var bd = $("mapDockBody");
+      if (bd.style.maxHeight !== mh) bd.style.maxHeight = mh;
+    }
   }
+  var mapHome = map.parentNode, mapNext = map.nextSibling;
+  function setMapDock(on) {
+    var md = $("mapDock"), body = $("mapDockBody");
+    if (on) {
+      body.appendChild(map);
+      md.hidden = false;
+      body.hidden = true;
+      $("mapDockBar").setAttribute("aria-expanded", "false");
+    } else if (!md.hidden) {
+      mapHome.insertBefore(map, mapNext);
+      md.hidden = true;
+    }
+    drawMap();
+    lastFit = -1e9;
+  }
+  $("mapDockBar").addEventListener("click", function() {
+    var body = $("mapDockBody"), open = body.hidden;
+    body.hidden = !open;
+    this.setAttribute("aria-expanded", String(open));
+    drawMap();
+    lastFit = -1e9;
+  });
   function syncModeBar() {
     var h = !!(G2.on || G2.phase === "countdown");
     if (app.classList.contains("playing") !== h) app.classList.toggle("playing", h);
