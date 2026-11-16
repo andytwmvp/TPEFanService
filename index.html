@@ -4698,8 +4698,12 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   var AC = null, master = null, sfxGain = null, bgmGain = null, bgmEl = $("bgm"), muted = false;
   function initAudio() {
     if (AC) {
-      if (AC.state === "suspended") AC.resume();
-      if (bgmEl.src && bgmEl.paused) bgmEl.play().catch(function() {
+      if (AC.state !== "running") {
+        var pr = AC.resume();
+        if (pr && pr.catch) pr.catch(function() {
+        });
+      }
+      if (bgmEl.src && bgmEl.paused && !document.hidden) bgmEl.play().catch(function() {
       });
       return;
     }
@@ -4728,8 +4732,30 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       AC = null;
     }
   }
-  document.addEventListener("pointerdown", initAudio, true);
-  document.addEventListener("keydown", initAudio, true);
+  function unlockAudio() {
+    initAudio();
+    if (!AC) return;
+    if (AC.state !== "running") {
+      var pr = AC.resume();
+      if (pr && pr.catch) pr.catch(function() {
+      });
+    }
+    if (!unlockAudio.done) {
+      try {
+        var b = AC.createBuffer(1, 1, 22050), s = AC.createBufferSource();
+        s.buffer = b;
+        s.connect(AC.destination);
+        s.start(0);
+        unlockAudio.done = true;
+      } catch (e) {
+      }
+    }
+    if (bgmEl.src && bgmEl.paused && !document.hidden) bgmEl.play().catch(function() {
+    });
+  }
+  ["pointerdown", "touchend", "click", "keydown"].forEach(function(ev) {
+    document.addEventListener(ev, unlockAudio, true);
+  });
   document.addEventListener("visibilitychange", function() {
     var now = performance.now();
     if (document.hidden) {
@@ -4748,7 +4774,9 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       AC.suspend();
       if (!bgmEl.paused) bgmEl.pause();
     } else {
-      AC.resume();
+      var pr = AC.resume();
+      if (pr && pr.catch) pr.catch(function() {
+      });
       if (bgmEl.src) bgmEl.play().catch(function() {
       });
     }
