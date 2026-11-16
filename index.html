@@ -534,50 +534,61 @@ details.members tr.tbd td {
 }
 .mapdock {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 8px;
   top: 170px;
   z-index: 6;
   pointer-events: auto;
-  width: min(300px, calc(100% - 24px));
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   background: rgba(13, 10, 16, .94);
   border: 1px solid rgba(255, 255, 255, .22);
   border-radius: 10px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, .55);
   overflow: hidden;
+  max-width: calc(100% - 16px);
 }
 .mapdock[hidden] {
   display: none;
 }
 .mapdock-bar {
-  width: 100%;
+  order: 2;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 8px;
-  min-height: 38px;
-  padding: 6px 12px;
+  width: 34px;
+  min-height: 120px;
+  padding: 10px 0;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: #fff;
   font-weight: 700;
   font-size: 14px;
+  letter-spacing: .15em;
   cursor: pointer;
 }
 .mapdock-bar:hover {
   background: rgba(255, 255, 255, .06);
 }
 .mapdock-arw {
-  transition: transform .2s;
-  transform: rotate(-90deg);
+  writing-mode: horizontal-tb;
   color: var(--accent);
+  transition: transform .2s;
 }
 .mapdock-bar[aria-expanded=true] .mapdock-arw {
-  transform: none;
+  transform: rotate(180deg);
+}
+.mapdock-bar[aria-expanded=true] {
+  border-left: 1px solid rgba(255, 255, 255, .14);
 }
 .mapdock-body {
-  padding: 0 8px 8px;
+  order: 1;
+  width: min(250px, calc(100vw - 70px));
+  padding: 8px 0 8px 8px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -1559,7 +1570,7 @@ details.members tr.tbd td {
     <select id="svProps" aria-label="觀眾應援物"><option value="all">粉絲拿應援物</option><option value="none">粉絲空手</option></select>
   </div>
   <div id="mapDock" class="mapdock idol-only" hidden>
-    <button type="button" id="mapDockBar" class="mapdock-bar" aria-expanded="false" aria-controls="mapDockBody"><span>座位圖</span><span class="mapdock-arw" aria-hidden="true">▾</span></button>
+    <button type="button" id="mapDockBar" class="mapdock-bar" aria-expanded="false" aria-controls="mapDockBody"><span>座位圖</span><span class="mapdock-arw" aria-hidden="true">▶</span></button>
     <div id="mapDockBody" class="mapdock-body" hidden></div>
   </div>
   <div id="gToast" class="toast" role="status" hidden></div>
@@ -5788,7 +5799,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (!md.hidden) {
       var dt = Math.round(top + (sb.hidden ? 0 : sb.offsetHeight + 6)) + "px";
       if (md.style.top !== dt) md.style.top = dt;
-      var mh = Math.max(120, vh - (top + (sb.hidden ? 0 : sb.offsetHeight + 6)) - 38 - 16) + "px";
+      var mh = Math.max(130, vh - (top + (sb.hidden ? 0 : sb.offsetHeight + 6)) - 12) + "px";
+      if (md.style.maxHeight !== mh) md.style.maxHeight = mh;
       var bd = $("mapDockBody");
       if (bd.style.maxHeight !== mh) bd.style.maxHeight = mh;
     }
