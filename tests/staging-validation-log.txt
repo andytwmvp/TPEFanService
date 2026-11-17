@@ -1,13 +1,18 @@
 loaded false
-console error Failed to load resource: the server responded with a status of 404 (File not found)
-console error Failed to load resource: the server responded with a status of 404 (File not found)
-target ready false
-native hit false
-result ready false 成果合照已完成，可儲存圖片；手機也可以長按圖片儲存。
-{"mobile":false,"url":"http://127.0.0.1:8765/TPEFanService/","power":1.01812545,"hit":1,"photo":"1200x920","normalRAF":true,"testHooks":false,"devicePixelRatio":0.5,"errors":[]}
+ready {"mobile":false,"who":"你是 張少瞳（ひとみ）","target":"目標觀眾：D排 7號 · 舞台正面站位","zone":"front","power":1.0575004275}
+native hit {"mobile":false,"hits":1,"zone":"front"}
+ready {"mobile":false,"who":"你是 陳昭霓（棗泥）","target":"目標觀眾：D排 8號 · 舞台正面站位","zone":"front","power":0.9337495725000001}
+native hit {"mobile":false,"hits":2,"zone":"front"}
+ready {"mobile":false,"who":"你是 虛擬站位（舞台演出）","target":"目標觀眾：Q排 2號（舞台右側） · 舞台右側站位","zone":"right","power":1.0462495274999999}
+native hit {"mobile":false,"hits":3,"zone":"right"}
+ready {"mobile":false,"who":"你是 胡詠晴（くるみ）","target":"目標觀眾：N排 9號（舞台左側） · 舞台左側站位","zone":"left","power":0.6581254725}
+native hit {"mobile":false,"hits":4,"zone":"left"}
+{"mobile":false,"url":"http://127.0.0.1:8876/TPEFanService/","hits":4,"zones":["front","right","left"],"photo":"1200x920","normalRAF":true,"testHooks":false,"devicePixelRatio":0.5,"errors":[]}
 loaded true
-console error Failed to load resource: the server responded with a status of 404 (File not found)
-target ready true
-native hit true
-result ready true 成果合照已完成，可儲存圖片；手機也可以長按圖片儲存。
-{"mobile":true,"url":"http://127.0.0.1:8765/TPEFanService/","power":0.9225004275,"hit":1,"photo":"1200x920","normalRAF":true,"testHooks":false,"devicePixelRatio":0.5,"errors":[]}
+ready {"mobile":true,"who":"你是 張少瞳（ひとみ）","target":"目標觀眾：A排 1號 · 舞台正面站位","zone":"front","power":0.49500045}
+native hit {"mobile":true,"hits":1,"zone":"front"}
+ready {"mobile":true,"who":"你是 胡詠晴（くるみ）","target":"目標觀眾：N排 2號（舞台左側） · 舞台左側站位","zone":"left","power":0.9675004500000002}
+native hit {"mobile":true,"hits":2,"zone":"left"}
+ready {"mobile":true,"who":"你是 虛擬站位（舞台演出）","target":"目標觀眾：P排 8號（舞台右側） · 舞台右側站位","zone":"right","power":0.69750045}
+native hit {"mobile":true,"hits":3,"zone":"right"}
+{"mobile":true,"url":"http://127.0.0.1:8876/TPEFanService/","hits":3,"zones":["front","left","right"],"photo":"1200x920","normalRAF":true,"testHooks":false,"devicePixelRatio":0.5,"errors":[]}

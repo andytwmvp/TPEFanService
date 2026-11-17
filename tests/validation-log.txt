@@ -1,188 +1,11 @@
+Base: f21f996; final fourteen-station / ten-throw rules / visibility guards
+
 
 > test
-> node tests/ribbon-records.cjs && node tests/ribbon-world.cjs && node tests/ribbon-review.cjs && node tests/ribbon-browser.cjs && node tests/ribbon-ui.cjs && node tests/ribbon-visibility.cjs
+> node tests/ribbon-records.cjs && node tests/ribbon-world.cjs && node tests/ribbon-review.cjs && node tests/ribbon-browser.cjs && node tests/ribbon-ui.cjs && node tests/ribbon-visibility.cjs && node tests/ribbon-side.cjs
 
 record persistence, per-member rows, best score, milestones, perfect preservation and storage errors passed
 rotated obstacle bounds: no invisible AABB corners; actual oriented wall collision passed
-[
-  {
-    "name": "reference roll parity after 1 tape steps",
-    "pass": true,
-    "maxError": 0
-  },
-  {
-    "name": "reference roll parity after 12 tape steps",
-    "pass": true,
-    "maxError": 0
-  },
-  {
-    "name": "reference roll parity after 24 tape steps",
-    "pass": true,
-    "maxError": 0
-  },
-  {
-    "name": "other spectators ranked by horizontal reach with separate real hand distance",
-    "pass": true
-  },
-  {
-    "name": "interrupted flight completes visually without scoring",
-    "pass": true,
-    "distance": 4.317384574078282,
-    "resolved": true,
-    "attempts": 0
-  },
-  {
-    "name": "completed finale skips per-ribbon skeleton walks",
-    "pass": true,
-    "skeletonUpdates": 0
-  },
-  {
-    "name": "idle result skips empty preview redraw",
-    "pass": true,
-    "previewClears": 0
-  },
-  {
-    "name": "ribbon marker uses current camera before renderer",
-    "pass": true,
-    "pixelError": 0.00040389158332401634
-  },
-  {
-    "name": "swipe started before orientation change",
-    "pass": true
-  },
-  {
-    "name": "ribbon rotation cancels old-coordinate swipe",
-    "pass": true
-  },
-  {
-    "name": "ribbon resize updates lens immediately",
-    "pass": true,
-    "resizeFov": 86,
-    "expected": 86
-  },
-  {
-    "name": "wild throw follows roll without changing target",
-    "pass": true,
-    "yawChange": 0.9087454485663309
-  }
-]
-WebGL context
-selecting hides candidate and bands
-old search cannot publish into restarted session
-search rejection finishes with readable error
-cancel search 0
-cancel search 1
-cancel search 2
-cancel search 3
-reachable target selected
-hit interval sample 0
-hit interval sample 1
-hit interval sample 2
-hit interval sample 3
-hit interval sample 4
-hit interval sample 5
-hit interval sample 6
-hit interval sample 7
-hit interval sample 8
-hit interval sample 9
-hit interval sample 10
-hit interval sample 11
-perfect uses actual distance
-perfect uses actual distance
-perfect uses actual distance
-perfect uses actual distance
-target remains fixed
-reference launch parity 0/-80
-reference launch parity 0/-12
-reference launch parity 0/0
-reference launch parity 0/14
-reference launch parity 0/70
-reference launch parity 0.4/-80
-reference launch parity 0.4/-12
-reference launch parity 0.4/0
-reference launch parity 0.4/14
-reference launch parity 0.4/70
-reference launch parity 0.8/-80
-reference launch parity 0.8/-12
-reference launch parity 0.8/0
-reference launch parity 0.8/14
-reference launch parity 0.8/70
-reference launch parity 1.35/-80
-reference launch parity 1.35/-12
-reference launch parity 1.35/0
-reference launch parity 1.35/14
-reference launch parity 1.35/70
-ribbon feeds more than two nodes
-actual throw resolves exactly once
-no duplicate scoring
-round 0 has reachable target
-round 0 scores once
-round 1 has reachable target
-round 1 scores once
-round 2 has reachable target
-round 2 scores once
-round 3 has reachable target
-round 3 scores once
-round 4 has reachable target
-round 4 scores once
-round 5 has reachable target
-round 5 scores once
-round 6 has reachable target
-round 6 scores once
-round 7 has reachable target
-round 7 scores once
-round 8 has reachable target
-round 8 scores once
-eight-member rotation repeats in challenge
-all eight hits enter challenge
-challenge miss ends after recording last throw
-challenge transitions to result
-result keeps ribbon
-settled ribbon sleeps
-64 sleeping ribbons retain display without physics
-64 ribbons / 1000 ticks ms: 9.7
-endpoint motion wakes ribbon
-64 tape and roll meshes removed
-uploaded ribbon GPU geometries disposed
-GPU geometry count: 346 -> 158
-return menu disposes ribbons
-background search waits before publishing
-background search resumes
-countdown compensated
-hidden flight frozen
-catch and next-target timestamps compensated
-result background frozen
-original modes and fan game still start
-first lap failure test target 0
-first-lap miss completes all eight throws 0
-first lap failure test target 1
-first-lap miss completes all eight throws 1
-first lap failure test target 2
-first-lap miss completes all eight throws 2
-first lap failure test target 3
-first-lap miss completes all eight throws 3
-first lap failure test target 4
-first-lap miss completes all eight throws 4
-first lap failure test target 5
-first-lap miss completes all eight throws 5
-first lap failure test target 6
-first-lap miss completes all eight throws 6
-first lap failure test target 7
-first-lap miss completes all eight throws 7
-first lap with one miss ends at eight
-settings change disposes flight and cancels session
-replay after result preserves newly selected member and hides menu
-desktop camera 1100x760: {"vertical":46.00000000000001,"horizontal":52.347970966159686,"eye":1.4960000000000002,"height":1.6}
-desktop camera 390x844: {"vertical":46.00000000000001,"horizontal":52.347970966159686,"eye":1.4960000000000002,"height":1.6}
-desktop camera 844x390: {"vertical":46.00000000000001,"horizontal":72.52602111421349,"eye":1.4960000000000002,"height":1.6}
-desktop: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
-mobile camera 1100x760: {"vertical":46.00000000000001,"horizontal":52.347970966159686,"eye":1.4960000000000002,"height":1.6}
-mobile camera 390x844: {"vertical":54.08658372839446,"horizontal":29.999999999999996,"eye":1.4960000000000002,"height":1.6}
-mobile camera 844x390: {"vertical":46.00000000000001,"horizontal":72.52602111421349,"eye":1.4960000000000002,"height":1.6}
-mobile: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
-1100x760: [{"blockedTargets":8,"slot":0,"ndc":[-0.044130418871239856,0.12435297890748122,0.5955304246466051],"handError":4.965068306494546e-16,"release":[-2.86178170103147,1.4905319582223102,-2.1062412962704116],"hand":[-2.8617817010314694,1.4905319582223104,-2.1062412962704116],"heading":0.9577887554252063,"bodyYaw":4.099381409014999,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":7,"ndc":[-0.04404197675297442,0.060015219192231586,0.5963435319935064],"handError":3.1401849173675503e-16,"release":[3.0033494687242537,1.4905319582223107,-1.9851891920409581],"hand":[3.0033494687242537,1.4905319582223104,-1.985189192040958],"heading":-0.45708576396974454,"bodyYaw":2.6845068896200486,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":1,"ndc":[-0.044022397702603654,0.03129066656048746,0.5965235352545599],"handError":4.965068306494546e-16,"release":[-2.0481673265498186,1.4905319582223102,-2.0173769382034865],"hand":[-2.048167326549818,1.4905319582223104,-2.0173769382034865],"heading":0.5990134624098331,"bodyYaw":3.7406061159996264,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":6,"ndc":[-0.044021786685217286,0.029954556631850444,0.5965291527446966],"handError":4.440892098500626e-16,"release":[2.1438905471704013,1.4905319582223104,-1.9693143378501472],"hand":[2.1438905471704013,1.4905319582223104,-1.9693143378501468],"heading":-0.33163845315926976,"bodyYaw":2.809954200430523,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":2,"ndc":[-0.04419502099152016,0.1553805787229822,0.5949364942924588],"handError":9.155133597044475e-16,"release":[-1.1501071240661322,1.4905319582223102,-2.0160016526770437],"hand":[-1.1501071240661314,1.4905319582223104,-2.0160016526770437],"heading":0.5921665981473191,"bodyYaw":3.733759251737112,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":5,"ndc":[-0.04404607092692761,0.06442368294490339,0.5963058915232402],"handError":9.155133597044475e-16,"release":[1.3824409506995032,1.4905319582223104,-1.95422578486967],"hand":[1.3824409506995041,1.4905319582223104,-1.9542257848696698],"heading":0.07240726418330853,"bodyYaw":3.213999917773102,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":3,"ndc":[-0.04408362982800992,0.09584029948234091,0.5959605875096354],"handError":5.978733960281817e-16,"release":[-0.27910844148950653,1.4905319582223104,-1.9976619468853813],"hand":[-0.279108441489506,1.4905319582223104,-1.9976619468853816],"heading":0.4933233345448796,"bodyYaw":3.6349159881346726,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":4,"ndc":[-0.04409997222312466,0.10666527037403818,0.5958103409778509],"handError":7.870063977598499e-16,"release":[0.39768500238930404,1.4905319582223107,-1.9566701816674288],"hand":[0.39768500238930476,1.4905319582223104,-1.9566701816674286],"heading":-0.17235229762766496,"bodyYaw":2.9692403559621283,"visible":true,"early":[true,true,true]}]
-390x844: [{"blockedTargets":8,"slot":0,"ndc":[-0.06089714214314966,0.09617431668856598,0.594966628458954],"handError":6.280369834735101e-16,"release":[-2.959789875671595,1.4905319582223104,-2.0094275791919403],"hand":[-2.9597898756715946,1.4905319582223104,-2.0094275791919407],"heading":0.5584654922738553,"bodyYaw":3.7000581458636486,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":7,"ndc":[-0.06069271001422293,0.03846447747903637,0.596330527181991],"handError":2.220446049250313e-16,"release":[2.9798857764080786,1.4905319582223104,-1.997223887892388],"hand":[2.9798857764080786,1.4905319582223104,-1.9972238878923878],"heading":-0.5330343046572901,"bodyYaw":2.608558348932503,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":1,"ndc":[-0.060692548559515065,0.038384760525332004,0.596331604350596],"handError":4.965068306494546e-16,"release":[-2.0866144079027116,1.4905319582223102,-1.9935405876363042],"hand":[-2.086614407902711,1.4905319582223104,-1.9935405876363042],"heading":0.46866624725329786,"bodyYaw":3.6102589008430908,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":6,"ndc":[-0.06073861179186459,0.05676142794996585,0.596024286787026],"handError":0,"release":[2.027495191308576,1.4905319582223104,-2.033346979689942],"hand":[2.027495191308576,1.4905319582223104,-2.033346979689942],"heading":-0.7165286136499126,"bodyYaw":2.4250640399398806,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":2,"ndc":[-0.06074750411109273,0.05966194297112907,0.5959649603841229],"handError":8.005932084973442e-16,"release":[-1.1570129198208217,1.4905319582223104,-2.0112644635393857],"hand":[-1.157012919820821,1.4905319582223104,-2.011264463539386],"heading":0.5680525678396707,"bodyYaw":3.7096452214294637,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":5,"ndc":[-0.06069785461222454,0.04092346006534537,0.5962962042470924],"handError":7.021666937153402e-16,"release":[1.3823165404955537,1.4905319582223104,-1.9542141351331974],"hand":[1.3823165404955544,1.4905319582223104,-1.9542141351331976],"heading":0.07204746839345336,"bodyYaw":3.2136401219832464,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":3,"ndc":[-0.060682547467188375,0.03307481340069379,0.5963983280946619],"handError":9.650801630464006e-16,"release":[-0.10985575565548811,1.4905319582223107,-2.229899242724602],"hand":[-0.1098557556554878,1.4905319582223104,-2.2298992427246027],"heading":1.346410608802246,"bodyYaw":4.48800326239204,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":4,"ndc":[-0.060691070482217446,0.037647136597470106,0.5963414655585444],"handError":6.684427777288335e-16,"release":[0.3761383111562157,1.4905319582223104,-1.9606525761812426],"hand":[0.3761383111562162,1.4905319582223104,-1.9606525761812421],"heading":-0.23545544361110463,"bodyYaw":2.9061372099786884,"visible":true,"early":[true,true,true]}]
-844x390: [{"blockedTargets":8,"slot":0,"ndc":[-0.032406873857569615,0.14673440561669615,0.5953610133042553],"handError":6.280369834735101e-16,"release":[-2.874014470332498,1.4905319582223104,-2.089182044063054],"hand":[-2.8740144703324977,1.4905319582223104,-2.0891820440630546],"heading":0.8973352257309596,"bodyYaw":4.038927879320752,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":7,"ndc":[-0.032315564354953516,0.03880055048065165,0.5965046469985912],"handError":9.930136612989092e-16,"release":[2.9327006433833094,1.4905319582223104,-2.029088182713903],"hand":[2.93270064338331,1.4905319582223104,-2.029088182713902],"heading":-0.6971624311244742,"bodyYaw":2.4444302224653187,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":1,"ndc":[-0.03232797801841811,0.06499739322208282,0.5963491682871546],"handError":5.438959822042073e-16,"release":[-2.1118120241032967,1.4905319582223102,-1.9813837630489375],"hand":[-2.1118120241032963,1.4905319582223104,-1.9813837630489377],"heading":0.3880872619757385,"bodyYaw":3.5296799155655316,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":6,"ndc":[-0.032360258764967134,0.10630408096573615,0.5959448582386732],"handError":4.440892098500626e-16,"release":[2.1701708018350625,1.4905319582223104,-1.962006623953033],"hand":[2.170170801835063,1.4905319582223104,-1.962006623953033],"heading":-0.2530753918877888,"bodyYaw":2.8885172617020043,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":2,"ndc":[-0.03232759377506528,0.06434654634394857,0.5963539808601594],"handError":5.438959822042073e-16,"release":[-1.2990173902283244,1.4905319582223102,-1.9564698024450362],"hand":[-1.299017390228324,1.4905319582223104,-1.956469802445036],"heading":0.126192467542632,"bodyYaw":3.267785121132425,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":5,"ndc":[-0.032330713448046736,0.06945494788319433,0.5963149075651062],"handError":7.021666937153402e-16,"release":[1.195179919717715,1.4905319582223102,-1.989125482111077],"hand":[1.1951799197177158,1.4905319582223104,-1.989125482111077],"heading":-0.48319820246486084,"bodyYaw":2.6583944511249324,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":3,"ndc":[-0.032327862245199256,0.06480197913338046,0.5963506183241457],"handError":6.377745716588144e-16,"release":[-0.3616103238824907,1.4905319582223102,-1.964143649327387],"hand":[-0.36161032388249015,1.4905319582223104,-1.9641436493273867],"heading":0.23620151566019318,"bodyYaw":3.377794169249986,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":4,"ndc":[-0.03236892914500579,0.11490124668144676,0.5958362634213581],"handError":6.377745716588144e-16,"release":[0.48149598843936836,1.4905319582223107,-1.954138429652107],"hand":[0.4814959884393689,1.4905319582223104,-1.9541384296521067],"heading":0.0696747228892055,"bodyYaw":3.2112673764789985,"visible":true,"early":[true,true,true]}]
 [
   {
     "name": "reference roll parity after 1 tape steps",
@@ -269,7 +92,7 @@ mobile: game picker, both games, cancel / Escape; native swipe, one score, resul
   {
     "name": "interrupted flight completes visually without scoring",
     "pass": true,
-    "distance": 6.115656427335826,
+    "distance": 6.2215644466591185,
     "resolved": true,
     "attempts": 0
   },
@@ -290,7 +113,7 @@ mobile: game picker, both games, cancel / Escape; native swipe, one score, resul
   {
     "name": "ribbon marker uses current camera before renderer",
     "pass": true,
-    "pixelError": 0.00044933437080531404
+    "pixelError": 0.000549810708852279
   },
   {
     "name": "swipe started before orientation change",
@@ -309,72 +132,584 @@ mobile: game picker, both games, cancel / Escape; native swipe, one score, resul
   {
     "name": "wild throw follows roll without changing target",
     "pass": true,
-    "yawChange": 0.8581300895914379
+    "yawChange": 1.0293769718746377
   }
 ]
-[
-  {
-    "name": "reference roll parity after 1 tape steps",
-    "pass": true,
-    "maxError": 0
-  },
-  {
-    "name": "reference roll parity after 12 tape steps",
-    "pass": true,
-    "maxError": 0
-  },
-  {
-    "name": "reference roll parity after 24 tape steps",
-    "pass": true,
-    "maxError": 0
-  },
-  {
-    "name": "other spectators ranked by horizontal reach with separate real hand distance",
-    "pass": true
-  },
-  {
-    "name": "interrupted flight completes visually without scoring",
-    "pass": true,
-    "distance": 6.011843735454033,
-    "resolved": true,
-    "attempts": 0
-  },
-  {
-    "name": "catch reaction finishes after transfer to settled ribbons",
-    "pass": true
-  },
-  {
-    "name": "completed finale skips per-ribbon skeleton walks",
-    "pass": true,
-    "skeletonUpdates": 0
-  },
-  {
-    "name": "idle result skips empty preview redraw",
-    "pass": true,
-    "previewClears": 0
-  },
-  {
-    "name": "ribbon marker uses current camera before renderer",
-    "pass": true,
-    "pixelError": 0.00028459217910384353
-  },
-  {
-    "name": "swipe started before orientation change",
-    "pass": true
-  },
-  {
-    "name": "ribbon rotation cancels old-coordinate swipe",
-    "pass": true
-  },
-  {
-    "name": "ribbon resize updates lens immediately",
-    "pass": true,
-    "resizeFov": 86,
-    "expected": 86
-  },
-  {
-    "name": "wild throw follows roll without changing target",
-    "pass": true,
-    "yawChange": 0.9300497126823495
-  }
-]
+WebGL context
+selecting hides candidate and bands
+old search cannot publish into restarted session
+search rejection finishes with readable error
+cancel search 0
+cancel search 1
+cancel search 2
+cancel search 3
+reachable target selected
+hit interval sample 0
+hit interval sample 1
+hit interval sample 2
+hit interval sample 3
+hit interval sample 4
+hit interval sample 5
+hit interval sample 6
+hit interval sample 7
+hit interval sample 8
+hit interval sample 9
+hit interval sample 10
+perfect uses actual distance
+perfect uses actual distance
+perfect uses actual distance
+perfect uses actual distance
+target remains fixed
+reference launch parity 0/-80
+reference launch parity 0/-12
+reference launch parity 0/0
+reference launch parity 0/14
+reference launch parity 0/70
+reference launch parity 0.4/-80
+reference launch parity 0.4/-12
+reference launch parity 0.4/0
+reference launch parity 0.4/14
+reference launch parity 0.4/70
+reference launch parity 0.8/-80
+reference launch parity 0.8/-12
+reference launch parity 0.8/0
+reference launch parity 0.8/14
+reference launch parity 0.8/70
+reference launch parity 1.35/-80
+reference launch parity 1.35/-12
+reference launch parity 1.35/0
+reference launch parity 1.35/14
+reference launch parity 1.35/70
+ribbon feeds more than two nodes
+actual throw resolves exactly once
+no duplicate scoring
+round 0 has reachable target
+round 0 scores once
+round 1 has reachable target
+round 1 scores once
+round 2 has reachable target
+round 2 scores once
+round 3 has reachable target
+round 3 scores once
+round 4 has reachable target
+round 4 scores once
+round 5 has reachable target
+round 5 scores once
+round 6 has reachable target
+round 6 scores once
+round 7 has reachable target
+round 7 scores once
+round 8 has reachable target
+round 8 scores once
+round 9 has reachable target
+round 9 scores once
+round 10 has reachable target
+round 10 scores once
+round 11 has reachable target
+round 11 scores once
+round 12 has reachable target
+round 12 scores once
+round 13 has reachable target
+round 13 scores once
+fourteen distinct stand-ins rotate independently of ten-throw rounds
+fourteen hits continue into the second ten-throw round
+challenge completes ten throws and fails with four hits
+challenge transitions to result
+one settlement per throw first round 3 of 10 fails 0
+ten progress dots
+one settlement per throw first round 3 of 10 fails 1
+ten progress dots
+one settlement per throw first round 3 of 10 fails 2
+ten progress dots
+one settlement per throw first round 3 of 10 fails 3
+ten progress dots
+one settlement per throw first round 3 of 10 fails 4
+ten progress dots
+one settlement per throw first round 3 of 10 fails 5
+ten progress dots
+one settlement per throw first round 3 of 10 fails 6
+ten progress dots
+one settlement per throw first round 3 of 10 fails 7
+ten progress dots
+one settlement per throw first round 3 of 10 fails 8
+ten progress dots
+one settlement per throw first round 3 of 10 fails 9
+first round 3 of 10 fails
+first round 3 of 10 fails result
+all three round summaries
+one settlement per throw first round 4 passes; challenge 5 fails 0
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 1
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 2
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 3
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 4
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 5
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 6
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 7
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 8
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 9
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 10
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 11
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 12
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 13
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 14
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 15
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 16
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 17
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 18
+ten progress dots
+one settlement per throw first round 4 passes; challenge 5 fails 19
+first round 4 passes; challenge 5 fails
+first round 4 passes; challenge 5 fails result
+all three round summaries
+one settlement per throw challenge 6 passes; final 9 fails 0
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 1
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 2
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 3
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 4
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 5
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 6
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 7
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 8
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 9
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 10
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 11
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 12
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 13
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 14
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 15
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 16
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 17
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 18
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 19
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 20
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 21
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 22
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 23
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 24
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 25
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 26
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 27
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 28
+ten progress dots
+one settlement per throw challenge 6 passes; final 9 fails 29
+challenge 6 passes; final 9 fails
+challenge 6 passes; final 9 fails result
+all three round summaries
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 0
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 1
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 2
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 3
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 4
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 5
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 6
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 7
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 8
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 9
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 10
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 11
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 12
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 13
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 14
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 15
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 16
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 17
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 18
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 19
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 20
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 21
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 22
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 23
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 24
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 25
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 26
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 27
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 28
+ten progress dots
+one settlement per throw exact thresholds 4 / 6 / 10 clear all rounds 29
+exact thresholds 4 / 6 / 10 clear all rounds
+exact thresholds 4 / 6 / 10 clear all rounds result
+all three round summaries
+result keeps ribbon
+settled ribbon sleeps
+64 sleeping ribbons retain display without physics
+64 ribbons / 1000 ticks ms: 16.3
+endpoint motion wakes ribbon
+64 tape and roll meshes removed
+uploaded ribbon GPU geometries disposed
+GPU geometry count: 345 -> 153
+return menu disposes ribbons
+background search waits before publishing
+background search resumes
+countdown compensated
+hidden flight frozen
+catch and next-target timestamps compensated
+result background frozen
+original modes and fan game still start
+first lap failure test target 0
+first-lap misses still complete all ten throws 0
+first lap failure test target 1
+first-lap misses still complete all ten throws 1
+first lap failure test target 2
+first-lap misses still complete all ten throws 2
+first lap failure test target 3
+first-lap misses still complete all ten throws 3
+first lap failure test target 4
+first-lap misses still complete all ten throws 4
+first lap failure test target 5
+first-lap misses still complete all ten throws 5
+first lap failure test target 6
+first-lap misses still complete all ten throws 6
+first lap failure test target 7
+first-lap misses still complete all ten throws 7
+first lap failure test target 8
+first-lap misses still complete all ten throws 8
+first lap failure test target 9
+first-lap misses still complete all ten throws 9
+first lap below four hits ends after ten
+settings change disposes flight and cancels session
+replay after result preserves newly selected member and hides menu
+desktop camera 1100x760: {"vertical":46.00000000000001,"horizontal":52.347970966159686,"eye":1.4960000000000002,"height":1.6}
+desktop camera 390x844: {"vertical":54.08658372839446,"horizontal":29.999999999999996,"eye":1.4960000000000002,"height":1.6}
+desktop camera 844x390: {"vertical":46.00000000000001,"horizontal":72.52602111421349,"eye":1.4960000000000002,"height":1.6}
+desktop: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
+mobile camera 1100x760: {"vertical":46.00000000000001,"horizontal":52.347970966159686,"eye":1.4960000000000002,"height":1.6}
+mobile camera 390x844: {"vertical":54.08658372839446,"horizontal":29.999999999999996,"eye":1.4960000000000002,"height":1.6}
+mobile camera 844x390: {"vertical":46.00000000000001,"horizontal":72.52602111421349,"eye":1.4960000000000002,"height":1.6}
+mobile: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
+1100x760: [{"blockedTargets":8,"slot":0,"ndc":[-0.04405990813187737,-0.07749100453127149,0.5961786768745228],"handError":6.280369834735101e-16,"release":[-3.197006918992853,1.4905319582223104,-2.0337551710281994],"hand":[-3.1970069189928525,1.4905319582223104,-2.0337551710282],"heading":0.676080944540648,"bodyYaw":3.8176735981304413,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":5,"ndc":[-0.044018765638774576,-0.02219683005960619,0.5965569272383962],"handError":4.965068306494546e-16,"release":[3.1356579576757886,1.4905319582223102,-2.100596323759616],"hand":[3.135657957675788,1.4905319582223104,-2.100596323759616],"heading":-0.980351230696635,"bodyYaw":2.1612414228931582,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":1,"ndc":[-0.044130734850279726,-0.12452343177047331,0.5955275196407293],"handError":3.1401849173675503e-16,"release":[-1.1056695018683937,1.4905319582223104,-1.9693853477258338],"hand":[-1.1056695018683935,1.4905319582223104,-1.9693853477258336],"heading":0.29002678419751066,"bodyYaw":3.4316194377873037,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":3,"ndc":[-0.04405274686951406,-0.07102844259546925,0.5962445151330399],"handError":2.482534153247273e-16,"release":[0.39746868612901926,1.4905319582223102,-1.9527687153057747],"hand":[0.39746868612901937,1.4905319582223104,-1.9527687153057747],"heading":-0.039947568214749506,"bodyYaw":3.1016450853750435,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":4,"ndc":[-0.04425343744715091,-0.17889230374173512,0.5943994328767049],"handError":3.1401849173675503e-16,"release":[1.161908928764105,1.4905319582223104,-1.9563386729442431],"hand":[1.1619089287641051,1.4905319582223104,-1.9563386729442434],"heading":-0.16587792420591285,"bodyYaw":2.9757147293838804,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":10,"ndc":[-0.044433087738172186,-0.2371446974530208,0.5927477880002424],"handError":0,"release":[3.567448742172837,1.4905319582223104,-2.2657131988180694],"hand":[3.567448742172837,1.4905319582223104,-2.2657131988180694],"heading":1.8893372785753173,"bodyYaw":5.03092993216511,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":9,"ndc":[-0.04404730662233905,-0.06569622201297104,0.5962945309517076],"handError":4.440892098500626e-16,"release":[-3.2836579147632166,1.4905319582223104,-6.455462324832522],"hand":[-3.283657914763216,1.4905319582223104,-6.455462324832522],"heading":-0.1471828401333833,"bodyYaw":2.99440981345641,"visible":true,"early":[true,true,true]},{"blockedTargets":6,"slot":11,"ndc":[-0.044074138285830594,-0.08895263182783492,0.5960478495837587],"handError":0,"release":[3.340788537149008,1.4905319582223104,-3.3676539545734805],"hand":[3.340788537149008,1.4905319582223104,-3.3676539545734805],"heading":0.27330835151532423,"bodyYaw":3.414901005105117,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":12,"ndc":[-0.04409765552010449,-0.10519826663194613,0.5958316399730834],"handError":1.0175362097255202e-15,"release":[3.3657977089024538,1.4905319582223102,-4.926291551599009],"hand":[3.3657977089024533,1.4905319582223104,-4.92629155159901],"heading":0.34951259455152095,"bodyYaw":3.491105248141314,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":13,"ndc":[-0.04409464638112804,-0.1032617990885644,0.5958593049934733],"handError":4.440892098500626e-16,"release":[3.3487763197267597,1.4905319582223104,-6.470181966232917],"hand":[3.3487763197267593,1.4905319582223104,-6.470181966232917],"heading":0.2974334751912951,"bodyYaw":3.439026128781088,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":6,"ndc":[-0.044357301884249384,-0.21448073242568966,0.5934445378726105],"handError":4.965068306494546e-16,"release":[-3.4432387052651277,1.4905319582223107,-2.4316136570080324],"hand":[-3.4432387052651277,1.4905319582223104,-2.431613657008033],"heading":-2.537595364861067,"bodyYaw":0.6039972887287259,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":2,"ndc":[-0.044062741429885706,-0.07990395906854747,0.5961526284773826],"handError":3.554447978966673e-16,"release":[-0.4661903505651688,1.4905319582223102,-1.9583209350459634],"hand":[-0.4661903505651686,1.4905319582223104,-1.9583209350459632],"heading":-0.2011830738173096,"bodyYaw":2.9404095797724836,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":8,"ndc":[-0.044201970933814165,-0.1583591591060003,0.5948725988402923],"handError":1.0175362097255202e-15,"release":[-3.363625518352876,1.4905319582223107,-4.925455774441654],"hand":[-3.3636255183528756,1.4905319582223104,-4.925455774441655],"heading":-0.38509112708328547,"bodyYaw":2.756501526506508,"visible":true,"early":[true,true,true]},{"blockedTargets":6,"slot":7,"ndc":[-0.04410132760117381,-0.10751428970426379,0.5957978800840319],"handError":4.440892098500626e-16,"release":[-3.3436184382828866,1.4905319582223104,-3.3685253518304927],"hand":[-3.3436184382828866,1.4905319582223104,-3.3685253518304923],"heading":-0.3241145869389098,"bodyYaw":2.8174780666508834,"visible":true,"early":[true,true,true]}]
+390x844: [{"blockedTargets":8,"slot":0,"ndc":[-0.06069419545163513,-0.03919030194436078,0.5963206168699586],"handError":6.280369834735101e-16,"release":[-3.1531436964499466,1.4905319582223104,-2.077739035395585],"hand":[-3.153143696449946,1.4905319582223104,-2.0777390353955845],"heading":0.855181826766334,"bodyYaw":3.996774480356127,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":1,"ndc":[-0.06085762045687339,-0.0880075893204463,0.5952303031451764],"handError":4.440892098500626e-16,"release":[-1.2051456865030008,1.4905319582223104,-1.9527749411148898],"hand":[-1.2051456865030004,1.4905319582223104,-1.9527749411148898],"heading":-0.0014023949592133042,"bodyYaw":3.1401902586305797,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":5,"ndc":[-0.06070580223498226,-0.04445601659327245,0.5962431805243863],"handError":4.965068306494546e-16,"release":[3.1744589802916843,1.4905319582223102,-2.0543949699784547],"hand":[3.1744589802916843,1.4905319582223104,-2.0543949699784543],"heading":-0.8064079279734798,"bodyYaw":2.335184725616313,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":3,"ndc":[-0.060804827609663825,-0.0757469876087069,0.5955825183144453],"handError":2.482534153247273e-16,"release":[0.399949446731323,1.4905319582223104,-1.9527309167957778],"hand":[0.3999494467313231,1.4905319582223104,-1.9527309167957776],"heading":-0.032803583369876606,"bodyYaw":3.1087890702199164,"visible":true,"early":[true,true,true]},{"blockedTargets":6,"slot":11,"ndc":[-0.061134839138669655,-0.13533902736306072,0.593380798333557],"handError":2.220446049250313e-16,"release":[3.52732124591164,1.4905319582223107,-3.504913545372658],"hand":[3.52732124591164,1.4905319582223104,-3.504913545372658],"heading":0.9531748290526401,"bodyYaw":4.094767482642434,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":12,"ndc":[-0.06085430857720067,-0.08728878885647537,0.5952523988328143],"handError":9.930136612989092e-16,"release":[3.3792786357348437,1.4905319582223104,-4.931859017479476],"hand":[3.379278635734843,1.4905319582223104,-4.931859017479477],"heading":0.3915129279539063,"bodyYaw":3.5331055815436994,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":9,"ndc":[-0.06078150000966918,-0.06964915479832652,0.5957381517953837],"handError":8.881784197001252e-16,"release":[-3.3236224362796034,1.4905319582223104,-6.462925065776248],"hand":[-3.3236224362796034,1.4905319582223104,-6.462925065776249],"heading":-0.2643133603587994,"bodyYaw":2.877279293230994,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":4,"ndc":[-0.060800936376109296,-0.07476423052196438,0.5956084792458592],"handError":6.280369834735101e-16,"release":[1.1518055713591115,1.4905319582223104,-1.9579636658308353],"hand":[1.151805571359112,1.4905319582223104,-1.9579636658308348],"heading":-0.19534463209963626,"bodyYaw":2.946248021490157,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":10,"ndc":[-0.06101178260255019,-0.11669681572543697,0.594201787937064],"handError":6.280369834735101e-16,"release":[3.412089047759487,1.4905319582223104,-2.4516580560378194],"hand":[3.4120890477594865,1.4905319582223104,-2.45165805603782],"heading":2.6020239164177634,"bodyYaw":5.743616570007557,"visible":true,"early":[true,true,true]},{"blockedTargets":6,"slot":7,"ndc":[-0.06137710388398775,-0.16611560222857435,0.5917644938001408],"handError":8.881784197001252e-16,"release":[-3.576806623960041,1.4905319582223104,-3.615303357871031],"hand":[-3.576806623960041,1.4905319582223104,-3.61530335787103],"heading":-1.3455750405315354,"bodyYaw":1.7960176130582577,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":6,"ndc":[-0.06135105599154191,-0.16308005981852036,0.5919382761083598],"handError":2.220446049250313e-16,"release":[-3.5824231383535565,1.4905319582223107,-2.0920464198570583],"hand":[-3.5824231383535565,1.4905319582223104,-2.0920464198570583],"heading":-1.4242796475474764,"bodyYaw":1.7173130060423167,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":13,"ndc":[-0.060734418621064316,-0.055341126582380024,0.596052262136713],"handError":4.965068306494546e-16,"release":[3.325397464199541,1.4905319582223107,-6.463370387161838],"hand":[3.3253974641995416,1.4905319582223104,-6.463370387161838],"heading":0.22730261714306174,"bodyYaw":3.368895270732855,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":8,"ndc":[-0.0608863225339309,-0.09400859823330468,0.5950388130577596],"handError":9.930136612989092e-16,"release":[-3.363803163196122,1.4905319582223104,-4.925523498672218],"hand":[-3.3638031631961214,1.4905319582223104,-4.925523498672219],"heading":-0.38563855132245123,"bodyYaw":2.7559541022673417,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":2,"ndc":[-0.06097492448262094,-0.11051101408535709,0.5944476922524546],"handError":3.554447978966673e-16,"release":[-0.3303949774483267,1.4905319582223104,-1.9605968123507809],"hand":[-0.3303949774483264,1.4905319582223104,-1.960596812350781],"heading":0.1924189671376571,"bodyYaw":3.33401162072745,"visible":true,"early":[true,true,true]}]
+844x390: [{"blockedTargets":8,"slot":0,"ndc":[-0.032366123814484914,-0.11219147362400185,0.5958713996384857],"handError":4.440892098500626e-16,"release":[-3.1640642351498065,1.4905319582223104,-2.065246709497332],"hand":[-3.1640642351498065,1.4905319582223104,-2.0652467094973317],"heading":0.807400118502775,"bodyYaw":3.948992772092568,"visible":true,"early":[true,true,true]},{"blockedTargets":6,"slot":11,"ndc":[-0.03254264014389591,-0.22673988348897817,0.5936605670730556],"handError":4.965068306494546e-16,"release":[3.518299855882337,1.4905319582223102,-3.907753251110912],"hand":[3.518299855882337,1.4905319582223104,-3.9077532511109125],"heading":2.1909191346050227,"bodyYaw":5.332511788194816,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":1,"ndc":[-0.032384711035519535,-0.1290936226669668,0.5956385983237142],"handError":4.965068306494546e-16,"release":[-1.0081639391638528,1.4905319582223107,-2.018818415549514],"hand":[-1.0081639391638524,1.4905319582223104,-2.018818415549514],"heading":0.6061201046400582,"bodyYaw":3.7477127582298513,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":9,"ndc":[-0.03265807578557343,-0.2773351286986276,0.5922147581969547],"handError":1.0175362097255202e-15,"release":[-3.4829280619212177,1.4905319582223102,-6.551810193878789],"hand":[-3.482928061921218,1.4905319582223104,-6.55181019387879],"heading":-0.795824854972781,"bodyYaw":2.345767798617012,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":3,"ndc":[-0.032496352535871874,-0.20300191573598583,0.5942403103270154],"handError":5.438959822042073e-16,"release":[0.40171883252683727,1.4905319582223102,-1.9527147866576482],"hand":[0.4017188325268375,1.4905319582223104,-1.9527147866576477],"heading":-0.027708569267562228,"bodyYaw":3.113884084322231,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":8,"ndc":[-0.032389900346258306,-0.13343227577320707,0.5955736032198772],"handError":9.930136612989092e-16,"release":[-3.3540676159729563,1.4905319582223104,-4.92197438801592],"hand":[-3.354067615972956,1.4905319582223104,-4.921974388015921],"heading":-0.35580010424110653,"bodyYaw":2.7857925493486864,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":6,"ndc":[-0.03276132998882784,-0.3159173611873412,0.5909215194589449],"handError":4.965068306494546e-16,"release":[-3.582153527196275,1.4905319582223107,-2.090475324793569],"hand":[-3.5821535271962754,1.4905319582223104,-2.090475324793569],"heading":-1.4196896800996868,"bodyYaw":1.7219029734901063,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":10,"ndc":[-0.032433932756255994,-0.16575961321679294,0.5950221058808339],"handError":4.965068306494546e-16,"release":[3.398987272867758,1.4905319582223104,-1.8412358987878348],"hand":[3.3989872728677586,1.4905319582223104,-1.8412358987878346],"heading":0.4543682101927127,"bodyYaw":3.595960863782506,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":2,"ndc":[-0.032308747054799754,-0.0035519507105381625,0.5965900323521556],"handError":3.1401849173675503e-16,"release":[-0.2775273696695505,1.4905319582223104,-1.976554646178708],"hand":[-0.2775273696695503,1.4905319582223104,-1.9765546461787078],"heading":0.35159840840592355,"bodyYaw":3.4931910619957165,"visible":true,"early":[true,true,true]},{"blockedTargets":6,"slot":7,"ndc":[-0.03252609486438119,-0.21854733863720824,0.5938677934688635],"handError":4.440892098500626e-16,"release":[-3.517281670162853,1.4905319582223104,-3.4908897455336496],"hand":[-3.5172816701628533,1.4905319582223104,-3.4908897455336496],"heading":-0.9457885449771346,"bodyYaw":2.1958041086126583,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":5,"ndc":[-0.03230883804887612,0.005704414907188608,0.5965888926691044],"handError":2.220446049250313e-16,"release":[3.2564035963820377,1.4905319582223104,-1.9936530727189314],"hand":[3.2564035963820377,1.4905319582223104,-1.9936530727189312],"heading":-0.5116344533552535,"bodyYaw":2.6299582002345394,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":13,"ndc":[-0.03234001386387435,-0.0828376526587207,0.5961984216725497],"handError":0,"release":[3.2994124495093664,1.4905319582223104,-6.457826967785917],"hand":[3.2994124495093664,1.4905319582223104,-6.457826967785917],"heading":0.15077865797545392,"bodyYaw":3.292371311565247,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":4,"ndc":[-0.032397901729177815,-0.13985980186322847,0.5954733874607788],"handError":3.1401849173675503e-16,"release":[1.0914358496092613,1.4905319582223104,-1.9743061118598586],"hand":[1.0914358496092615,1.4905319582223104,-1.9743061118598584],"heading":-0.3756750523298179,"bodyYaw":2.765917601259975,"visible":true,"early":[true,true,true]},{"blockedTargets":4,"slot":12,"ndc":[-0.03281986632323079,-0.33587495635541254,0.5901883632983034],"handError":4.440892098500626e-16,"release":[3.5725222670411196,1.4905319582223104,-5.1497943861197495],"hand":[3.572522267041119,1.4905319582223104,-5.1497943861197495],"heading":1.256961288666805,"bodyYaw":4.398553942256598,"visible":true,"early":[true,true,true]}]
+{ width: 1100, height: 760 } {"castCount":14,"front":[-3.42,-1.212,-0.40400000000000014,0.4039999999999997,1.2119999999999995,3.4199999999999995],"clearance":true,"initialError":1.1368683772161603e-13,"shots":[{"zone":"left","station":0,"standing":[-3.2399999999999998,0,-2.15],"seat":"N","error":4.440892098500626e-16,"markerError":2.8421709430404007e-13,"visible":true},{"zone":"left","station":1,"standing":[-3.2399999999999998,0,-3.7],"seat":"N","error":0,"markerError":1.7053025658242404e-13,"visible":true},{"zone":"left","station":2,"standing":[-3.2399999999999998,0,-5.25],"seat":"O","error":4.965068306494546e-16,"markerError":5.684341886080802e-14,"visible":true},{"zone":"left","station":3,"standing":[-3.2399999999999998,0,-6.800000000000001],"seat":"O","error":9.930136612989092e-16,"markerError":2.8984570199058825e-13,"visible":true},{"zone":"right","station":0,"standing":[3.2399999999999998,0,-2.15],"seat":"P","error":2.220446049250313e-16,"markerError":1.7053025658242404e-13,"visible":true},{"zone":"right","station":1,"standing":[3.2399999999999998,0,-3.7],"seat":"P","error":4.965068306494546e-16,"markerError":0,"visible":true},{"zone":"right","station":2,"standing":[3.2399999999999998,0,-5.25],"seat":"Q","error":9.155133597044475e-16,"markerError":2.8421709430404007e-13,"visible":true},{"zone":"right","station":3,"standing":[3.2399999999999998,0,-6.800000000000001],"seat":"Q","error":4.965068306494546e-16,"markerError":5.684341886080802e-14,"visible":true}],"transitionError":0,"finalHeight":1.2371,"maxNdc":1.779490182014843,"castNdc":0.7381167548179759,"fov":77.69273590505398}
+cleanup {
+  restored: 8,
+  texturesBefore: 31,
+  texturesAfter: 25,
+  teamPSize: 14,
+  teamPVirtual: false
+}
+{ width: 390, height: 844 } {"castCount":14,"front":[-3.42,-1.212,-0.40400000000000014,0.4039999999999997,1.2119999999999995,3.4199999999999995],"clearance":true,"initialError":0.140625,"shots":[{"zone":"left","station":0,"standing":[-3.2399999999999998,0,-2.15],"seat":"N","error":2.220446049250313e-16,"markerError":0.14062500000022737,"visible":true},{"zone":"left","station":1,"standing":[-3.2399999999999998,0,-3.7],"seat":"N","error":4.965068306494546e-16,"markerError":0.140625,"visible":true},{"zone":"left","station":2,"standing":[-3.2399999999999998,0,-5.25],"seat":"O","error":4.965068306494546e-16,"markerError":0.140625,"visible":true},{"zone":"left","station":3,"standing":[-3.2399999999999998,0,-6.800000000000001],"seat":"O","error":4.440892098500626e-16,"markerError":0.140625,"visible":true},{"zone":"right","station":0,"standing":[3.2399999999999998,0,-2.15],"seat":"P","error":0,"markerError":0.14062499999994316,"visible":true},{"zone":"right","station":1,"standing":[3.2399999999999998,0,-3.7],"seat":"P","error":2.220446049250313e-16,"markerError":0.14062500000005684,"visible":true},{"zone":"right","station":2,"standing":[3.2399999999999998,0,-5.25],"seat":"Q","error":1.0175362097255202e-15,"markerError":0.140625,"visible":true},{"zone":"right","station":3,"standing":[3.2399999999999998,0,-6.800000000000001],"seat":"Q","error":1.0175362097255202e-15,"markerError":0.14062500000005684,"visible":true}],"transitionError":0,"finalHeight":1.2371,"maxNdc":4.868086731323204,"castNdc":0.7381167548179759,"fov":66}
+cleanup {
+  restored: 8,
+  texturesBefore: 11,
+  texturesAfter: 6,
+  teamPSize: 14,
+  teamPVirtual: false
+}
+{ width: 844, height: 390 } {"castCount":14,"front":[-3.42,-1.212,-0.40400000000000014,0.4039999999999997,1.2119999999999995,3.4199999999999995],"clearance":true,"initialError":6.355287432313019e-14,"shots":[{"zone":"left","station":0,"standing":[-3.2399999999999998,0,-2.15],"seat":"N","error":2.220446049250313e-16,"markerError":8.526512829121202e-14,"visible":true},{"zone":"left","station":1,"standing":[-3.2399999999999998,0,-3.7],"seat":"N","error":2.220446049250313e-16,"markerError":2.9673135796061134e-13,"visible":true},{"zone":"left","station":2,"standing":[-3.2399999999999998,0,-5.25],"seat":"O","error":1.0175362097255202e-15,"markerError":1.797546735911271e-13,"visible":true},{"zone":"left","station":3,"standing":[-3.2399999999999998,0,-6.800000000000001],"seat":"O","error":8.881784197001252e-16,"markerError":5.684341886080802e-14,"visible":true},{"zone":"right","station":0,"standing":[3.2399999999999998,0,-2.15],"seat":"P","error":0,"markerError":0,"visible":true},{"zone":"right","station":1,"standing":[3.2399999999999998,0,-3.7],"seat":"P","error":4.440892098500626e-16,"markerError":0,"visible":true},{"zone":"right","station":2,"standing":[3.2399999999999998,0,-5.25],"seat":"Q","error":2.220446049250313e-16,"markerError":1.7288250917028502e-13,"visible":true},{"zone":"right","station":3,"standing":[3.2399999999999998,0,-6.800000000000001],"seat":"Q","error":0,"markerError":1.797546735911271e-13,"visible":true}],"transitionError":0,"finalHeight":1.2371,"maxNdc":1.7794901820148434,"castNdc":0.7381167548179759,"fov":56.701345302682725}
+cleanup {
+  restored: 8,
+  texturesBefore: 31,
+  texturesAfter: 25,
+  teamPSize: 14,
+  teamPVirtual: false
+}
+{ width: 320, height: 568 } {"castCount":14,"front":[-3.42,-1.212,-0.40400000000000014,0.4039999999999997,1.2119999999999995,3.4199999999999995],"clearance":true,"initialError":0.0859375,"shots":[{"zone":"left","station":0,"standing":[-3.2399999999999998,0,-2.15],"seat":"N","error":0,"markerError":0.08593750000005684,"visible":true},{"zone":"left","station":1,"standing":[-3.2399999999999998,0,-3.7],"seat":"N","error":4.965068306494546e-16,"markerError":0.0859375,"visible":true},{"zone":"left","station":2,"standing":[-3.2399999999999998,0,-5.25],"seat":"O","error":9.155133597044475e-16,"markerError":0.08593750000002842,"visible":true},{"zone":"left","station":3,"standing":[-3.2399999999999998,0,-6.800000000000001],"seat":"O","error":0,"markerError":0.0859375,"visible":true},{"zone":"right","station":0,"standing":[3.2399999999999998,0,-2.15],"seat":"P","error":4.440892098500626e-16,"markerError":0.08593749999988631,"visible":true},{"zone":"right","station":1,"standing":[3.2399999999999998,0,-3.7],"seat":"P","error":4.965068306494546e-16,"markerError":0.0859375,"visible":true},{"zone":"right","station":2,"standing":[3.2399999999999998,0,-5.25],"seat":"Q","error":1.0175362097255202e-15,"markerError":0.08593749999994316,"visible":true},{"zone":"right","station":3,"standing":[3.2399999999999998,0,-6.800000000000001],"seat":"Q","error":1.0175362097255202e-15,"markerError":0.0859375,"visible":true}],"transitionError":0,"finalHeight":1.2371,"maxNdc":3.9925845920593246,"castNdc":0.7381167548179759,"fov":66}
+cleanup {
+  restored: 8,
+  texturesBefore: 11,
+  texturesAfter: 6,
+  teamPSize: 14,
+  teamPVirtual: false
+}
+
+Actual pillar and input rejection review:
+{ width: 1100, height: 760 } {"castCount":14,"front":[-3.42,-1.212,-0.40400000000000014,0.4039999999999997,1.2119999999999995,3.4199999999999995],"clearance":true,"initialError":1.1368683772161603e-13,"shots":[{"zone":"left","station":0,"standing":[-3.2399999999999998,0,-2.15],"seat":"N","error":4.440892098500626e-16,"markerError":3.3145124091591355e-13,"visible":true},{"zone":"left","station":1,"standing":[-3.2399999999999998,0,-3.7],"seat":"N","error":0,"markerError":3.410605131648481e-13,"visible":true},{"zone":"left","station":2,"standing":[-3.2399999999999998,0,-5.25],"seat":"O","error":9.155133597044475e-16,"markerError":2.8421709430404007e-13,"visible":true},{"zone":"left","station":3,"standing":[-3.2399999999999998,0,-6.800000000000001],"seat":"O","error":8.881784197001252e-16,"markerError":5.684341886080802e-14,"visible":true},{"zone":"right","station":0,"standing":[3.2399999999999998,0,-2.15],"seat":"P","error":4.965068306494546e-16,"markerError":2.8421709430404007e-13,"visible":true},{"zone":"right","station":1,"standing":[3.2399999999999998,0,-3.7],"seat":"P","error":0,"markerError":0,"visible":true},{"zone":"right","station":2,"standing":[3.2399999999999998,0,-5.25],"seat":"Q","error":8.881784197001252e-16,"markerError":5.684341886080802e-14,"visible":true},{"zone":"right","station":3,"standing":[3.2399999999999998,0,-6.800000000000001],"seat":"Q","error":2.220446049250313e-16,"markerError":2.8984570199058825e-13,"visible":true}],"transitionError":0,"finalHeight":1.2371,"maxNdc":1.779490182014843,"castNdc":0.7381167548179759,"fov":77.69273590505398}
+cleanup {
+  restored: 8,
+  texturesBefore: 29,
+  texturesAfter: 23,
+  teamPSize: 14,
+  teamPVirtual: false
+}
+{ width: 390, height: 844 } {"castCount":14,"front":[-3.42,-1.212,-0.40400000000000014,0.4039999999999997,1.2119999999999995,3.4199999999999995],"clearance":true,"initialError":0.140625,"shots":[{"zone":"left","station":0,"standing":[-3.2399999999999998,0,-2.15],"seat":"N","error":4.965068306494546e-16,"markerError":0.14062500000005684,"visible":true},{"zone":"left","station":1,"standing":[-3.2399999999999998,0,-3.7],"seat":"N","error":4.965068306494546e-16,"markerError":0.14062500000017053,"visible":true},{"zone":"left","station":2,"standing":[-3.2399999999999998,0,-5.25],"seat":"O","error":8.881784197001252e-16,"markerError":0.140625,"visible":true},{"zone":"left","station":3,"standing":[-3.2399999999999998,0,-6.800000000000001],"seat":"O","error":0,"markerError":0.14062500000005684,"visible":true},{"zone":"right","station":0,"standing":[3.2399999999999998,0,-2.15],"seat":"P","error":0,"markerError":0.14062499999994316,"visible":true},{"zone":"right","station":1,"standing":[3.2399999999999998,0,-3.7],"seat":"P","error":4.965068306494546e-16,"markerError":0.14062500000005684,"visible":true},{"zone":"right","station":2,"standing":[3.2399999999999998,0,-5.25],"seat":"Q","error":4.440892098500626e-16,"markerError":0.14062499999994316,"visible":true},{"zone":"right","station":3,"standing":[3.2399999999999998,0,-6.800000000000001],"seat":"Q","error":4.440892098500626e-16,"markerError":0.140625,"visible":true}],"transitionError":0,"finalHeight":1.2371,"maxNdc":4.868086731323204,"castNdc":0.7381167548179759,"fov":66}
+cleanup {
+  restored: 8,
+  texturesBefore: 11,
+  texturesAfter: 6,
+  teamPSize: 14,
+  teamPVirtual: false
+}
+{ width: 844, height: 390 } {"castCount":14,"front":[-3.42,-1.212,-0.40400000000000014,0.4039999999999997,1.2119999999999995,3.4199999999999995],"clearance":true,"initialError":5.684341886080802e-14,"shots":[{"zone":"left","station":0,"standing":[-3.2399999999999998,0,-2.15],"seat":"N","error":4.965068306494546e-16,"markerError":0,"visible":true},{"zone":"left","station":1,"standing":[-3.2399999999999998,0,-3.7],"seat":"N","error":4.965068306494546e-16,"markerError":8.526512829121202e-14,"visible":true},{"zone":"left","station":2,"standing":[-3.2399999999999998,0,-5.25],"seat":"O","error":2.220446049250313e-16,"markerError":5.684341886080802e-14,"visible":true},{"zone":"left","station":3,"standing":[-3.2399999999999998,0,-6.800000000000001],"seat":"O","error":4.440892098500626e-16,"markerError":2.8421709430404007e-13,"visible":true},{"zone":"right","station":0,"standing":[3.2399999999999998,0,-2.15],"seat":"P","error":4.965068306494546e-16,"markerError":1.7053025658242404e-13,"visible":true},{"zone":"right","station":1,"standing":[3.2399999999999998,0,-3.7],"seat":"P","error":2.220446049250313e-16,"markerError":4.3290658060549894e-13,"visible":true},{"zone":"right","station":2,"standing":[3.2399999999999998,0,-5.25],"seat":"Q","error":0,"markerError":5.684341886080802e-14,"visible":true},{"zone":"right","station":3,"standing":[3.2399999999999998,0,-6.800000000000001],"seat":"Q","error":9.155133597044475e-16,"markerError":1.797546735911271e-13,"visible":true}],"transitionError":0,"finalHeight":1.2371,"maxNdc":1.7794901820148434,"castNdc":0.7381167548179759,"fov":56.701345302682725}
+cleanup {
+  restored: 8,
+  texturesBefore: 31,
+  texturesAfter: 25,
+  teamPSize: 14,
+  teamPVirtual: false
+}
+{ width: 320, height: 568 } {"castCount":14,"front":[-3.42,-1.212,-0.40400000000000014,0.4039999999999997,1.2119999999999995,3.4199999999999995],"clearance":true,"initialError":0.0859375,"shots":[{"zone":"left","station":0,"standing":[-3.2399999999999998,0,-2.15],"seat":"N","error":2.220446049250313e-16,"markerError":0.0859375,"visible":true},{"zone":"left","station":1,"standing":[-3.2399999999999998,0,-3.7],"seat":"N","error":4.440892098500626e-16,"markerError":0.08593750000005684,"visible":true},{"zone":"left","station":2,"standing":[-3.2399999999999998,0,-5.25],"seat":"O","error":9.930136612989092e-16,"markerError":0.0859375,"visible":true},{"zone":"left","station":3,"standing":[-3.2399999999999998,0,-6.800000000000001],"seat":"O","error":2.220446049250313e-16,"markerError":0.0859375,"visible":true},{"zone":"right","station":0,"standing":[3.2399999999999998,0,-2.15],"seat":"P","error":2.220446049250313e-16,"markerError":0.0859375,"visible":true},{"zone":"right","station":1,"standing":[3.2399999999999998,0,-3.7],"seat":"P","error":4.440892098500626e-16,"markerError":0.08593750000005684,"visible":true},{"zone":"right","station":2,"standing":[3.2399999999999998,0,-5.25],"seat":"Q","error":9.155133597044475e-16,"markerError":0.0859375,"visible":true},{"zone":"right","station":3,"standing":[3.2399999999999998,0,-6.800000000000001],"seat":"Q","error":9.930136612989092e-16,"markerError":0.0859375,"visible":true}],"transitionError":0,"finalHeight":1.2371,"maxNdc":3.9925845920593246,"castNdc":0.7381167548179759,"fov":66}
+cleanup {
+  restored: 8,
+  texturesBefore: 11,
+  texturesAfter: 6,
+  teamPSize: 14,
+  teamPVirtual: false
+}
+
+Complete thirty-throw real-physics run:
+{
+  "attempts": 30,
+  "hits": 30,
+  "cleared": true,
+  "shots": [
+    {
+      "throw": 1,
+      "slot": 0,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 2,
+      "slot": 13,
+      "zone": "right",
+      "phase": "play"
+    },
+    {
+      "throw": 3,
+      "slot": 1,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 4,
+      "slot": 2,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 5,
+      "slot": 3,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 6,
+      "slot": 8,
+      "zone": "left",
+      "phase": "play"
+    },
+    {
+      "throw": 7,
+      "slot": 7,
+      "zone": "left",
+      "phase": "play"
+    },
+    {
+      "throw": 8,
+      "slot": 11,
+      "zone": "right",
+      "phase": "play"
+    },
+    {
+      "throw": 9,
+      "slot": 12,
+      "zone": "right",
+      "phase": "play"
+    },
+    {
+      "throw": 10,
+      "slot": 9,
+      "zone": "left",
+      "phase": "play"
+    },
+    {
+      "throw": 11,
+      "slot": 6,
+      "zone": "left",
+      "phase": "play"
+    },
+    {
+      "throw": 12,
+      "slot": 4,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 13,
+      "slot": 10,
+      "zone": "right",
+      "phase": "play"
+    },
+    {
+      "throw": 14,
+      "slot": 5,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 15,
+      "slot": 0,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 16,
+      "slot": 13,
+      "zone": "right",
+      "phase": "play"
+    },
+    {
+      "throw": 17,
+      "slot": 1,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 18,
+      "slot": 2,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 19,
+      "slot": 3,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 20,
+      "slot": 8,
+      "zone": "left",
+      "phase": "play"
+    },
+    {
+      "throw": 21,
+      "slot": 7,
+      "zone": "left",
+      "phase": "play"
+    },
+    {
+      "throw": 22,
+      "slot": 11,
+      "zone": "right",
+      "phase": "play"
+    },
+    {
+      "throw": 23,
+      "slot": 12,
+      "zone": "right",
+      "phase": "play"
+    },
+    {
+      "throw": 24,
+      "slot": 9,
+      "zone": "left",
+      "phase": "play"
+    },
+    {
+      "throw": 25,
+      "slot": 6,
+      "zone": "left",
+      "phase": "play"
+    },
+    {
+      "throw": 26,
+      "slot": 4,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 27,
+      "slot": 10,
+      "zone": "right",
+      "phase": "play"
+    },
+    {
+      "throw": 28,
+      "slot": 5,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 29,
+      "slot": 0,
+      "zone": "front",
+      "phase": "play"
+    },
+    {
+      "throw": 30,
+      "slot": 13,
+      "zone": "right",
+      "phase": "resultWait"
+    }
+  ],
+  "summaries": [
+    "第一輪：命中 10/10（十投門檻 4 中） · 過關",
+    "挑戰輪：命中 10/10（十投門檻 6 中） · 過關",
+    "決勝輪：命中 10/10（十投門檻 10 中） · 過關"
+  ]
+}

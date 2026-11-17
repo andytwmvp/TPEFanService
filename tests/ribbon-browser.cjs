@@ -50,10 +50,10 @@ const root=path.resolve(__dirname,'..');
   for(let i=0;i<960 && !f.resolved;i++)t.ribbonPhysicsStep(f,1/120,performance.now());
   check(f.resolved && r.attempts===1,'actual throw resolves exactly once');
   const attempts=r.attempts;t.ribbonTick(f.removeAt+1);check(r.attempts===attempts,'no duplicate scoring');
-  // Eight distinct roster slots and challenge continuation, using the same physics.
+  // Fourteen distinct station slots; ten-throw rounds use the same real physics.
   t.finishRibbonGame();t.startGame('ribbon');
   const seen=[];
-  for(let round=0;round<9;round++) {
+  for(let round=0;round<14;round++) {
     await t.ribbonStartPlay(performance.now());
     check(r.phase==='play','round '+round+' has reachable target');seen.push(r.slot);
     t.ribbonLaunch(r.window.mid,0,performance.now());
@@ -62,12 +62,30 @@ const root=path.resolve(__dirname,'..');
     check(r.hits===round+1,'round '+round+' scores once');
     r.settled.push(shot);r.flight=null;
   }
-  check(new Set(seen.slice(0,8)).size===8 && seen[8]===0,'eight-member rotation repeats in challenge');
-  check(r.phase==='play','all eight hits enter challenge');
-  await t.ribbonStartPlay(performance.now());t.ribbonLaunch(0,0,performance.now());
-  for(let k=0;k<960 && !r.flight.resolved;k++)t.ribbonPhysicsStep(r.flight,1/120,performance.now());
-  check(r.phase==='resultWait' && r.attempts===10,'challenge miss ends after recording last throw');
+  check(new Set(seen).size===14 && seen[0]===0,'fourteen distinct stand-ins rotate independently of ten-throw rounds');
+  check(r.phase==='play','fourteen hits continue into the second ten-throw round');
+  for(let miss=0;miss<6;miss++){await t.ribbonStartPlay(performance.now());t.ribbonLaunch(r.window.mid,0,performance.now());t.ribbonOutcome(null,performance.now());if(miss<5){r.settled.push(r.flight);r.flight=null;}}
+  check(r.phase==='resultWait' && r.attempts===20,'challenge completes ten throws and fails with four hits');
   t.ribbonTick(r.nextAt+1);check(r.phase==='result','challenge transitions to result');
+  async function rulesCase(pattern,expectedCount,cleared,label) {
+    t.closeRibbonSummary();t.startGame('ribbon');await t.ribbonStartPlay(performance.now());
+    for(let n=0;n<pattern.length;n++) {
+      t.ribbonLaunch(r.window.mid,0,performance.now());const flight=r.flight;
+      t.ribbonOutcome(pattern[n]?{seat:r.target,distance:.1}:null,performance.now());
+      t.ribbonOutcome(null,performance.now());check(r.attempts===n+1,'one settlement per throw '+label+' '+n);
+      if(r.phase==='resultWait')break;
+      check(n%10!==9 || ribbonDots.children.length===10,'ten progress dots');
+      r.settled.push(flight);r.flight=null;
+    }
+    check(r.attempts===expectedCount && r.phase==='resultWait' && r.cleared===cleared,label);
+    t.ribbonTick(r.nextAt+1);check(r.phase==='result',label+' result');
+    check(document.getElementById('ribbonRoundResults').children.length===3,'all three round summaries');
+  }
+  const round=n=>Array.from({length:10},(_,i)=>i<n);
+  await rulesCase(round(3),10,false,'first round 3 of 10 fails');
+  await rulesCase([...round(4),...round(5)],20,false,'first round 4 passes; challenge 5 fails');
+  await rulesCase([...round(4),...round(6),...round(9)],30,false,'challenge 6 passes; final 9 fails');
+  await rulesCase([...round(4),...round(6),...round(10)],30,true,'exact thresholds 4 / 6 / 10 clear all rounds');
   // Long challenge: preserve 64 full ribbons; warm them to sleep, then require no physics changes.
   t.finishRibbonGame();
   const base=r.settled[0];check(!!base,'result keeps ribbon');
@@ -96,14 +114,14 @@ const root=path.resolve(__dirname,'..');
   t.finishRibbonGame();hidden=true;document.dispatchEvent(new Event('visibilitychange'));const resultTime=r.settled[0].time;t.ribbonTick(performance.now()+5000);check(r.settled[0].time===resultTime,'result background frozen');hidden=false;document.dispatchEvent(new Event('visibilitychange'));
   t.closeRibbonSummary();t.setMode('seat');t.setMode('over');t.setMode('game');t.startGame();check(t.G2.phase==='countdown' && !r.active,'original modes and fan game still start');
   t.startGame('ribbon');
-  for(let i=0;i<8;i++) {
+  for(let i=0;i<10;i++) {
     await t.ribbonStartPlay(performance.now());check(r.phase==='play','first lap failure test target '+i);
     t.ribbonLaunch(r.window.mid,0,performance.now());
-    t.ribbonOutcome(i===0?null:{seat:r.target,distance:.1},performance.now());
-    check(r.attempts===i+1 && (i===7?r.phase==='resultWait':r.phase==='play'),'first-lap miss completes all eight throws '+i);
+    t.ribbonOutcome(i<3?{seat:r.target,distance:.1}:null,performance.now());
+    check(r.attempts===i+1 && (i===9?r.phase==='resultWait':r.phase==='play'),'first-lap misses still complete all ten throws '+i);
     r.settled.push(r.flight);r.flight=null;
   }
-  t.ribbonTick(r.nextAt+1);check(r.phase==='result' && r.hits===7,'first lap with one miss ends at eight');t.closeRibbonSummary();
+  t.ribbonTick(r.nextAt+1);check(r.phase==='result' && r.hits===3,'first lap below four hits ends after ten');t.closeRibbonSummary();
   t.startGame('ribbon');await t.ribbonStartPlay(performance.now());t.ribbonLaunch(r.window.mid,0,performance.now());
   t.onAudienceChanged();check(!r.active && r.phase==='idle' && !r.flight && !r.settled.length && !r.world && ribbonTargetMark.hidden,'settings change disposes flight and cancels session');
   t.startGame('ribbon');await t.ribbonStartPlay(performance.now());t.finishRibbonGame();document.getElementById('gMember').value='2';t.startGame('ribbon');check(r.roster[0]===2 && document.getElementById('startPanel').hidden,'replay after result preserves newly selected member and hides menu');t.finishRibbonGame();t.closeRibbonSummary();
