@@ -4,18 +4,18 @@
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.RibbonRecords=factory();})(typeof window==='undefined'?globalThis:window,function(){
   'use strict';
   var titles=[
-    ['first','第一條彩帶','累計送達 1 條彩帶'],['six','送達六條','單次挑戰命中 6 次'],['eight','八人全中','單次挑戰連續命中 8 次'],
+    ['first','第一條彩帶','累計送達 1 條彩帶'],['six','送達六條','單次挑戰命中 6 次'],['eight','前八投全中','單次挑戰連續命中 8 次'],
     ['sixteen','兩輪全中','單次挑戰連續命中 16 次'],['twentyfour','三輪全中','單次挑戰連續命中 24 次'],
     ['perfect3','完美三投','單次挑戰完美接取 3 次'],['row4','第四排完美','D 排完美接取'],['member','一人全排','同一位成員完成四排可達記錄'],
     ['total50','累計五十條','累計送達 50 條彩帶'],['perfect30','累計三十次完美','累計完美接取 30 次'],
-    ['grid','實績全收集','當次八位成員的可達格全部命中'],['allperfect','全格完美','當次八位成員的可達格全部完美']
+    ['grid','實績全收集','當次成員的可達格全部命中'],['allperfect','全格完美','當次成員的可達格全部完美']
   ];
   function count(v){return Number.isSafeInteger(v)&&v>=0?Math.min(v,1000000000):0;}
   function create(storage){
     var key='TPEFanService.ribbon.v1',data={version:1,plays:0,hits:0,perfects:0,bestHit:0,bestPerfect:0,grid:{},available:{},titles:[]},warning='';
     try {var saved=JSON.parse(storage.getItem(key)||'null');if(saved&&saved.version===1){
       ['plays','hits','perfects','bestHit','bestPerfect'].forEach(function(k){data[k]=count(saved[k]);});
-      ['grid','available'].forEach(function(k){if(saved[k]&&typeof saved[k]==='object')Object.keys(saved[k]).slice(0,10000).forEach(function(id){if(/^\d+:\d+:[ABCD]$/.test(id)){var v=saved[k][id];if(k==='grid'&&(v===1||v===2)||k==='available'&&typeof v==='boolean')data[k][id]=v;}});});
+      ['grid','available'].forEach(function(k){if(saved[k]&&typeof saved[k]==='object')Object.keys(saved[k]).slice(0,10000).forEach(function(id){if(/^\d+:\d+:[ABCDNOPQ]$/.test(id)){var v=saved[k][id];if(k==='grid'&&(v===1||v===2)||k==='available'&&typeof v==='boolean')data[k][id]=v;}});});
       data.titles=titles.filter(function(t){return Array.isArray(saved.titles)&&saved.titles.includes(t[0]);}).map(function(t){return t[0];});
     }}catch(error){warning='無法讀取既有實績，先以本次使用的記錄顯示。';}
     function save(){try{storage.setItem(key,JSON.stringify(data));}catch(error){warning='瀏覽器未允許儲存，實績暫時只保留在本次使用。';}}
@@ -25,7 +25,7 @@
     function totals(){if(data.hits>=1)grant('first');if(data.hits>=50)grant('total50');if(data.perfects>=30)grant('perfect30');}
     function hit(team,member,row,perfect){
       data.hits++;if(perfect)data.perfects++;
-      if(/^[ABCD]$/.test(row)){var cell=id(team,member,row);data.grid[cell]=Math.max(get(team,member,row),perfect?2:1);data.available[cell]=true;}
+      if(/^[ABCDNOPQ]$/.test(row)){var cell=id(team,member,row);data.grid[cell]=Math.max(get(team,member,row),perfect?2:1);data.available[cell]=true;}
       totals();save();
     }
     function available(team,member,row){var cell=id(team,member,row);return Object.prototype.hasOwnProperty.call(data.available,cell)?data.available[cell]:null;}
