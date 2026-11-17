@@ -39,9 +39,9 @@
       if(known===roster.length*4&&cells>0){if(got===cells)grant('grid');if(pf===cells)grant('allperfect');}
       return {known:known,cells:cells,got:got,perfect:pf,total:roster.length*4};
     }
-    function finish(results,team,roster){
+    function finish(results,team,roster,countPlay){
       var before=data.titles.slice(),hits=results.filter(function(r){return r.ok;}).length,perfect=results.filter(function(r){return r.perfect;}).length;
-      if(results.length)data.plays++;
+      if(results.length&&countPlay!==false)data.plays++;
       if(hits>data.bestHit||hits===data.bestHit&&perfect>data.bestPerfect){data.bestHit=hits;data.bestPerfect=perfect;}
       if(hits>=6)grant('six');if(hits>=8&&results.slice(0,8).every(function(r){return r.ok;}))grant('eight');
       if(hits>=16)grant('sixteen');if(hits>=24)grant('twentyfour');if(perfect>=3)grant('perfect3');if(results.some(function(r){return r.perfect&&r.row==='D';}))grant('row4');
