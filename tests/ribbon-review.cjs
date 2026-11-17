@@ -6,8 +6,8 @@ const root=path.resolve(__dirname,'..');
   const page=await browser.newPage({viewport:{width:1100,height:760}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   let html=process.argv.includes('--baseline')?execFileSync('git',['show','HEAD:index.html'],{cwd:root,encoding:'utf8',maxBuffer:8*1024*1024}):fs.readFileSync(path.join(root,'index.html'),'utf8');
   html=html.replaceAll('requestAnimationFrame(frame);','').replace('})();\n</script>','window.reviewRibbon={RIBBON,S,camera,seats,performers,startGame,ribbonStartPlay,ribbonLaunch,ribbonCatchAt,ribbonStepRoll,ribbonTick,ribbonTickSettled,ribbonDrawPreview,ribbonUpdateMarker,ribbonFaceTarget,resize,updateCamera,headWorld,finishRibbonGame,closeRibbonSummary};\n})();\n</script>');
-  await page.route('**/TPEFanService/',r=>r.fulfill({body:html,contentType:'text/html'}));await page.route('**/ribbon-world.js',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-world.js')),contentType:'application/javascript'}));await page.route('**/three.min.js',r=>r.fulfill({body:fs.readFileSync(require.resolve('three/build/three.min.js')),contentType:'application/javascript'}));
-  await page.route('**/ribbon-records.js',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-records.js')),contentType:'application/javascript'}));
+  await page.route('**/TPEFanService/',r=>r.fulfill({body:html,contentType:'text/html'}));await page.route('**/ribbon-world.js*',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-world.js')),contentType:'application/javascript'}));await page.route('**/three.min.js',r=>r.fulfill({body:fs.readFileSync(require.resolve('three/build/three.min.js')),contentType:'application/javascript'}));
+  await page.route('**/ribbon-records.js*',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-records.js')),contentType:'application/javascript'}));
  await page.goto('http://ribbon.test/TPEFanService/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.reviewRibbon);
   const fixture=JSON.parse(fs.readFileSync(path.join(__dirname,'reference-roll-fixtures.json'),'utf8'));
   const cases=await page.evaluate(async fixture=>{

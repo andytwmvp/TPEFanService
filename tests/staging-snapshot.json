@@ -1,9 +1,9 @@
 {
-  "sourceBase": "f21f99625138c3bb93d383c92f2b7d3a2e202ce6",
+  "sourceBase": "94fae1272f973d0ea5a68d93bbe48703e1f82e06",
   "uncommitted": true,
   "files": {
-    "index.html": "9b840daa73b396631400eb6c0c7c0daed76b85ee541b06a26364366dce4f6cc5",
-    "ribbon-world.js": "e91dbf4e7bdf5f7f6f503d8dcda9c0e7b6ae4e95e9448a5cc29804fb9e506b5c",
+    "index.html": "efd36996b2dde14a113f8f81d3f903c5c17e0c925300e97627fedf1dadb4dcb7",
+    "ribbon-world.js": "2f3153fee34e98a53328abf301b2c25983a1ec952c48abd3a2dc33b6755445f5",
     "ribbon-records.js": "cdaa9a1099b669b37d805873f01d959055587ca65ab96061e5fe0a4dbd69e550",
     "preview.jpg": "8d1e7f1ae554355d9abf798a993b389a7a4d81c31679c19c980900bd31086b70"
   }

@@ -1,5 +1,5 @@
 // Unmodified page and normal RAF. RIBBON_VERIFY_ZONES=1 covers front, left and right.
-const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 async function swipe(page,mobile,power){
  const box=await page.locator('#gl').boundingBox(),speed=.5+6.5*Math.pow(power/1.35,4/3),travel=Math.max(.08,.025*speed),duration=travel/speed,x=box.x+box.width*.5,y=box.y+box.height*.85,end=y-box.height*travel,cdp=await page.context().newCDPSession(page),time=Date.now()/1000;
  try{if(mobile){await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}],timestamp:time});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:end,id:1}],timestamp:time+duration*.75});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[],timestamp:time+duration});}else{await cdp.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1,timestamp:time});await cdp.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y:end,button:'left',buttons:1,timestamp:time+duration*.75});await cdp.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y:end,button:'left',buttons:0,clickCount:1,timestamp:time+duration});}}finally{await cdp.detach();}
@@ -9,8 +9,8 @@ async function swipe(page,mobile,power){
  try{for(const mobile of [false,true]){
   const page=await browser.newPage({viewport:mobile?{width:390,height:844}:{width:1100,height:760},hasTouch:mobile,isMobile:mobile,deviceScaleFactor:.5}),errors=[],zones=new Set();let previousWho=null,hits=0;
   page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error'&&!m.text().startsWith('Failed to load resource:'))errors.push(m.text());});
-  await page.goto(process.argv[2]||'https://andytwmvp.github.io/TPEFanService/',{waitUntil:'domcontentloaded',timeout:90000});
-  assert(await page.evaluate(()=>['testRibbon','uiTest','reviewRibbon','ribbonVisibility','sideTest','fullRun'].every(k=>typeof window[k]==='undefined')),'no application test hooks');
+  const response=await page.goto(process.argv[2]||'https://andytwmvp.github.io/TPEFanService/',{waitUntil:'domcontentloaded',timeout:90000});
+  const htmlSha=crypto.createHash('sha256').update(await response.body()).digest('hex');if(process.env.RIBBON_EXPECT_SHA)assert.equal(htmlSha,process.env.RIBBON_EXPECT_SHA,'normal URL must serve expected deployment');console.log('document',htmlSha);assert(await page.evaluate(()=>['testRibbon','uiTest','reviewRibbon','ribbonVisibility','sideTest','fullRun','dropTest'].every(k=>typeof window[k]==='undefined')),'no application test hooks');
   await page.locator('#gStart').click();await page.locator('#ribbonStart').click();console.log('loaded',mobile);
   const maxThrows=process.env.RIBBON_VERIFY_ZONES?14:1;
   for(let shot=0;shot<maxThrows;shot++){
@@ -24,7 +24,7 @@ async function swipe(page,mobile,power){
   }
   if(process.env.RIBBON_VERIFY_ZONES)assert.equal(zones.size,3,'all zones receive native input');
   await page.locator('#ribbonStop').click();await page.locator('#ribbonSummary').waitFor({state:'visible',timeout:300000});await page.locator('#ribbonPhoto').waitFor({state:'visible',timeout:30000});assert(await page.locator('#ribbonPhoto').evaluate(e=>e.naturalWidth===1200&&e.naturalHeight===920));assert.equal(await page.locator('#ribbonRoundResults > p').count(),3);
-  if(process.env.RIBBON_ARTIFACT_DIR)await page.screenshot({path:path.join(process.env.RIBBON_ARTIFACT_DIR,(mobile?'mobile':'desktop')+'-live-result.png'),timeout:90000});
+  if(process.env.RIBBON_ARTIFACT_DIR){await page.screenshot({path:path.join(process.env.RIBBON_ARTIFACT_DIR,(mobile?'mobile':'desktop')+'-live-result.png'),timeout:90000});const photo=await page.locator('#ribbonPhoto').evaluate(e=>e.src);assert(photo.startsWith('data:image/png;base64,'));fs.writeFileSync(path.join(process.env.RIBBON_ARTIFACT_DIR,(mobile?'mobile':'desktop')+'-export.png'),Buffer.from(photo.split(',')[1],'base64'));}
   await page.locator('#ribbonClose').click();assert(await page.locator('#startPanel').isVisible());assert.deepEqual(errors,[]);console.log(JSON.stringify({mobile,url:page.url(),hits,zones:[...zones],photo:'1200x920',normalRAF:true,testHooks:false,devicePixelRatio:.5,errors}));await page.close();
  }}finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1)});

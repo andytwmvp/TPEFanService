@@ -8,3 +8,15 @@ console.log('rotated obstacle bounds: no invisible AABB corners; actual oriented
 
 assert(world.blocked(new THREE.Vector3(1,1,1),new THREE.Vector3(3,1,-1)),'pillar blocks sight and catch across its solid volume');
 assert(!world.blocked(new THREE.Vector3(-2,1,3),new THREE.Vector3(-2,1,-3)),'unobstructed direction remains usable');
+
+const actor=new THREE.Group();actor.position.set(-3,1,0);actor.add(new THREE.Mesh(new THREE.BoxGeometry(.4,1.5,.3),new THREE.MeshBasicMaterial()));scene.add(actor);world.setActors([{i:7,g:actor}]);
+assert(world.blocked(new THREE.Vector3(-3,1,-1),new THREE.Vector3(-3,1,1),0),'standing member blocks target sight');
+assert(!world.blocked(new THREE.Vector3(-3,1,-1),new THREE.Vector3(-3,1,1),7),'own hidden model excluded');
+let bodyPoint=new THREE.Vector3(-3,1,0),bodyVelocity=new THREE.Vector3(0,0,4);assert.equal(world.collide(bodyPoint,bodyVelocity,.03,0).actor,7,'standing member physically collides');
+assert(!world.collide(new THREE.Vector3(-3,1,0),null,.03,7).hit,'own model cannot obstruct release');
+const snapshot=world.snapshotActors(),revision=world.actorRevision();world.setActors([{i:7,g:actor}]);assert.equal(world.actorRevision(),revision,'unchanged poses keep cache revision');actor.position.x=-5;world.setActors([{i:7,g:actor}]);assert(!world.blocked(new THREE.Vector3(-3,1,-1),new THREE.Vector3(-3,1,1),0),'old body location removed');assert(world.blocked(new THREE.Vector3(-3,1,-1),new THREE.Vector3(-3,1,1),0,snapshot),'asynchronous search retains immutable pose snapshot');world.setActors([]);assert.equal(world.actorBounds().length,0);
+console.log('member sight / physical collision / self exclusion / pose update / stable snapshot / cleanup passed');
+
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),appRoot=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(appRoot,'index.html'),'utf8');
+for(const name of ['ribbon-world.js','ribbon-records.js']){const digest=crypto.createHash('sha256').update(fs.readFileSync(path.join(appRoot,name))).digest('hex').slice(0,12);assert(html.includes('./'+name+'?v='+digest),'deployment must version runtime assets by their content');}
+console.log('runtime asset versions match content hashes');

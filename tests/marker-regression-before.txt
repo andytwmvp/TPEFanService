@@ -8,3 +8,15 @@ AssertionError [ERR_ASSERTION]: ring center matches true projected catch point
   operator: '==',
   diff: 'simple'
 }
+
+Rechecked with current regression harness against f21f996:
+{ width: 1100, height: 760 } {"initialError":51.45509311897001,"missingSideStations":true}
+AssertionError [ERR_ASSERTION]: ring center matches true projected catch point
+    at /workspace/TPEFanService-ribbon/tests/ribbon-side.cjs:14:2040 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

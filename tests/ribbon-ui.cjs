@@ -5,9 +5,9 @@ const root=path.resolve(__dirname,'..');
  for(const mobile of [false,true]) {
  const page=await browser.newPage({viewport:mobile?{width:390,height:844}:{width:1100,height:760},hasTouch:mobile,isMobile:mobile,deviceScaleFactor:1});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const html=fs.readFileSync(path.join(root,'index.html'),'utf8').replaceAll('requestAnimationFrame(frame);','').replace('})();\n</script>','window.uiTest={S,setMode,G2,RIBBON,startGame,ribbonStartPlay,ribbonPhysicsStep,ribbonTick,finishRibbonGame,closeRibbonSummary,renderer,scene,camera,ribbonRenderFrame,placePerformers,updateFx,placeMoods,updateCamera};\n})();\n</script>');
- await page.route('**/TPEFanService/',r=>r.fulfill({body:html,contentType:'text/html'}));await page.route('**/ribbon-world.js',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-world.js')),contentType:'application/javascript'}));
+ await page.route('**/TPEFanService/',r=>r.fulfill({body:html,contentType:'text/html'}));await page.route('**/ribbon-world.js*',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-world.js')),contentType:'application/javascript'}));
  const three=process.env.THREE_PATH||require.resolve('three/build/three.min.js');await page.route('**/three.min.js',r=>r.fulfill({body:fs.readFileSync(three),contentType:'application/javascript'}));
- await page.route('**/ribbon-records.js',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-records.js')),contentType:'application/javascript'}));
+ await page.route('**/ribbon-records.js*',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-records.js')),contentType:'application/javascript'}));
  await page.goto('http://ribbon.test/TPEFanService/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.uiTest);
  assert.equal(await page.locator('#ribbonStart').isVisible(),false);
  await page.locator('#gStart').click();assert(await page.locator('#gamePicker').isVisible());
