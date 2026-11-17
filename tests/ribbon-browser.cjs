@@ -83,10 +83,10 @@ const root=path.resolve(__dirname,'..');
     check(document.getElementById('ribbonRoundResults').children.length===Math.ceil(expectedCount/10),'only played round summaries');
   }
   const round=n=>Array.from({length:10},(_,i)=>i<n);
-  await rulesCase(round(5),10,false,'first round 5 of 10 fails');
-  await rulesCase([...round(6),...round(7)],20,false,'first round 6 passes; challenge 7 fails');
-  await rulesCase([...round(6),...round(8),...round(0)],30,true,'challenge 8 passes; final has no hit threshold');
-  await rulesCase([...round(6),...round(8),...round(10)],30,true,'six and eight qualify; final completes ten throws');
+  await rulesCase(round(4),10,false,'first round 4 of 10 fails');
+  await rulesCase([...round(5),...round(6)],20,false,'first round 5 passes; challenge 6 fails');
+  await rulesCase([...round(5),...round(7),...round(0)],30,true,'challenge 7 passes; final has no hit threshold');
+  await rulesCase([...round(5),...round(7),...round(10)],30,true,'five and seven qualify; final completes ten throws');
   // Long challenge: preserve 64 full ribbons; warm them to sleep, then require no physics changes.
   t.finishRibbonGame();
   const base=r.settled[0];check(!!base,'result keeps ribbon');
@@ -122,7 +122,7 @@ const root=path.resolve(__dirname,'..');
     check(r.attempts===i+1 && (i===9?r.phase==='resultWait':r.phase==='play'),'first-lap misses still complete all ten throws '+i);
     r.settled.push(r.flight);r.flight=null;
   }
-  t.ribbonTick(r.nextAt+1);for(let n=0;n<40&&r.phase==='resultWait';n++)t.ribbonTick(r.lastFrame+50);check(r.phase==='result' && r.hits===3,'first lap below six hits ends after ten');t.closeRibbonSummary();
+  t.ribbonTick(r.nextAt+1);for(let n=0;n<40&&r.phase==='resultWait';n++)t.ribbonTick(r.lastFrame+50);check(r.phase==='result' && r.hits===3,'first lap below five hits ends after ten');t.closeRibbonSummary();
   t.startGame('ribbon');await t.ribbonStartPlay(performance.now());t.ribbonLaunch(r.window.mid,0,performance.now());
   t.onAudienceChanged();check(!r.active && r.phase==='idle' && !r.flight && !r.settled.length && !r.world && ribbonTargetMark.hidden,'settings change disposes flight and cancels session');
   t.startGame('ribbon');await t.ribbonStartPlay(performance.now());t.finishRibbonGame();document.getElementById('gMember').value='2';t.startGame('ribbon');check(r.roster[0]===2 && document.getElementById('startPanel').hidden,'replay after result preserves newly selected member and hides menu');t.finishRibbonGame();t.closeRibbonSummary();

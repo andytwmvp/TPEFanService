@@ -1836,7 +1836,7 @@ details.members tr.tbd td {
     <div class="ribbon-meter" role="meter" aria-label="彩帶投擲力度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="ribbonPowerFill"></i><b id="ribbonPowerBand" hidden></b><b id="ribbonPerfectBand" hidden></b><span>力度</span></div>
     <div class="ribbon-stats"><span>投出 <b id="ribbonAttempt">0</b></span><span>命中 <b id="ribbonHits">0</b></span><span>完美 <b id="ribbonPerfect">0</b> ★</span><span>連擊 <b id="ribbonCombo">0</b></span></div>
     <div id="ribbonDots" class="ribbon-dots" aria-label="本輪十投進度"></div>
-    <p id="ribbonHint">向上快速滑動投出彩帶；左右微偏調整方向。每輪十投後合照；第一輪六中、挑戰輪八中可晉級，決勝輪不設門檻。</p>
+    <p id="ribbonHint">向上快速滑動投出彩帶；左右微偏調整方向。每輪十投後合照；第一輪五中、挑戰輪七中可晉級，決勝輪不設門檻。</p>
   </div>
   <div id="ribbonTargetMark" hidden aria-hidden="true"><i></i><span>目標粉絲</span></div>
   <div id="ribbonFinaleNote" class="chip" role="status" hidden>彩帶正在集合，準備拍攝成果合照…</div>
@@ -5317,7 +5317,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   var ribbonProject = new THREE.Vector3(), ribbonHead = new THREE.Vector3();
   var RIBBON_MAX = 200, RIBBON_SEGMENT = 0.12, RIBBON_DT = 1 / 120;
   var RIBBON_PHYSICS = { g: 9.8, air: 1.2, tapeLen: 30, rollMass: 0.025, rollCdA: 0.0013, pullForce: 0.02, liftA: 0.005, dragN: 11, dragT: 0.4, flutter: 0.45, inherit: 0.08, rollR: 0.03, vMin: 2, vMax: 9.4, elev0: 6, elev1: 32, yawGain: 0.25, yawDead: 2, tiltGain: 1.2, wildFrom: 50, reachR: 0.36, reachUp: 0.45, perfect: 0.3 };
-  var RIBBON_ROUNDS=[{name:"第一輪",hits:6},{name:"挑戰輪",hits:8},{name:"決勝輪",hits:null}],RIBBON_ROUND_SIZE=10;
+  var RIBBON_ROUNDS=[{name:"第一輪",hits:5},{name:"挑戰輪",hits:7},{name:"決勝輪",hits:null}],RIBBON_ROUND_SIZE=10;
   function ribbonPrepareThrower() {
     var slot = RIBBON.order[RIBBON.attempts % RIBBON.order.length];
     RIBBON.slot = slot;
@@ -5399,7 +5399,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   function ribbonCandidateSeats() {
     var front = RIBBON.targets.filter(function(s) {
       var row = FRONT.findIndex(function(r) { return r[0] === s.row; });
-      return ribbonTargetZone(s)===RIBBON.stations[RIBBON.slot].zone && (s.side || row >= 0 && row <= 3) && s.i !== S.my;
+      return ribbonTargetZone(s)===RIBBON.stations[RIBBON.slot].zone && (s.side || row >= 0 && row <= 2) && s.i !== S.my;
     });
     return front;
   }
@@ -5408,8 +5408,10 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if(front){
       function angle(s){return Math.abs(Math.atan2(s.pos.x-station.position.x,s.pos.z-station.position.z));}
       var outer=(random===undefined?Math.random():random)>=.92,pool=options.filter(function(s){return outer?angle(s)>Math.PI/4:angle(s)<=Math.PI/4;});
+      var rowPick=Math.random(),preferredRow=rowPick<.45?"A":rowPick<.9?"B":"C";
+      function rowRank(s){return s.row===preferredRow?0:s.row==="C"?2:1;}
       var ranks=pool.map(function(s){return {seat:s,key:-Math.log(Math.max(1e-9,Math.random()))/(outer?Math.exp(-(angle(s)-Math.PI/4)/.35):1)};});
-      var fans=new Set(RIBBON.targets.map(function(s){return s.i;}));ranks.sort(function(a,b){return Number(RIBBON.used.has(a.seat.i))-Number(RIBBON.used.has(b.seat.i))||Number(!fans.has(a.seat.i))-Number(!fans.has(b.seat.i))||a.key-b.key;});
+      var fans=new Set(RIBBON.targets.map(function(s){return s.i;}));ranks.sort(function(a,b){return rowRank(a.seat)-rowRank(b.seat)||Number(RIBBON.used.has(a.seat.i))-Number(RIBBON.used.has(b.seat.i))||Number(!fans.has(a.seat.i))-Number(!fans.has(b.seat.i))||a.key-b.key;});
       var chosen=new Set(pool.map(function(s){return s.i;}));return ranks.map(function(r){return r.seat;}).concat(options.filter(function(s){return !chosen.has(s.i);}));
     }
     if((random===undefined?Math.random():random)>=.8)return options;
@@ -5424,16 +5426,11 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       options = ribbonCandidateSeats();
     }
     for(var j=options.length-1;j>0;j--){var swap=Math.floor(Math.random()*(j+1)),item=options[j];options[j]=options[swap];options[swap]=item;}
-    var weights='ABCD'.split('').map(function(row){return ribbonRecords.available(G2.team,G2.member,row)===false?0:[3,2,1][ribbonRecords.get(G2.team,G2.member,row)];});
-    var pick=Math.random()*weights.reduce(function(a,b){return a+b;},0),preferred=0;
-    for(var row=0;row<weights.length;row++){pick-=weights[row];if(pick<=0){preferred=row;break;}}
-    var zones=Array.from(new Set(options.map(ribbonTargetZone))),zone=zones[Math.floor(Math.random()*zones.length)];
-    options.sort(function(a,b){return (ribbonTargetZone(a)!==zone)-(ribbonTargetZone(b)!==zone) || (a.side||b.side?0:Math.abs(a.st-preferred)-Math.abs(b.st-preferred));});
     var remaining = ribbonCandidateSeats().filter(function(s){ return RIBBON.used.has(s.i) && !options.includes(s); });
     options = options.concat(remaining);
     var included = new Set(options.map(function(s){return s.i;}));
     // Prefer this member's fans, then retry other real spectators as in the reference.
-    options = options.concat(seats.filter(function(s){return !included.has(s.i) && s.i!==S.my && seatOcc(s) && (s.side || s.st<=3) && ribbonTargetZone(s)===RIBBON.stations[RIBBON.slot].zone;}).sort(function(){return Math.random()-.5;}));
+    options = options.concat(seats.filter(function(s){return !included.has(s.i) && s.i!==S.my && seatOcc(s) && (s.side || s.st<=2) && ribbonTargetZone(s)===RIBBON.stations[RIBBON.slot].zone;}).sort(function(){return Math.random()-.5;}));
     options=ribbonSideCandidateOrder(options,RIBBON.slot);
     if(RIBBON.egg&&RIBBON.egg.armed&&RIBBON.egg.attempt===RIBBON.attempts){var quiet=options.filter(function(s){return !s.light&&!s.fan&&!s.towel&&(G2.member===null||s.oshi===G2.member);}),quietIds=new Set(quiet.map(function(s){return s.i;}));options=quiet.concat(options.filter(function(s){return !quietIds.has(s.i);}));}
     for (var i = 0; i < options.length; i++) {
