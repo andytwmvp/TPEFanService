@@ -4,6 +4,8 @@
 
 ## 已執行的驗證
 
+入口更新：主畫面僅保留「開始遊戲」，點擊後以對話框選擇「找出我的粉絲」或「彩帶投擲挑戰」。桌面與手機尺寸均驗證兩種遊戲啟動、返回設定、Esc 關閉與選擇後對話框移除；彩帶投擲、重玩及匯出回歸通過。
+
 環境：Linux Chromium、ANGLE SwiftShader WebGL、Node 24、Playwright。共享桌面工具初始化遭 `the gaas-browser node_repl sandbox cannot be disabled` 阻擋，改用獨立 Chromium 完成操作。
 
 - 原站實際載入並建立 WebGL context，確認 `game.CFG.order` 為 `0,7,1,6,2,5,3,4`；以瀏覽器滑鼠事件投擲，原站公開狀態得到 `n=1, hits=1, tapes=1`。為加速後續物理觀察，測試時只在 `game.advance(2500)` 期間停用逐幀 render，沒有改動物理或結算程式；操作前後有實際渲染。原站僅做單投與程式對照，未完成每一種失敗演出的人工比對。

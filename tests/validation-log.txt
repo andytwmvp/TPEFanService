@@ -109,3 +109,7 @@ settings change disposes flight and cancels session
 replay after result preserves newly selected member and hides menu
 desktop: native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
 mobile: native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
+
+Game-picker UI regression: node tests/ribbon-ui.cjs
+desktop: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
+mobile: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed

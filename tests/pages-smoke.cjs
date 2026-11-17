@@ -6,6 +6,7 @@ const {chromium}=require('playwright');
   const page=await browser.newPage({viewport:{width:1100,height:760}}),errors=[],failed=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>failed.push({url:r.url(),error:r.failure()}));
   await page.goto(process.argv[2]||'https://andytwmvp.github.io/TPEFanService/',{waitUntil:'domcontentloaded',timeout:90000});
+  await page.locator('#gStart').click({timeout:60000});
   await page.locator('#ribbonStart').click({timeout:60000});
   await page.waitForFunction(()=>!ribbonHud.hidden && !ribbonTargetMark.hidden,null,{timeout:60000});
   console.log(JSON.stringify(await page.evaluate(()=>({url:location.href,webgl:!!document.getElementById('gl').getContext('webgl2'),target:ribbonTargetText.textContent,hint:ribbonHint.textContent,adapter:typeof RibbonWorld,testAPI:typeof window.testRibbon})),null,2));

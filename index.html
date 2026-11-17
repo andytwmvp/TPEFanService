@@ -1514,17 +1514,23 @@ details.members tr.tbd td {
   }
 }
 
-.startpanel #ribbonStart {
-  width: 100%;
-  min-height: 42px;
-  border-color: rgba(242, 178, 92, .7);
-  color: #ffe0ac;
-  background: rgba(242, 178, 92, .1);
-  font-weight: 700;
+#gamePicker {
+  width: min(380px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 22px;
+  color: var(--text);
+  background: #17121b;
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }
-.startpanel.compact > #ribbonStart {
-  grid-column: 1 / -1;
-}
+#gamePicker::backdrop { background: rgba(0, 0, 0, .72); }
+#gamePicker h2 { margin: 0 0 16px; color: #ffe0ac; }
+#gamePicker .game-choices { display: grid; gap: 12px; }
+#gamePicker .game-choice { width: 100%; min-height: 74px; text-align: left; padding: 12px 16px; }
+#gamePicker .game-choice strong { display: block; font-size: 17px; }
+#gamePicker .game-choice span { display: block; margin-top: 5px; font-size: 12px; font-weight: normal; }
+#gamePickerCancel { display: block; margin: 16px auto 0; }
 #ribbonPreview {
   position: absolute;
   inset: 0;
@@ -1780,10 +1786,17 @@ details.members tr.tbd td {
       <label><input type="radio" name="gTime" value="50" checked>50 秒</label>
       <label><input type="radio" name="gTime" value="100">100 秒</label>
     </div>
-    <button type="button" class="primary big" id="gStart">開始遊戲</button>
-    <button type="button" id="ribbonStart">丟彩帶挑戰</button>
-    <p class="note" id="ribbonStartNote">快速向上滑動投出彩帶；滑動方向控制落點，滑動速度控制力度。</p>
+    <button type="button" class="primary big" id="gStart" aria-haspopup="dialog" aria-controls="gamePicker">開始遊戲</button>
   </div>
+
+  <dialog id="gamePicker" aria-labelledby="gamePickerTitle">
+    <h2 id="gamePickerTitle">選擇遊戲</h2>
+    <div class="game-choices">
+      <button type="button" class="game-choice primary" id="fanStart"><strong>找出我的粉絲</strong><span>在限時內找出支持你的觀眾。</span></button>
+      <button type="button" class="game-choice" id="ribbonStart"><strong>彩帶投擲挑戰</strong><span>向上快速滑動，把彩帶送到目標觀眾手上。</span></button>
+    </div>
+    <button type="button" id="gamePickerCancel">返回設定</button>
+  </dialog>
 
   <div id="gameHud" class="gamehud" hidden>
     <div class="ghead"><span id="gWho"></span></div>
@@ -5950,6 +5963,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
 
   function startGame(kind) {
+    if ($("gamePicker").open) $("gamePicker").close();
     if (RIBBON.active) finishRibbonGame();
     if (RIBBON.phase === "result") closeRibbonSummary();
     initAudio();
@@ -6718,7 +6732,11 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (G2.phase === "result") G2.phase = "idle";
     if (IDOL && !G2.on && G2.phase !== "countdown" && (typeof MODE === "undefined" || MODE === "game")) $("startPanel").hidden = false;
   }
-  $("gStart").addEventListener("click", startGame);
+  $("gStart").addEventListener("click", function() {
+    if (!$("gamePicker").open) $("gamePicker").showModal();
+  });
+  $("gamePickerCancel").addEventListener("click", function() { $("gamePicker").close(); });
+  $("fanStart").addEventListener("click", function() { startGame(); });
   $("ribbonExport").addEventListener("click", function() {
     var status=$("ribbonExportStatus");
     try {
