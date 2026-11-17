@@ -4373,7 +4373,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   function fovFactor() {
     if (RIBBON && (RIBBON.active || RIBBON.phase==="result")) {
       var ribbonBase=Math.max(56,Math.min(86,2*Math.atan(Math.tan(34*Math.PI/180)/Math.max(.1,camera.aspect))*180/Math.PI));
-      return ribbonBase/IDOL_FOV;
+      return (RIBBON.active&&RIBBON.thrower&&RIBBON.thrower.zone!=="front"?70:ribbonBase)/IDOL_FOV;
     }
     if (stageGameView()) {
       // Keep a modest horizontal field in portrait without an extreme wide lens.
@@ -5364,7 +5364,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     var stations=ribbonFrontPositions().map(function(x,i){return {zone:"front",station:"front:"+i,position:new THREE.Vector3(x,S.stageH,STAGE_Z0-.8),heading:0};});
     var rear=SIDES.reduce(function(z,row){return Math.min(z,row[2]-(row[3]-1)*row[4]);},Infinity)+.17;
     ["left","right"].forEach(function(zone){for(var i=0;i<4;i++)stations.push({zone:zone,station:zone+":"+i,
-      position:new THREE.Vector3((zone==="left"?-1:1)*(STAGE_W/2-.93),S.stageH,STAGE_Z0-1.65+i*(rear-(STAGE_Z0-1.65))/3),heading:zone==="left"?-Math.PI/2:Math.PI/2});});
+      position:new THREE.Vector3((zone==="left"?-1:1)*(STAGE_W/2-2.08),S.stageH,STAGE_Z0-1.65+i*(rear-(STAGE_Z0-1.65))/3),heading:zone==="left"?-Math.PI/2:Math.PI/2});});
     return stations;
   }
   function ribbonStationsFor(slot,target) {return ribbonTargetZone(target)===RIBBON.stations[slot].zone?[RIBBON.throwers[slot]]:[];}
@@ -5501,6 +5501,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   function ribbonCandidateVisible(thrower,target,actors) {
     var aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight),base=Math.max(56,Math.min(86,2*Math.atan(Math.tan(34*Math.PI/180)/aspect)*180/Math.PI));
+    if(thrower.zone&&thrower.zone!=="front")base=70;
     var view=new THREE.PerspectiveCamera(S.fov*base/IDOL_FOV,aspect,.05,80),point=new THREE.Vector3();
     headWorld(target,point);point.y+=.25;
     if(RIBBON.world.blocked&&RIBBON.world.blocked(thrower.eye,point,thrower.slot,actors))return false;
