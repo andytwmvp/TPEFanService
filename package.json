@@ -1,0 +1,11 @@
+{
+  "name": "tpe-fan-service",
+  "private": true,
+  "scripts": {
+    "test": "node tests/ribbon-browser.cjs && node tests/ribbon-ui.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1",
+    "three": "0.128.0"
+  }
+}

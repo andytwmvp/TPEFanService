@@ -1,0 +1,104 @@
+node tests/ribbon-browser.cjs
+WebGL context
+selecting hides candidate and bands
+old search cannot publish into restarted session
+search rejection finishes with readable error
+cancel search 0
+cancel search 1
+cancel search 2
+cancel search 3
+reachable target selected
+hit interval sample 0
+hit interval sample 1
+hit interval sample 2
+hit interval sample 3
+hit interval sample 4
+hit interval sample 5
+hit interval sample 6
+perfect uses actual distance
+perfect uses actual distance
+perfect uses actual distance
+perfect uses actual distance
+target remains fixed
+reference launch parity 0/-80
+reference launch parity 0/-12
+reference launch parity 0/0
+reference launch parity 0/14
+reference launch parity 0/70
+reference launch parity 0.4/-80
+reference launch parity 0.4/-12
+reference launch parity 0.4/0
+reference launch parity 0.4/14
+reference launch parity 0.4/70
+reference launch parity 0.8/-80
+reference launch parity 0.8/-12
+reference launch parity 0.8/0
+reference launch parity 0.8/14
+reference launch parity 0.8/70
+reference launch parity 1.35/-80
+reference launch parity 1.35/-12
+reference launch parity 1.35/0
+reference launch parity 1.35/14
+reference launch parity 1.35/70
+ribbon feeds more than two nodes
+actual throw resolves exactly once
+no duplicate scoring
+round 0 has reachable target
+round 0 scores once
+round 1 has reachable target
+round 1 scores once
+round 2 has reachable target
+round 2 scores once
+round 3 has reachable target
+round 3 scores once
+round 4 has reachable target
+round 4 scores once
+round 5 has reachable target
+round 5 scores once
+round 6 has reachable target
+round 6 scores once
+round 7 has reachable target
+round 7 scores once
+round 8 has reachable target
+round 8 scores once
+eight-member rotation repeats in challenge
+all eight hits enter challenge
+challenge miss ends after recording last throw
+challenge transitions to result
+result keeps ribbon
+settled ribbon sleeps
+64 sleeping ribbons retain display without physics
+64 ribbons / 1000 ticks ms: 5.9
+endpoint motion wakes ribbon
+64 tape and roll meshes removed
+uploaded ribbon GPU geometries disposed
+GPU geometry count: 247 -> 122
+return menu disposes ribbons
+background search waits before publishing
+background search resumes
+countdown compensated
+hidden flight frozen
+catch and next-target timestamps compensated
+result background frozen
+original modes and fan game still start
+first lap failure test target 0
+first-lap miss completes all eight throws 0
+first lap failure test target 1
+first-lap miss completes all eight throws 1
+first lap failure test target 2
+first-lap miss completes all eight throws 2
+first lap failure test target 3
+first-lap miss completes all eight throws 3
+first lap failure test target 4
+first-lap miss completes all eight throws 4
+first lap failure test target 5
+first-lap miss completes all eight throws 5
+first lap failure test target 6
+first-lap miss completes all eight throws 6
+first lap failure test target 7
+first-lap miss completes all eight throws 7
+first lap with one miss ends at eight
+
+node tests/ribbon-ui.cjs
+desktop: native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
+mobile: native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
