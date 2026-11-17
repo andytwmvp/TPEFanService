@@ -5,7 +5,7 @@ const root=path.resolve(__dirname,'..');
  for(const mobile of [false,true]) {
  const page=await browser.newPage({viewport:mobile?{width:390,height:844}:{width:1100,height:760},hasTouch:mobile,isMobile:mobile,deviceScaleFactor:1});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const html=fs.readFileSync(path.join(root,'index.html'),'utf8').replaceAll('requestAnimationFrame(frame);','').replace('})();\n</script>','window.uiTest={S,setMode,G2,RIBBON,startGame,ribbonStartPlay,ribbonPhysicsStep,ribbonTick,finishRibbonGame,closeRibbonSummary,renderer,scene,camera,ribbonRenderFrame,placePerformers,updateFx,placeMoods,updateCamera};\n})();\n</script>');
- await page.route('**/TPEFanService/',r=>r.fulfill({body:html,contentType:'text/html'}));await page.route('**/ribbon-world.js*',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-world.js')),contentType:'application/javascript'}));
+ await page.route('**/TPEFanService/',r=>r.fulfill({body:html,contentType:'text/html'}));await page.route('**/ribbon-world.js*',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-world.js')),contentType:'application/javascript'}));await page.route('**/ribbon-crowd.js*',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-crowd.js')),contentType:'application/javascript'}));
  const three=process.env.THREE_PATH||require.resolve('three/build/three.min.js');await page.route('**/three.min.js',r=>r.fulfill({body:fs.readFileSync(three),contentType:'application/javascript'}));
  await page.route('**/ribbon-records.js*',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-records.js')),contentType:'application/javascript'}));
  await page.goto('http://ribbon.test/TPEFanService/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.uiTest);
@@ -42,7 +42,7 @@ const root=path.resolve(__dirname,'..');
  // Touch cancellation and second-finger input must never throw.
  await page.evaluate(()=>{const canvas=document.getElementById('gl'),rect=canvas.getBoundingClientRect();const opts={bubbles:true,pointerId:41,pointerType:'touch',isPrimary:true,clientX:rect.x+rect.width/2,clientY:rect.y+rect.height*.8};canvas.dispatchEvent(new PointerEvent('pointerdown',opts));canvas.dispatchEvent(new PointerEvent('pointerdown',{...opts,pointerId:42,isPrimary:false}));canvas.dispatchEvent(new PointerEvent('pointercancel',opts));});
  assert(await page.evaluate(()=>!uiTest.RIBBON.flight&&!uiTest.RIBBON.gesture));
- await page.locator('#ribbonStop').click();await page.locator('#ribbonClose').click();assert(await page.locator('#startPanel').isVisible());assert.equal(await page.evaluate(()=>uiTest.RIBBON.settled.length),0);assert.deepEqual(errors,[]);
+ await page.locator('#ribbonStop').click();await page.evaluate(()=>{const r=uiTest.RIBBON;for(let i=0;i<170;i++)uiTest.ribbonTick(r.lastFrame+17);});await page.locator('#ribbonClose').click();assert(await page.locator('#startPanel').isVisible());assert.equal(await page.evaluate(()=>uiTest.RIBBON.settled.length),0);assert.deepEqual(errors,[]);
  for(const viewport of [{width:1100,height:760},{width:390,height:844},{width:844,height:390}]) {
   await page.setViewportSize(viewport);await page.waitForTimeout(150);
   const view=await page.evaluate(()=>{const t=uiTest;t.updateCamera();const v=t.camera.fov,h=2*Math.atan(Math.tan(v*Math.PI/360)*t.camera.aspect)*180/Math.PI;return{vertical:v,horizontal:h,eye:t.camera.position.y-t.S.stageH,height:t.S.perfH/100};});

@@ -11,3 +11,5 @@ console.log('record persistence, per-member rows, best score, milestones, perfec
 records.setAvailable(0,0,'A',false);assert.equal(records.available(0,0,'A'),true,'previously delivered cell remains reachable');
 
 records.hit(0,3,'N',true);records.hit(0,3,'P',false);records=create(storage);assert.equal(records.get(0,3,'N'),2);assert.equal(records.get(0,3,'P'),1);assert.equal(records.collection(0,roster).total,32,'side records do not change original front collection');
+
+const plays=records.snapshot().plays;records.finish(Array.from({length:20},()=>({ok:true,perfect:false,row:'A',member:0})),0,roster,false);assert.equal(records.snapshot().plays,plays,'round checkpoints must not count extra games');assert.equal(records.snapshot().bestHit,20,'checkpoint best totals remain cumulative');

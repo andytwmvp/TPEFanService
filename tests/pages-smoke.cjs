@@ -10,7 +10,7 @@ const {chromium}=require('playwright');
   await page.locator('#ribbonStart').click({timeout:60000});
   await page.waitForFunction(()=>!ribbonHud.hidden && !ribbonTargetMark.hidden,null,{timeout:60000});
   console.log(JSON.stringify(await page.evaluate(()=>({url:location.href,webgl:!!document.getElementById('gl').getContext('webgl2'),target:ribbonTargetText.textContent,hint:ribbonHint.textContent,adapter:typeof RibbonWorld,testAPI:typeof window.testRibbon})),null,2));
-  await page.locator('#ribbonStop').click();await page.locator('#ribbonClose').click();
+  await page.locator('#ribbonStop').click();await page.locator('#ribbonSummary').waitFor({state:'visible',timeout:300000});await page.locator('#ribbonClose').click();
   if(errors.length)throw Error(JSON.stringify({errors,failed}));
   console.log('Live Pages start / target / stop / menu passed; requests failing: '+JSON.stringify(failed));
  } finally {await browser.close()}

@@ -1835,8 +1835,8 @@ details.members tr.tbd td {
     <div id="ribbonTargetText" class="ribbon-target-text"></div>
     <div class="ribbon-meter" role="meter" aria-label="彩帶投擲力度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="ribbonPowerFill"></i><b id="ribbonPowerBand" hidden></b><b id="ribbonPerfectBand" hidden></b><span>力度</span></div>
     <div class="ribbon-stats"><span>投出 <b id="ribbonAttempt">0</b></span><span>命中 <b id="ribbonHits">0</b></span><span>完美 <b id="ribbonPerfect">0</b> ★</span><span>連擊 <b id="ribbonCombo">0</b></span></div>
-    <div id="ribbonDots" class="ribbon-dots" aria-label="本輪八投進度"></div>
-    <p id="ribbonHint">向上快速滑動投出彩帶；左右微偏調整方向。前八投完成後進入挑戰輪，失手即結束。</p>
+    <div id="ribbonDots" class="ribbon-dots" aria-label="本輪十投進度"></div>
+    <p id="ribbonHint">向上快速滑動投出彩帶；左右微偏調整方向。每輪十投後合照；第一輪六中、挑戰輪八中可晉級，決勝輪不設門檻。</p>
   </div>
   <div id="ribbonTargetMark" hidden aria-hidden="true"><i></i><span>目標粉絲</span></div>
   <div id="ribbonFinaleNote" class="chip" role="status" hidden>彩帶正在集合，準備拍攝成果合照…</div>
@@ -1854,7 +1854,7 @@ details.members tr.tbd td {
       <button type="button" class="ghost" id="ribbonRecordResult">查看彩帶實績</button>
       <img id="ribbonPhoto" class="ribbon-photo" hidden alt="劇場彩帶挑戰成果合照">
       <p id="ribbonExportStatus" role="status"></p>
-      <div class="ract"><button type="button" class="primary" id="ribbonAgain">再玩一次</button><button type="button" id="ribbonExport">儲存合照</button><button type="button" class="ghost" id="ribbonClose" aria-label="回到選單" title="回到選單">✕</button></div>
+      <div class="ract"><button type="button" class="primary" id="ribbonNext" hidden disabled>晉級下一輪</button><button type="button" class="primary" id="ribbonAgain">再玩一次</button><button type="button" id="ribbonExport">儲存合照</button><button type="button" class="ghost" id="ribbonClose" aria-label="回到選單" title="回到選單">✕</button></div>
     </div>
   </div>
   <div id="seatBar" class="seatbar idol-only" hidden>
@@ -2037,8 +2037,9 @@ details.members tr.tbd td {
 </aside>
 </div>
 
-<script src="./ribbon-records.js?v=cdaa9a1099b6"></script>
-<script src="./ribbon-world.js?v=2f3153fee34e"></script>
+<script src="./ribbon-records.js?v=73d3067ed4e4"></script>
+<script src="./ribbon-crowd.js?v=cae2422a3f0a"></script>
+<script src="./ribbon-world.js?v=e04809bd57d1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 var GIF_B64 = "";
@@ -3700,6 +3701,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     lastT = t;
     var b = t * 132 / 60, anyRainbow = false, np = 0, PI = Math.PI;
     arms.forEach(function(r) {
+      if(RIBBON&&RIBBON.crowd&&RIBBON.crowd.has(r.i))return;
       var s = seats[r.i], a = s.amp || 1;
       if (r.kind === "pen") {
         r.side = Math.max(0, Math.min(1, (a - 1.1) / 0.4));
@@ -3721,6 +3723,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       forearm(r.idx, r.k, r.e[0], r.e[1], r.e[2], r.hp[0], r.hp[1], r.hp[2]);
     });
     sticks.forEach(function(q) {
+      if(RIBBON&&RIBBON.crowd&&RIBBON.crowd.has(q.i))return;
       var r = q.arm, a = seats[q.i].amp || 1, lag = Math.sin(PI * b / 2 + q.ph - 0.8), lagS = Math.sin(PI * b / 2 + q.ph + 0.4);
       var tz = q.splay + 1.2 * r.phi + 0.15 * (r.side || 0) * lagS + 0.26 * Math.sin(PI * b / 2 + q.ph + 1.6);
       if (seats[q.i].fan) tz = Math.max(-0.3, Math.min(tz, 0.08));
@@ -3749,6 +3752,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     IM.stick.instanceMatrix.needsUpdate = true;
     if (anyRainbow) IM.rstick.instanceMatrix.needsUpdate = true;
     towels.forEach(function(q) {
+      if(RIBBON&&RIBBON.crowd&&RIBBON.crowd.has(q.i))return;
       var s = seats[q.i], a = s.amp || 1;
       var bob = a > 1.2 ? 0.04 * Math.abs(Math.sin(PI * b)) : 0.015 * Math.sin(PI * b + q.ph);
       eul.set(-0.06 - 0.06 * a * Math.sin(PI * b + q.ph - 1), 0, 0.06 * a * Math.sin(PI * b / 2 + q.ph));
@@ -3776,7 +3780,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     }
   }
   function headWorld(s, out) {
-    return out.set(0, s.headLocal || 1.2, s.headZ !== void 0 ? s.headZ : 0.04).applyMatrix4(s.m);
+    out.set(0,s.headLocal||1.2,s.headZ!==void 0?s.headZ:0.04).applyMatrix4(s.m);var body=RIBBON&&RIBBON.crowd&&RIBBON.crowd.bodyTransform(s.i);return body?out.applyMatrix4(body):out;
   }
   var meMat = new THREE.MeshBasicMaterial({ color: 15905372, fog: false });
   var me = new THREE.Group();
@@ -4189,7 +4193,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       g.scale.setScalar(sc);
       if (!dance || RIBBON && (RIBBON.active || RIBBON.phase === "result")) {
         if(RIBBON && RIBBON.active && RIBBON.stations)g.position.copy(RIBBON.stations[p.i].position);
-        else if(RIBBON && RIBBON.phase==="result")g.position.set(p.i<6?(p.i===2?-.25*S.perfH/160:p.i===3?.25*S.perfH/160:(p.i-2.5)*.8):(p.i-9.5)*.7,S.stageH,STAGE_Z0-.8-(p.i<6?0:1.25));
+        else if(RIBBON && RIBBON.phase==="result")g.position.set(p.i<6?(p.i===2?-.25*S.perfH/160:p.i===3?.25*S.perfH/160:RIBBON.stations[p.i].position.x):(p.i-9.5)*.7,S.stageH,STAGE_Z0-.8-(p.i<6?0:1.25));
         else g.position.set(p.bx, S.stageH, p.bz);
         g.rotation.y = Math.PI;
         if(RIBBON && RIBBON.active) {
@@ -4892,12 +4896,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   var moodGroup = new THREE.Group();
   scene.add(moodGroup);
   function showMood(s, ch) {
+    if(RIBBON&&(RIBBON.active||RIBBON.phase==="result")&&RIBBON.angrySeats&&RIBBON.angrySeats.has(s.i))return;
     if (s.mood) moodGroup.remove(s.mood);
     var sp = new THREE.Sprite(moodMaterial(ch));
     sp.renderOrder = 10;
     sp.scale.set(0.34, 0.34, 1);
     sp.userData.seat = s;
-    sp.userData.born = performance.now();
+    sp.userData.born = performance.now();sp.userData.expression=ch;
+    if(RIBBON&&(RIBBON.active||RIBBON.phase==="result")){sp.userData.ribbonReaction=true;sp.userData.ribbonBorn=RIBBON.fxTime||0;}
     moodGroup.add(sp);
     s.mood = sp;
   }
@@ -4910,9 +4916,9 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   var hw = new THREE.Vector3();
   function placeMoods(now) {
     moodGroup.children.forEach(function(sp) {
-      var s = sp.userData.seat, age = (now - sp.userData.born) / 1e3;
+      var s=sp.userData.seat,clock=sp.userData.ribbonReaction?(RIBBON.fxTime||0)*1000:now,age=sp.userData.ribbonReaction?(RIBBON.fxTime||0)-sp.userData.ribbonBorn:(now-sp.userData.born)/1e3;
       headWorld(s, hw);
-      sp.position.set(hw.x, hw.y + 0.34 + 0.06 * Math.sin(now / 230), hw.z);
+      sp.position.set(hw.x, hw.y + 0.34 + 0.06 * Math.sin(clock / 230), hw.z);
       var pop = Math.min(1, age * 4);
       sp.scale.set(0.34 * pop, 0.34 * pop, 1);
     });
@@ -5311,7 +5317,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   var ribbonProject = new THREE.Vector3(), ribbonHead = new THREE.Vector3();
   var RIBBON_MAX = 200, RIBBON_SEGMENT = 0.12, RIBBON_DT = 1 / 120;
   var RIBBON_PHYSICS = { g: 9.8, air: 1.2, tapeLen: 30, rollMass: 0.025, rollCdA: 0.0013, pullForce: 0.02, liftA: 0.005, dragN: 11, dragT: 0.4, flutter: 0.45, inherit: 0.08, rollR: 0.03, vMin: 2, vMax: 9.4, elev0: 6, elev1: 32, yawGain: 0.25, yawDead: 2, tiltGain: 1.2, wildFrom: 50, reachR: 0.36, reachUp: 0.45, perfect: 0.3 };
-  var RIBBON_ROUNDS=[{name:"第一輪",hits:4},{name:"挑戰輪",hits:6},{name:"決勝輪",hits:10}],RIBBON_ROUND_SIZE=10;
+  var RIBBON_ROUNDS=[{name:"第一輪",hits:6},{name:"挑戰輪",hits:8},{name:"決勝輪",hits:null}],RIBBON_ROUND_SIZE=10;
   function ribbonPrepareThrower() {
     var slot = RIBBON.order[RIBBON.attempts % RIBBON.order.length];
     RIBBON.slot = slot;
@@ -5328,7 +5334,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       hold:performer ? performer.elL.localToWorld(new THREE.Vector3(0,-.245,0)) : new THREE.Vector3(x+.16,S.stageH+h*.62,z+.3)
     };
     var member = ribbonCastMember(G2.team,G2.member);
-    RIBBON.color=ribbonThrowColor(member,RIBBON.attempts);
+    ribbonLockInterception();RIBBON.color=ribbonThrowColor(member,RIBBON.attempts);
     placePerformers(0);if(RIBBON.world&&RIBBON.world.setActors)RIBBON.world.setActors(performers);
   }
   function ribbonAimThrower(thrower,target) {
@@ -5339,7 +5345,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     return {slot:thrower.slot,position:thrower.position,zone:thrower.zone||"front",station:thrower.station||"front",heading:heading,baseForAim:false,eye:turned(thrower.eye),release:turned(thrower.release),hold:turned(thrower.hold)};
   }
   function ribbonFrontPositions() {
-    var edge=STAGE_W/2-.5,intervals=[[-edge,edge]],clearance=PILLAR_W/2+.25;
+    var aRow=seats.filter(function(s){return !s.side&&s.row==="A";}),edge=Math.min(STAGE_W/2-.5,Math.max.apply(null,aRow.map(function(s){return Math.abs(s.pos.x);}))),intervals=[[-edge,edge]],clearance=PILLAR_W/2+Math.max(.25,.24*S.perfH/157);
     PILLARS.forEach(function(p){
       var next=[];intervals.forEach(function(range){
         if(p.x+clearance<=range[0] || p.x-clearance>=range[1]){next.push(range);return;}
@@ -5398,9 +5404,17 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     return front;
   }
   function ribbonSideCandidateOrder(options,slot,random) {
-    var station=RIBBON.stations[slot];if(station.zone==="front" || (random===undefined?Math.random():random)>=.8)return options;
+    var station=RIBBON.stations[slot],front=station.zone==="front";
+    if(front){
+      function angle(s){return Math.abs(Math.atan2(s.pos.x-station.position.x,s.pos.z-station.position.z));}
+      var outer=(random===undefined?Math.random():random)>=.92,pool=options.filter(function(s){return outer?angle(s)>Math.PI/4:angle(s)<=Math.PI/4;});
+      var ranks=pool.map(function(s){return {seat:s,key:-Math.log(Math.max(1e-9,Math.random()))/(outer?Math.exp(-(angle(s)-Math.PI/4)/.35):1)};});
+      var fans=new Set(RIBBON.targets.map(function(s){return s.i;}));ranks.sort(function(a,b){return Number(RIBBON.used.has(a.seat.i))-Number(RIBBON.used.has(b.seat.i))||Number(!fans.has(a.seat.i))-Number(!fans.has(b.seat.i))||a.key-b.key;});
+      var chosen=new Set(pool.map(function(s){return s.i;}));return ranks.map(function(r){return r.seat;}).concat(options.filter(function(s){return !chosen.has(s.i);}));
+    }
+    if((random===undefined?Math.random():random)>=.8)return options;
     var fans=new Set(RIBBON.targets.map(function(s){return s.i;}));
-    var direct=options.filter(function(s){return Math.abs(Math.atan2(s.pos.z-station.position.z,Math.abs(s.pos.x-station.position.x)))<=Math.PI/6;});
+    var direct=options.filter(function(s){return Math.abs(front?Math.atan2(s.pos.x-station.position.x,Math.abs(s.pos.z-station.position.z)):Math.atan2(s.pos.z-station.position.z,Math.abs(s.pos.x-station.position.x)))<=(front?Math.PI/4:Math.PI/6);});
     direct.sort(function(a,b){return Number(RIBBON.used.has(a.i))-Number(RIBBON.used.has(b.i)) || Number(!fans.has(a.i))-Number(!fans.has(b.i)) || Math.abs(a.pos.z-station.position.z)-Math.abs(b.pos.z-station.position.z);});
     var selected=new Set(direct.map(function(s){return s.i;}));return direct.concat(options.filter(function(s){return !selected.has(s.i);}));
   }
@@ -5421,6 +5435,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     // Prefer this member's fans, then retry other real spectators as in the reference.
     options = options.concat(seats.filter(function(s){return !included.has(s.i) && s.i!==S.my && seatOcc(s) && (s.side || s.st<=3) && ribbonTargetZone(s)===RIBBON.stations[RIBBON.slot].zone;}).sort(function(){return Math.random()-.5;}));
     options=ribbonSideCandidateOrder(options,RIBBON.slot);
+    if(RIBBON.egg&&RIBBON.egg.armed&&RIBBON.egg.attempt===RIBBON.attempts){var quiet=options.filter(function(s){return !s.light&&!s.fan&&!s.towel&&(G2.member===null||s.oshi===G2.member);}),quietIds=new Set(quiet.map(function(s){return s.i;}));options=quiet.concat(options.filter(function(s){return !quietIds.has(s.i);}));}
     for (var i = 0; i < options.length; i++) {
       var target = options[i];
       var stations=ribbonStationsFor(RIBBON.slot,target);
@@ -5434,7 +5449,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   async function ribbonWindowFor(session,slot,target,thrower) {
     if(!RIBBON.active || RIBBON.session!==session)return null;
-    var key=slot+":"+(thrower.station||"front")+":"+target.i+":"+(RIBBON.world.actorRevision?RIBBON.world.actorRevision():0),cache=RIBBON.windowCache,pending=RIBBON.windowTasks;
+    var key=RIBBON.attempts+":"+slot+":"+(thrower.station||"front")+":"+target.i+":"+(RIBBON.world.actorRevision?RIBBON.world.actorRevision():0),cache=RIBBON.windowCache,pending=RIBBON.windowTasks;
     if(cache.has(key))return cache.get(key);
     if(pending.has(key))return pending.get(key);
     var task=ribbonFindWindow(session,target,thrower).then(function(win){
@@ -5521,7 +5536,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   async function ribbonFindWindow(session, target, thrower) {
     thrower=ribbonAimThrower(thrower || RIBBON.thrower,target);
-    var actors=RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null;
+    var actors=RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null,challenge=RIBBON.challenge?Object.assign({},RIBBON.challenge):null,bodies=RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null;
     if(!ribbonCandidateVisible(thrower,target,actors))return null;
     headWorld(target,ribbonHead);
     if(RIBBON.world.blocked && RIBBON.world.blocked(thrower.eye,ribbonHead,thrower.slot,actors))return null;
@@ -5532,7 +5547,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
         if(!RIBBON.active || RIBBON.session !== session) return null;
       }
       var power = 1.35 * i / 120, shot = ribbonBuildLaunch(power, 0, target, thrower);
-      var f = { owner:thrower.slot,actors:actors,roll: shot.origin.clone(), velocity: shot.velocity.clone(), tilt: shot.tilt, paid: 0, apex: shot.origin.y, hit: false, time: 0 };
+      var f = {bodies:bodies,interceptors:ribbonInterceptors(shot,target,thrower,challenge), owner:thrower.slot,actors:actors,roll: shot.origin.clone(), velocity: shot.velocity.clone(), tilt: shot.tilt, paid: 0, apex: shot.origin.y, hit: false, time: 0 };
       var outcome = null;
       for (var k = 0; k < 960; k++) {
         var result = ribbonStepRoll(f, target);
@@ -5568,7 +5583,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   function ribbonPredict(power,angle,target,thrower,actors) {
     var shot=ribbonBuildLaunch(power,angle,target,thrower);
-    var f={owner:(thrower||RIBBON.thrower).slot,actors:actors||(RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null),roll:shot.origin.clone(),velocity:shot.velocity.clone(),tilt:shot.tilt,paid:0,apex:shot.origin.y,hit:false,time:0}, result;
+    var f={bodies:RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null,interceptors:ribbonInterceptors(shot,target,thrower||RIBBON.thrower),owner:(thrower||RIBBON.thrower).slot,actors:actors||(RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null),roll:shot.origin.clone(),velocity:shot.velocity.clone(),tilt:shot.tilt,paid:0,apex:shot.origin.y,hit:false,time:0}, result;
     for(var i=0;i<960;i++){result=ribbonStepRoll(f,target);if(result.done)break;}
     return {ok:!!result.caught && result.caught.seat===target,perfect:!!result.caught && result.caught.seat===target && !f.hit && !result.caught.pickup && result.caught.distance<RIBBON_PHYSICS.perfect,hit:f.hit};
   }
@@ -5631,8 +5646,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     var member = ribbonCastMember(G2.team,G2.member);
     $("ribbonWho").textContent = "你是 " + member.n + "（" + member.nick + "）";
     var completed=RIBBON.attempts>0&&(RIBBON.flight&&RIBBON.flight.resolved||RIBBON.phase==="resultWait");
-    var base=Math.floor((completed?RIBBON.attempts-1:RIBBON.attempts)/RIBBON_ROUND_SIZE)*RIBBON_ROUND_SIZE,rule=RIBBON_ROUNDS[Math.min(2,base/RIBBON_ROUND_SIZE)];
-    $("ribbonRound").textContent=rule.name+"・十投至少 "+rule.hits+" 中（本輪 "+RIBBON.results.slice(base).filter(function(r){return r.ok;}).length+" 中）";
+    var base=(RIBBON.roundIndex||0)*10,rule=RIBBON_ROUNDS[RIBBON.roundIndex||0];
+    $("ribbonRound").textContent=rule.name+"・"+(rule.hits===null?"完成十投":"十投至少 "+rule.hits+" 中")+"（本輪 "+RIBBON.results.slice(base).filter(function(r){return r.ok;}).length+" 中）";
     $("ribbonTargetText").textContent = RIBBON.target ? "目標觀眾：" + seatLabel(RIBBON.target) + " · " + (RIBBON.thrower.zone==="left"?"舞台左側站位":RIBBON.thrower.zone==="right"?"舞台右側站位":"舞台正面站位") : "正在尋找下一位目標…";
     $("ribbonAttempt").textContent = String(RIBBON.attempts);
     $("ribbonHits").textContent = String(RIBBON.hits);
@@ -5645,7 +5660,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       dots.push('<i class="' + cls + '"></i>');
     }
     $("ribbonDots").innerHTML = dots.join("");
-    $("ribbonHint").textContent=RIBBON.phase==="selecting"?"正在準備下一投，請稍候…":rule.name+"十投至少 "+rule.hits+" 中；綠色可命中，黃色可完美接取。";
+    $("ribbonHint").textContent=RIBBON.phase==="selecting"?"正在準備下一投，請稍候…":rule.name+(rule.hits===null?"完成十投後結算，不設命中門檻":"十投至少 "+rule.hits+" 中")+"；綠色可命中，黃色可完美接取。";
+    if(RIBBON.roundIndex>=1&&RIBBON.challenge)$("ribbonHint").textContent+=" 前排攔截機率約 "+Math.round(RIBBON.challenge.chance*100)+"%。";
     if (RIBBON.phase === "play" && RIBBON.window) $("ribbonHint").textContent += " 直滑中央力度時，方向容許 " + RIBBON.window.aimLo + "°～+" + RIBBON.window.aimHi + "°。";
   }
   function ribbonUpdateMarker() {
@@ -5793,6 +5809,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       var contact=RIBBON.world.collide(v.p,null,0.01,f.owner);
       if(contact.hit) v.prev.lerp(v.p,0.7);
     }
+    if(RIBBON.world&&RIBBON.world.constrainBodySegment)for(var pass=0;pass<4;pass++)for(var n=0;n<last;n++)RIBBON.world.constrainBodySegment(nodes[n].p,nodes[n+1].p,n>0&&!nodes[n].pin,n+1<last&&!nodes[n+1].pin,.012);
     ribbonConstrainDrop(f);
   }
   var ribbonTangent = new THREE.Vector3(), ribbonView = new THREE.Vector3(), ribbonSide = new THREE.Vector3();
@@ -5830,12 +5847,52 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.flight.mesh.material.dispose();
     RIBBON.flight = null;
   }
+  function ribbonClearAudience(restore){if(!RIBBON)return;if(RIBBON.crowd)RIBBON.crowd.clear(restore);if(RIBBON.angrySeats)RIBBON.angrySeats.clear();moodGroup.children.slice().forEach(function(sp){if(sp.userData.ribbonReaction){moodGroup.remove(sp);if(sp.userData.seat.mood===sp)sp.userData.seat.mood=null;}});}
+  function ribbonNewEgg(){RIBBON.egg={attempt:(RIBBON.roundIndex||0)*10+Math.floor(Math.random()*10),armed:Math.random()<.05,used:false};RIBBON.angrySeats=new Set();}
+  function ribbonMaybeEgg(target){var egg=RIBBON.egg;if(!egg||!egg.armed||egg.used||egg.attempt!==RIBBON.attempts-1||target.light||target.fan||target.towel)return;egg.used=true;var winners=new Set(RIBBON.results.slice((RIBBON.roundIndex||0)*10).filter(function(r){return r.ok;}).map(function(r){return r.seat;}));seats.forEach(function(s){if(s===target||!seatOcc(s)||winners.has(s.i)||RIBBON.roundIndex!==2&&s.pos.distanceTo(target.pos)>1.05)return;RIBBON.angrySeats.add(s.i);if(s.mood){moodGroup.remove(s.mood);s.mood=null;}});if(RIBBON.angrySeats.size)RIBBON.crowd.beginAnger(moodMaterial("😠").map);}
+
+
+  function ribbonInterceptionChance(){
+    if(RIBBON.roundIndex<1)return 0;
+    var prior=RIBBON.results.slice(0,RIBBON.roundIndex*10).reduce(function(sum,r){return sum+(r.points||0);},0),hits=RIBBON.results.slice(RIBBON.roundIndex*10).filter(function(r){return r.ok;}).length;
+    var chance=Math.min(.7,.12+.03*hits+Math.min(.25,prior/6000*.25));return RIBBON.roundIndex===1?chance*.45:chance;
+  }
+  function ribbonLockInterception(){
+    var key=RIBBON.attempts,decisions=RIBBON.interceptionDecisions;
+    if(!decisions)return;
+    if(!decisions[key]){var chance=ribbonInterceptionChance();decisions[key]={chance:chance,active:chance>0&&Math.random()<chance,seed:Math.random(),receivers:RIBBON.crowd?Array.from(RIBBON.crowd.entries.values()).filter(function(e){return e.caught;}).map(function(e){return e.seat.i;}):[]};}
+    RIBBON.challenge=decisions[key];
+  }
+  function ribbonInterceptors(shot,target,thrower,challenge){
+    challenge=challenge===undefined?RIBBON.challenge:challenge;
+    if(!challenge||!challenge.active||!RIBBON.catchBySeat)return [];
+    var dx=shot.velocity.x,dz=shot.velocity.z,speed=Math.hypot(dx,dz)||1;dx/=speed;dz/=speed;
+    var targetPoint=headWorld(target,new THREE.Vector3()),end=(targetPoint.x-shot.origin.x)*dx+(targetPoint.z-shot.origin.z)*dz,choices=[];
+    RIBBON.catchBySeat.forEach(function(q){if(q.seat===target||challenge.receivers&&challenge.receivers.includes(q.seat.i))return;var x=q.x-shot.origin.x,z=q.z-shot.origin.z,along=x*dx+z*dz,lateral=Math.abs(x*dz-z*dx);if(along<.5||along>end-.4||lateral>.6*q.k)return;
+      var hand=new THREE.Vector3(.08*q.k,q.localShoulder.y+.48*q.k,q.localShoulder.z-.34*q.k).applyMatrix4(q.seat.m),n=Math.sin((q.seat.i+1)*12.9898+challenge.seed*43758.5453)*43758.5453;
+      choices.push({seat:q.seat,hand:hand,k:q.k,start:Math.max(0,(along-.9)/speed),key:n-Math.floor(n)});
+    });choices.sort(function(a,b){return a.key-b.key;});return choices.slice(0,1);
+  }
+  function ribbonCatchInterception(f){for(var i=0;i<(f.interceptors||[]).length;i++){var q=f.interceptors[i];if(f.time>=q.start+.18&&f.roll.distanceTo(q.hand)<.17*q.k&&f.roll.distanceTo(RIBBON.catchBySeat.get(q.seat.i).shoulder)<.615*q.k)return {seat:q.seat,distance:f.roll.distanceTo(q.hand),intercepted:true};}return null;}
+  function ribbonTickAudience(now){
+    var crowd=RIBBON.crowd;if(!crowd||document.hidden||RIBBON.pausedAt)return;var dt=Math.max(0,Math.min(.05,(now-(crowd.last||now))/1000));crowd.last=now;
+    if(RIBBON.angrySeats)crowd.tickAnger(RIBBON.angrySeats,camera,RIBBON.fxTime||0,headWorld);
+    var f=RIBBON.flight;
+    if(f&&!f.resolved){
+      var q=RIBBON.catchBySeat&&RIBBON.catchBySeat.get(f.targetSeat.i);
+      if(q){var target=new THREE.Vector3(q.x,q.y+.25,q.z);target.add(new THREE.Vector3(0,0,-.24*q.k).transformDirection(q.seat.m).multiplyScalar(.24*q.k));if(f.roll.distanceTo(target)<1.3)crowd.anticipate(q.seat,target,Math.min(1,(1.3-f.roll.distanceTo(target))/.8),f);}
+      (f.interceptors||[]).forEach(function(q){if(f.time>=q.start)crowd.anticipate(q.seat,q.hand,(f.time-q.start)/.18,f);});
+    }
+    crowd.entries.forEach(function(e,i){if(e.caught&&e.flight){if(!e.hand||e.hand.distanceToSquared(e.flight.roll)>1e-10)crowd.pose(e,e.flight.roll);(e.flights||[]).forEach(function(other){if(other!==e.flight&&other.roll&&other.roll.distanceToSquared(e.flight.roll)>1e-10){other.roll.copy(e.flight.roll);if(other.nodes&&other.nodes.length){var tail=other.nodes[other.nodes.length-1];tail.p.copy(other.roll);tail.prev.copy(other.roll);}other.asleep=false;other.calm=0;ribbonUpdateMesh(other);}});}else if(!f||f.resolved||e.anticipation!==f){e.returnAge=(e.returnAge||0)+dt;if(e.returnAge>=.3)crowd.release(i);else if(e.hand)crowd.pose(e,e.hand.clone().lerp(e.hands[1],Math.min(1,dt/.1)));}});
+  }
+  var ribbonCatchLocal=new THREE.Vector3(),ribbonAudienceMatrix=new THREE.Matrix4();
   function ribbonBuildCatchGrid() {
-    RIBBON.catchGrid = new Map();
+    RIBBON.catchGrid = new Map();RIBBON.catchBySeat=new Map();
     seats.forEach(function(s){
       if(s.i === S.my || !seatOcc(s)) return;
       headWorld(s, ribbonHead);
-      var q = {seat:s, x:ribbonHead.x, y:ribbonHead.y, z:ribbonHead.z, floor:s.pos.y};
+      var k=seatHeight(s)/170;IM.arm.getMatrixAt(s.i*2+1,ribbonAudienceMatrix);var shoulder=new THREE.Vector3(0,.15*k,0).applyMatrix4(ribbonAudienceMatrix),inverse=s.m.clone().invert();
+      var q={seat:s,x:ribbonHead.x,y:ribbonHead.y,z:ribbonHead.z,floor:s.pos.y,k:k,shoulder:shoulder,inverse:inverse,localShoulder:shoulder.clone().applyMatrix4(inverse)};RIBBON.catchBySeat.set(s.i,q);
       var key = Math.floor(q.x / 0.8) + ":" + Math.floor(q.z / 0.8);
       if(!RIBBON.catchGrid.has(key)) RIBBON.catchGrid.set(key, []);
       RIBBON.catchGrid.get(key).push(q);
@@ -5851,6 +5908,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       for(var i=0;i<bucket.length;i++) {
         var q=bucket[i], dx=p.x-q.x, dz=p.z-q.z;
         if(Math.hypot(dx,dz)>RIBBON_PHYSICS.reachR || p.y<q.floor || p.y>q.y+RIBBON_PHYSICS.reachUp) continue;
+        ribbonCatchLocal.copy(p).applyMatrix4(q.inverse);
+        if(ribbonCatchLocal.z>q.seat.headZ-.12*q.k||p.distanceTo(q.shoulder)>.615*q.k)continue;
         ribbonHead.set(q.x,q.y+.25,q.z);
         if(RIBBON.world.blocked && RIBBON.world.blocked(p,ribbonHead,owner,actors))continue;
         var distance=Math.hypot(dx,p.y-q.y-0.25,dz), score=q.seat===targetSeat?-1:Math.hypot(dx,dz);
@@ -5884,11 +5943,11 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     var perfect = ok && caught.distance < RIBBON_PHYSICS.perfect && !caught.pickup && !f.hit && !f.snag;
     RIBBON.attempts++;
     RIBBON.used.add(target.i);
-    RIBBON.results.push({ ok: ok, perfect: perfect, row:target.row, member:G2.member });
+    RIBBON.results.push({ok:ok,perfect:perfect,row:target.row,member:G2.member,points:0,seat:target.i});
     if(ok && G2.member!==null)ribbonRecords.hit(G2.team,G2.member,target.row,perfect);
     f.resolved = true;f.actors=null;
     f.lastLen = Math.max(RIBBON_SEGMENT*.5,f.nodes[f.nodes.length-2].p.distanceTo(f.roll));
-    if(caught) {f.catchFrom=f.roll.clone();headWorld(caught.seat,ribbonHead);f.catchTo=ribbonHead.clone();f.catchTo.y-=.35;f.catchAge=0;}
+    if(caught){f.catchAge=0;f.pickup=!!caught.pickup;f.catchFrom=f.roll.clone();f.receiver=RIBBON.crowd.receive(caught.seat,f.roll,f);f.catchTo=f.receiver.hold.clone();f.catchAge=0;f.intercepted=!!caught.intercepted;}
     f.removeAt = now + (ok ? 900 : 1200);
     if (ok) {
       RIBBON.hits++;
@@ -5896,7 +5955,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       RIBBON.bestCombo = Math.max(RIBBON.bestCombo, RIBBON.combo);
       if (perfect) RIBBON.perfect++;
       var points = 100 + (perfect ? 100 : 0) + 10 * Math.min(10, RIBBON.combo - 1);
-      RIBBON.score += points;
+      RIBBON.score += points;RIBBON.results[RIBBON.results.length-1].points=points;
       target.found = true;
       target.pts = points;
       G2.found = RIBBON.hits;
@@ -5904,27 +5963,26 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       G2.combo = RIBBON.combo;
       G2.maxCombo = RIBBON.bestCombo;
       ribbonFeedback(f,perfect?"★ 完美接住":"○ 接住了",perfect?"#ffe27a":"#77e8ae");
-      showMood(target, perfect ? "🤩" : "😍");
+      if(RIBBON.roundIndex===2&&RIBBON.angrySeats)RIBBON.angrySeats.delete(target.i);showMood(target, perfect ? "🤩" : "😍");if(target.mood)target.mood.userData.ribbonReaction=true;ribbonMaybeEgg(target);
       SFX.found();
       toast((perfect ? "完美接住！★　" : "接到彩帶！　") + seatLabel(target) + "　+" + points);
     } else {
       RIBBON.misses++;
       RIBBON.combo = 0;
       if (caught) {
-        ribbonFeedback(f,"× 被接走了","#ff8fc0");
-        showMood(caught.seat, "😮");
+        ribbonFeedback(f,caught.intercepted?"× 前排伸手攔截":"× 被接走了","#ff8fc0");
+        showMood(caught.seat, "😮");if(caught.seat.mood)caught.seat.mood.userData.ribbonReaction=true;
         toast(seatLabel(caught.seat) + " 把彩帶接走了，沒有送到目標粉絲手上");
       } else if(f.blockedByActor){ribbonFeedback(f,"× 被站位成員擋住","#ff8fc0");toast("彩帶被站位成員擋住，請調整方向，避開成員再投擲。");} else {ribbonFeedback(f,"× 沒有接住","#ff8fc0");toast(f.power < RIBBON.window.lo ? "力度偏弱，下次請更快速向上滑動" : f.power > RIBBON.window.hi ? "力度過強，下次請減輕力度" : "方向偏離，下次請向上直滑，修正左右偏移");}
       SFX.miss();
     }
     if(RIBBON.attempts%RIBBON_ROUND_SIZE===0) {
-      var roundIndex=RIBBON.attempts/RIBBON_ROUND_SIZE-1,rule=RIBBON_ROUNDS[roundIndex];
-      var hits=RIBBON.results.slice(roundIndex*RIBBON_ROUND_SIZE).filter(function(r){return r.ok;}).length;
-      if(hits<rule.hits || roundIndex===RIBBON_ROUNDS.length-1) {
-        RIBBON.cleared=hits>=rule.hits && roundIndex===RIBBON_ROUNDS.length-1;
-        RIBBON.phase="resultWait";
-        RIBBON.finishReason=RIBBON.cleared?"決勝輪十投全中，三輪挑戰通關！":rule.name+"命中 "+hits+"/10，未達 "+rule.hits+" 次命中。";
-      } else toast(rule.name+"命中 "+hits+"/10，進入"+RIBBON_ROUNDS[roundIndex+1].name+"！");
+      var roundIndex=RIBBON.roundIndex,rule=RIBBON_ROUNDS[roundIndex];
+      var hits=RIBBON.results.slice(roundIndex*10,(roundIndex+1)*10).filter(function(r){return r.ok;}).length,passed=rule.hits===null||hits>=rule.hits;
+      RIBBON.nextRound=passed&&roundIndex<2?roundIndex+1:null;
+      RIBBON.cleared=passed&&roundIndex===2;
+      RIBBON.phase="resultWait";
+      RIBBON.finishReason=RIBBON.cleared?"決勝輪完成十投，三輪挑戰結束！":RIBBON.nextRound!==null?rule.name+"命中 "+hits+"/10，合照後可晉級"+RIBBON_ROUNDS[RIBBON.nextRound].name+"。":rule.name+"命中 "+hits+"/10，未達 "+rule.hits+" 次命中。";
     }
     RIBBON.nextAt=now+(ok?900:1200);
     ribbonUpdateHud();
@@ -5951,10 +6009,10 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     for(var half=0;half<2;half++) {
       ribbonAdvanceRoll(f, RIBBON_DT / 2);
       var owner=f.owner===undefined?RIBBON.slot:f.owner;
-      var contact = RIBBON.world.collide(f.roll,f.velocity,RIBBON_PHYSICS.rollR,owner,f.actors);
+      var contact = RIBBON.world.collide(f.roll,f.velocity,RIBBON_PHYSICS.rollR,owner,f.actors,f.bodies);
       if (contact.hit) f.hit = true;
       if(contact.actor!==undefined)f.blockedByActor=true;
-      var caught=f.blockedByActor?null:ribbonCatchAt(f.roll,target,owner,f.actors);
+      var caught=f.blockedByActor||contact.audience!==undefined?null:ribbonCatchInterception(f)||ribbonCatchAt(f.roll,target,owner,f.actors);
       if (caught) return { done:true, caught:caught };
       if (contact.landed && contact.actor===undefined) {
         if(f.blockedByActor)return {done:true,caught:null};
@@ -5982,7 +6040,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     var shot = ribbonBuildLaunch(power, alpha);
     if (!shot) return;
     var color = RIBBON.color, f = ribbonMakeTrail(color);
-    f.owner = RIBBON.slot;f.actors=RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null;
+    f.bodies=RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null;f.interceptors=ribbonInterceptors(shot,RIBBON.target,RIBBON.thrower);f.owner = RIBBON.slot;f.actors=RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null;
     f.targetSeat = RIBBON.target;
     f.anchor = RIBBON.thrower.hold.clone();
     f.roll = shot.origin.clone();
@@ -6020,6 +6078,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     $("ribbonHud").hidden = true;
     $("countdown").hidden = true;
     ribbonCancelGesture();
+    ribbonClearAudience();
     ribbonDisposeHeld();
     ribbonDisposeFlight();
     ribbonDisposeSettled();
@@ -6038,6 +6097,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       return;
     }
     ribbonAddCast();
+    RIBBON.crowd=new RibbonCrowd(THREE,IM,seats,seatHeight,{fans:uchiwa,towels:towelG,scene:scene,getWorld:function(){return RIBBON.world;}});
     ribbonBuildCatchGrid();
     RIBBON.world = new RibbonWorld(THREE, scene, IM, seats, {width:ROOM_W, height:ROOM_H, depth:ROOM_D, z:ROOM_Z, platforms:platforms});
     drag = null; ptrs = {}; pinch = null;
@@ -6046,7 +6106,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.thrower = null;RIBBON.throwers=null;RIBBON.heldHeadings={};RIBBON.heldThrowers={};
     RIBBON.attempts = RIBBON.hits = RIBBON.perfect = RIBBON.misses = 0;
     RIBBON.combo = RIBBON.bestCombo = RIBBON.score = 0;
-    RIBBON.cleared=false;RIBBON.throwColors=[];RIBBON.paletteOffset=Math.floor(Math.random()*RIBBON_PALETTE.length);RIBBON.results = [];RIBBON.effects=[];RIBBON.fxTime=0;RIBBON.runTitles=ribbonRecords.snapshot().titles;
+    RIBBON.interceptionDecisions={};RIBBON.challenge=null;RIBBON.cleared=false;RIBBON.roundIndex=0;RIBBON.nextRound=null;RIBBON.runRecorded=false;RIBBON.throwColors=[];RIBBON.paletteOffset=Math.floor(Math.random()*RIBBON_PALETTE.length);RIBBON.results = [];RIBBON.effects=[];RIBBON.fxTime=0;RIBBON.runTitles=ribbonRecords.snapshot().titles;ribbonNewEgg();
     ribbonPrepareThrower();
     RIBBON.used.clear();
     RIBBON.windowCache = new Map();RIBBON.windowTasks=new Map();RIBBON.reachableRows={};RIBBON.recordsReady=false;
@@ -6080,8 +6140,26 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     updateHud();
     RIBBON.collectionTask=ribbonExploreRecords(RIBBON.session).catch(function(error){console.warn("彩帶實績探索未完成",error);});
   }
+  function ribbonFillPhotoTapes(){
+    var owners=new Set(RIBBON.settled.map(function(f){return f.owner;})),taken=new Set();
+    RIBBON.settled.forEach(function(f){if(f.receiver)taken.add(f.receiver.seat.i);});
+    var missing=RIBBON.stations.map(function(_,i){return i;}).filter(function(i){return !owners.has(i);}),lists=new Map(),assigned=new Map();
+    missing.forEach(function(owner){var station=RIBBON.stations[owner],hold=performers[owner].elL.localToWorld(new THREE.Vector3(0,-.245,0));
+      var candidates=seats.filter(function(seat){if(!seatOcc(seat)||seat.i===S.my||taken.has(seat.i))return false;var q=RIBBON.catchBySeat.get(seat.i),point=new THREE.Vector3(.06*q.k,q.localShoulder.y+.08*q.k,Math.min(-.36*q.k,q.localShoulder.z-.32*q.k)).applyMatrix4(seat.m),angle=wrapAng(Math.atan2(point.x-station.position.x,point.z-station.position.z)-station.heading);if(Math.abs(angle)>Math.PI/4)return false;return !RIBBON.world.blocked(hold,point,owner);});
+      for(var i=candidates.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),q=candidates[i];candidates[i]=candidates[j];candidates[j]=q;}lists.set(owner,candidates);
+    });
+    function match(owner,seen){var candidates=lists.get(owner);for(var i=0;i<candidates.length;i++){var seat=candidates[i];if(seen.has(seat.i))continue;seen.add(seat.i);var old=assigned.get(seat.i);if(old===undefined||match(old,seen)){assigned.set(seat.i,owner);return true;}}return false;}
+    missing.forEach(function(owner){match(owner,new Set());});
+    assigned.forEach(function(owner,id){var seat=seats[id],p=performers[owner];p.g.updateMatrixWorld(true);var f=ribbonMakeTrail(RIBBON_PALETTE[(RIBBON.paletteOffset+owner*5+(RIBBON.roundIndex||0)*3)%12]);
+      Object.assign(f,{owner:owner,targetSeat:seat,decorative:true,anchor:p.elL.localToWorld(new THREE.Vector3(0,-.245,0)),velocity:new THREE.Vector3(),resolved:true,time:0,paid:0,acc:0,alpha:0,heading:0,hit:false,snag:false});
+      f.receiver=RIBBON.crowd.receive(seat,RIBBON.crowd.ensure(seat).hold,f);f.roll=f.receiver.hold.clone();f.catchFrom=f.roll.clone();f.catchTo=f.roll.clone();f.catchAge=.75;
+      var count=Math.min(RIBBON_MAX-1,Math.max(8,Math.ceil((f.anchor.distanceTo(f.roll)+1.5)/RIBBON_SEGMENT))),point=new THREE.Vector3();
+      for(var n=0;n<=count;n++){var t=n/count;point.lerpVectors(f.anchor,f.roll,t);point.y+=.75*Math.sin(Math.PI*t);ribbonAddPoint(f,point);}f.paid=Math.min(30,count*RIBBON_SEGMENT);f.lastLen=RIBBON_SEGMENT;f.mesh.material.opacity=0;f.rollMesh.traverse(function(o){if(o.material){o.material.transparent=true;o.material.opacity=0;}});RIBBON.settled.push(f);
+    });
+  }
   function finishRibbonGame(reason) {
     if (!RIBBON.active) return;
+    if(reason&&reason!==RIBBON.finishReason)RIBBON.nextRound=null;
     RIBBON.resultFrom=performers.map(function(p){return {position:p.g.position.clone(),yaw:p.g.rotation.y,arms:[p.armL.quaternion.clone(),p.armR.quaternion.clone()],elbows:[p.elL.quaternion.clone(),p.elR.quaternion.clone()]};});
     RIBBON.resultStartPosition=camera.position.clone();RIBBON.resultStartQuaternion=camera.quaternion.clone();RIBBON.resultStartFov=camera.fov;RIBBON.resultView=null;
     RIBBON.active = false;
@@ -6091,7 +6169,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.phase = "result";
     RIBBON.resultAge = 0;
     RIBBON.finaleDone = false;
-    ribbonRecords.finish(RIBBON.results,G2.team,RIBBON.roster.filter(function(m){return m!==null;}));
+    ribbonRecords.finish(RIBBON.results,G2.team,RIBBON.roster.filter(function(m){return m!==null;}),!RIBBON.runRecorded);
+    if(RIBBON.results.length)RIBBON.runRecorded=true;
     RIBBON.photoURL = null; RIBBON.photoAttempted = false;
     RIBBON.lastFrame = performance.now();
     S.yaw = 0; S.pitch = 0;
@@ -6105,13 +6184,17 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     G2.phase = "idle";
     S.blackout = false;
     if(RIBBON.flight) { RIBBON.settled.push(RIBBON.flight); RIBBON.flight = null; }
+    performers.forEach(function(p){p.g.updateMatrixWorld(true);});ribbonFillPhotoTapes();
     RIBBON.settled.forEach(function(f){f.finaleFrom=f.anchor.clone();f.actors=null;if(f.owner>=6)ribbonPrepareDrop(f);});
     $("countdown").hidden = true;
     $("ribbonHud").hidden = true;
     ribbonMark.hidden = true;
     $("app").classList.remove("playing");
-    $("ribbonResultTitle").textContent = RIBBON.cleared ? "彩帶挑戰通關" : "彩帶挑戰結束";
-    $("ribbonResultMessage").textContent = reason || RIBBON.finishReason || "挑戰已結束。";
+    $("ribbonResultTitle").textContent=RIBBON.nextRound!==null?RIBBON_ROUNDS[RIBBON.roundIndex].name+"合照":RIBBON.cleared?"三輪挑戰完成":"彩帶挑戰結束";
+    $("ribbonNext").hidden=RIBBON.nextRound===null;$("ribbonNext").disabled=true;
+    if(RIBBON.nextRound!==null)$("ribbonNext").textContent="晉級"+RIBBON_ROUNDS[RIBBON.nextRound].name;
+    $("ribbonAgain").className=RIBBON.nextRound===null?"primary":"ghost";
+    $("ribbonResultMessage").textContent = (reason || RIBBON.finishReason || "挑戰已結束。")+" 以下為截至目前的累計成果。";
     var ratio=RIBBON.attempts?RIBBON.hits/RIBBON.attempts:0;
     var value=.75*ratio+.25*Math.min(1,RIBBON.bestCombo/Math.max(1,RIBBON.attempts));
     var rank=value>=.72?"ㄅ":value>=.52?"ㄆ":value>=.3?"ㄇ":"ㄈ";
@@ -6121,7 +6204,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     $("ribbonResultStats").innerHTML=[["投出彩帶",RIBBON.attempts+" 次"],["命中次數",RIBBON.hits+" 次"],["完美接取",RIBBON.perfect+" ★"],["最高 Combo",RIBBON.bestCombo],["失手",RIBBON.misses+" 次"],["命中率",Math.round(ratio*100)+"%"]].map(function(item){return "<div><span>"+item[0]+"</span><b>"+item[1]+"</b></div>";}).join("");
     var lastBase=Math.floor(Math.max(0,RIBBON.results.length-1)/RIBBON_ROUND_SIZE)*RIBBON_ROUND_SIZE;
     $("ribbonResultDots").innerHTML=RIBBON.results.slice(lastBase).map(function(r){return '<i class="'+(r.ok?'hit':'miss')+'" title="'+(r.row||'')+'排 '+(r.perfect?'完美':r.ok?'命中':'失手')+'"></i>';}).join('');
-    $("ribbonRoundResults").innerHTML=RIBBON_ROUNDS.map(function(rule,i){var results=RIBBON.results.slice(i*10,(i+1)*10),hits=results.filter(function(r){return r.ok;}).length;return '<p>'+rule.name+'：命中 '+hits+'/'+results.length+'（十投門檻 '+rule.hits+' 中） · '+(results.length<10?'未完成':hits>=rule.hits?'過關':'未過關')+'</p>';}).join('');
+    $("ribbonRoundResults").innerHTML=RIBBON_ROUNDS.filter(function(_,i){return i*10<RIBBON.results.length;}).map(function(rule,i){var results=RIBBON.results.slice(i*10,(i+1)*10),hits=results.filter(function(r){return r.ok;}).length;return '<p>'+rule.name+'：命中 '+hits+'/'+results.length+(rule.hits===null?'（不設門檻） · ':'（十投門檻 '+rule.hits+' 中） · ')+(results.length<10?'未完成':rule.hits===null?'完成':hits>=rule.hits?'過關':'未過關')+'</p>';}).join('');
     var newTitles=ribbonRecords.snapshot().titles.filter(function(id){return !(RIBBON.runTitles||[]).includes(id);});
     $("ribbonRunAwards").innerHTML=ribbonRecords.titles.filter(function(title){return newTitles.includes(title[0]);}).map(function(title){return '<span>新實績 · '+esc(title[1])+'</span>';}).join('');
     RIBBON.presentationReady=RIBBON.settled.length===0;
@@ -6130,6 +6213,9 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     syncModeBar();updateHud();
   }
   function closeRibbonSummary() {
+    RIBBON.active=false;RIBBON.session++;RIBBON.nextRound=null;RIBBON.presentationReady=false;
+    G2.phase="idle";$("app").classList.remove("playing");$("countdown").hidden=true;$("ribbonHud").hidden=true;ribbonMark.hidden=true;
+    ribbonClearAudience();
     if($("ribbonRecordDialog").open)$("ribbonRecordDialog").close();
     ribbonDisposeHeld();
     ribbonDisposeSettled();
@@ -6151,8 +6237,27 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (typeof MODE === "undefined" || MODE === "game") $("startPanel").hidden = false;
     updateHud();
   }
+  function ribbonContinueRound() {
+    if(RIBBON.phase!=="result"||!RIBBON.presentationReady||RIBBON.nextRound===null||$("ribbonNext").disabled)return false;
+    $("ribbonNext").disabled=true;
+    var next=RIBBON.nextRound;RIBBON.nextRound=null;RIBBON.session++;RIBBON.active=true;RIBBON.phase="countdown";RIBBON.roundIndex=next;
+    ribbonCancelGesture();ribbonClearAudience();ribbonDisposeHeld();ribbonDisposeFlight();ribbonDisposeSettled();
+    RIBBON.photoURL=null;RIBBON.photoAttempted=false;RIBBON.presentationReady=false;RIBBON.resultFrom=null;RIBBON.resultView=null;
+    RIBBON.target=null;RIBBON.window=null;RIBBON.thrower=null;RIBBON.heldHeadings={};RIBBON.heldThrowers={};RIBBON.used.clear();
+    RIBBON.effects=[];RIBBON.fxTime=0;RIBBON.finishReason="";RIBBON.cleared=false;ribbonNewEgg();
+    RIBBON.windowCache=new Map();RIBBON.windowTasks=new Map();RIBBON.reachableRows={};RIBBON.recordsReady=false;
+    $("ribbonSummary").hidden=true;$("ribbonPhoto").hidden=true;$("ribbonPhoto").removeAttribute("src");$("ribbonFinaleNote").hidden=true;$("ribbonNext").hidden=true;
+    drag=null;ptrs={};pinch=null;S.yaw=0;S.pitch=0;S.fov=IDOL_FOV;
+    ribbonPrepareThrower();RIBBON.heldSpool=ribbonMakeSpool(RIBBON.color);RIBBON.heldSpool.visible=false;scene.add(RIBBON.heldSpool);
+    RIBBON.nextAt=0;RIBBON.lastCd=0;RIBBON.pausedAt=0;RIBBON.cdStart=performance.now();RIBBON.lastFrame=RIBBON.cdStart;
+    G2.on=false;G2.result=false;G2.phase="ribbon";S.blackout=false;
+    $("app").classList.add("playing");$("modeBar").hidden=true;$("countdown").hidden=false;$("cdNum").textContent="3";$("ribbonHud").hidden=true;ribbonMark.hidden=true;
+    ribbonSetPower(0);ribbonUpdateHud();updateCamera();updateHud();
+    RIBBON.collectionTask=ribbonExploreRecords(RIBBON.session).catch(function(error){console.warn("彩帶實績探索未完成",error);});
+    return true;
+  }
   async function ribbonStartPlay(now) {
-    if (!RIBBON.active || RIBBON.phase === "selecting") return;
+    if (!RIBBON.active || !["countdown","play"].includes(RIBBON.phase)) return;
     var session = RIBBON.session;
     RIBBON.phase = "selecting";
     if(RIBBON.heldSpool)RIBBON.heldSpool.visible=false;
@@ -6222,7 +6327,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       ribbonCtx.save();
       ribbonCtx.beginPath();
       var open = false;
-      var predicted = {owner:RIBBON.slot,actors:RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null, roll: shot.origin.clone(), velocity: shot.velocity.clone(), tilt: shot.tilt, paid: 0, apex: shot.origin.y, hit: false, time: 0 };
+      var predicted = {bodies:RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null,interceptors:ribbonInterceptors(shot,RIBBON.target,RIBBON.thrower),owner:RIBBON.slot,actors:RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null, roll: shot.origin.clone(), velocity: shot.velocity.clone(), tilt: shot.tilt, paid: 0, apex: shot.origin.y, hit: false, time: 0 };
       for (var step = 0; step <= 960; step++) {
         var result = step ? ribbonStepRoll(predicted, RIBBON.target) : {done:false};
         var stopped = result.done;
@@ -6253,9 +6358,11 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       ribbonCtx.stroke();
     }
   }
+  function ribbonCatchDuration(f){return f.receiver?(f.pickup?.95:.75):.35;}
   function ribbonTickCatch(f,dt) {
-    if(!f.catchTo || f.catchAge>=.35)return;
-    f.catchAge=Math.min(.35,f.catchAge+dt);f.roll.lerpVectors(f.catchFrom,f.catchTo,f.catchAge/.35);
+    var duration=ribbonCatchDuration(f);if(!f.catchTo||f.catchAge>=duration)return;
+    f.catchAge=Math.min(duration,f.catchAge+dt);var u=f.pickup?Math.max(0,(f.catchAge-.2)/.75):f.catchAge/duration,t=u*u*(3-2*u);f.roll.lerpVectors(f.catchFrom,f.catchTo,t);
+    if(f.receiver){f.roll.y+=.05*Math.sin(u*Math.PI);RIBBON.crowd.pose(f.receiver,f.roll);if(f.pickup&&f.catchAge>=.2){var safe=f.receiver.hand.clone();for(var pass=0;pass<4;pass++){var contact=RIBBON.world.collide(safe,null,.035,f.owner);RIBBON.crowd.pose(f.receiver,safe);safe.copy(f.receiver.hand);if(!contact.hit)break;}f.roll.copy(safe);}}
   }
   function ribbonTickSettled(dt) {
     RIBBON.settled.forEach(function(f){
@@ -6299,7 +6406,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       var idleDt = Math.max(0,Math.min(.05,(now-RIBBON.lastFrame)/1000));
       RIBBON.lastFrame = now;
       if(RIBBON.phase === "result") {
-        RIBBON.resultAge += idleDt;RIBBON.fxTime=(RIBBON.fxTime||0)+idleDt;updateCamera();
+        RIBBON.resultAge += idleDt;RIBBON.settled.forEach(function(f){if(f.decorative){var opacity=.94*Math.min(1,RIBBON.resultAge/.45);f.mesh.material.opacity=opacity;f.rollMesh.traverse(function(o){if(o.material)o.material.opacity=opacity;});}});RIBBON.fxTime=(RIBBON.fxTime||0)+idleDt;updateCamera();
         if (!RIBBON.finaleDone) {
           placePerformers(0);
           var blend=Math.min(1,RIBBON.resultAge/1.1); blend=blend*blend*(3-2*blend);
@@ -6320,7 +6427,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
           RIBBON.photoAttempted=true;RIBBON.presentationReady=true;
           $("ribbonSummary").hidden=false;$("ribbonFinaleNote").hidden=true;
           $("ribbonExport").disabled=false;
-          ribbonCapturePhoto();
+          ribbonCapturePhoto();$("ribbonNext").disabled=false;
         }
       }
       ribbonDrawPreview(now); return;
@@ -6350,7 +6457,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       return;
     }
     if (RIBBON.phase === "resultWait") {
-      if (now >= RIBBON.nextAt) finishRibbonGame(RIBBON.finishReason);
+      if (now >= RIBBON.nextAt && (!RIBBON.flight||!RIBBON.flight.catchTo||RIBBON.flight.catchAge>=ribbonCatchDuration(RIBBON.flight))) finishRibbonGame(RIBBON.finishReason);
       ribbonDrawPreview(now);
       return;
     }
@@ -6371,7 +6478,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
         updateCamera();camera.updateMatrixWorld(true);
       }
       ribbonUpdateMesh(f);
-    } else if (RIBBON.flight && RIBBON.flight.resolved && now >= RIBBON.flight.removeAt) {
+    } else if (RIBBON.flight && RIBBON.flight.resolved && now >= RIBBON.flight.removeAt && (!RIBBON.flight.catchTo || RIBBON.flight.catchAge>=ribbonCatchDuration(RIBBON.flight))) {
       RIBBON.settled.push(RIBBON.flight);
       RIBBON.flight = null;
     }
@@ -7180,7 +7287,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       ctx.putImageData(data,0,0);ctx.fillStyle="#18101e";ctx.fillRect(0,height,width,120);
       ctx.fillStyle="#ffe5ac";ctx.font="bold 28px sans-serif";
       ctx.fillText("TPE 彩帶挑戰 · 命中 "+RIBBON.hits+" · 完美 "+RIBBON.perfect+" ★",24,height+45);
-      ctx.font="20px sans-serif";ctx.fillText("已完成 "+RIBBON.attempts+" 投 · 分數 "+RIBBON.score+" · "+(RIBBON.cleared?"三輪通關":RIBBON.finishReason||"挑戰結束"),24,height+86);
+      ctx.font="20px sans-serif";ctx.fillText("已完成 "+RIBBON.attempts+" 投 · 分數 "+RIBBON.score+" · "+(RIBBON.cleared?"三輪完成":RIBBON.finishReason||"挑戰結束"),24,height+86);
       var url=output.toDataURL("image/png");if(url==="data:,")throw new Error("empty canvas");
       RIBBON.photoURL=url;$("ribbonPhoto").src=url;$("ribbonPhoto").hidden=false;
       status.textContent="成果合照已完成，可儲存圖片；手機也可以長按圖片儲存。";
@@ -7195,11 +7302,12 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   $("ribbonExport").addEventListener("click", function() {
     if(!RIBBON.photoURL && !ribbonCapturePhoto())return;
-    var link=document.createElement("a");link.download="TPE-ribbon-result.png";link.href=RIBBON.photoURL;link.click();
+    var link=document.createElement("a");link.download="TPE-ribbon-round-"+(RIBBON.roundIndex+1)+".png";link.href=RIBBON.photoURL;link.click();
     $("ribbonExportStatus").textContent="合照已產生；若手機未下載，可長按上方圖片儲存。";
   });
   $("ribbonStart").addEventListener("click", function() { startGame("ribbon"); });
   $("ribbonStop").addEventListener("click", function() { finishRibbonGame("你提前結束了這一局。"); });
+  $("ribbonNext").addEventListener("click",ribbonContinueRound);
   $("ribbonAgain").addEventListener("click", function() { startGame("ribbon"); });
   $("ribbonClose").addEventListener("click", closeRibbonSummary);
   var MODE = "game";
@@ -7362,6 +7470,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     endGame(false);
   });
   function onAudienceChanged() {
+    ribbonClearAudience(false);
     if (RIBBON.active || RIBBON.phase === "result") {
       if (RIBBON.active) finishRibbonGame("觀眾設定變更，這一局已結束。");
       closeRibbonSummary();
@@ -7700,6 +7809,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     updateCamera();
     tickGame(now);
     ribbonTick(now);
+    ribbonTickAudience(now);
     placeMoods(now);
     updateFx(now);
     tickAudio();

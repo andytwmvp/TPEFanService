@@ -16,17 +16,17 @@
           targetGrid.get(key).push(box);
         }
     }
-    function addMeshBounds(geometry, transform, blocksTarget,actor) {
+    function addMeshBounds(geometry, transform, blocksTarget,actor,skipAdd) {
       if(!geometry.boundingBox)geometry.computeBoundingBox();
       var bounds=geometry.boundingBox.clone().applyMatrix4(transform);
-      bounds.blocksTarget=!!blocksTarget;
+      bounds.blocksTarget=!!blocksTarget;bounds.geometry=geometry;
       bounds.localBounds=geometry.boundingBox.clone();
       bounds.transform=transform.clone();
       bounds.inverse=transform.clone().invert();
       bounds.normalMatrix=new THREE.Matrix3().getNormalMatrix(transform);
       var e=transform.elements;
       bounds.scale=[Math.hypot(e[0],e[1],e[2]),Math.hypot(e[4],e[5],e[6]),Math.hypot(e[8],e[9],e[10])];
-      if(actor!==undefined){bounds.actor=actor;return bounds;}
+      if(actor!==undefined||skipAdd){if(actor!==undefined)bounds.actor=actor;return bounds;}
       add(bounds);return bounds;
     }
     function setActors(performers) {
@@ -55,17 +55,17 @@
     });
     // Platforms are a separate static group. Instanced chairs and spectators use their actual matrices.
     room.platforms.children.forEach(function(child){ addMeshBounds(child.geometry,child.matrixWorld); });
-    ['pad','back','torso','head'].forEach(function(name){
-      var im=instances[name]; im.geometry.computeBoundingBox();
-      seats.forEach(function(_,i){ im.getMatrixAt(i,matrix); addMeshBounds(im.geometry,matrix); });
+    ['pad','back','torso','head','hair'].forEach(function(name){
+      var im=instances[name];if(!im)return;im.geometry.computeBoundingBox();
+      seats.forEach(function(_,i){ im.getMatrixAt(i,matrix); var person=addMeshBounds(im.geometry,matrix);if(name==='torso'||name==='head'||name==='hair'){person.audience=i;person.instanceName=name;person.instanceIndex=i;} });
     });
     var empty=[], axes=['x','y','z'], faceAxis=['x','x','y','y','z','z'];
     var low=[-room.width/2,0,room.z-room.depth/2], high=[room.width/2,room.height,room.z+room.depth/2];
-    var faces=new Float64Array(6), contact={hit:false,landed:false,actor:undefined};
+    var faces=new Float64Array(6), contact={hit:false,landed:false,actor:undefined,audience:undefined};
     var localPoint=new THREE.Vector3(), closest=new THREE.Vector3(), normal=new THREE.Vector3();
     // Reuse scratch storage: a rope may query this hundreds of times per step.
-    function collide(p, velocity, radius,ignoreActor,snapshot) {
-      contact.hit=false;contact.landed=false;contact.actor=undefined;
+    function collide(p, velocity, radius,ignoreActor,snapshot,bodies) {
+      contact.hit=false;contact.landed=false;contact.actor=undefined;contact.audience=undefined;
       for(var i=0;i<3;i++) {
         var axis=axes[i], value=Math.max(low[i]+radius,Math.min(high[i]-radius,p[axis]));
         if(value!==p[axis]) {
@@ -75,7 +75,7 @@
       }
       var cell=Math.floor(p.x)+':'+Math.floor(p.z);
       for(var group=0;group<2;group++){
-      var nearby=(group?(snapshot?snapshot.grid:actorGrid):grid).get(cell)||empty;
+      var nearby=(group?(snapshot?snapshot.grid:actorGrid):(bodies?bodies.grid:grid)).get(cell)||empty;
       for(var i=0;i<nearby.length;i++) {
         var b=nearby[i];if(b.actor!==undefined&&b.actor===ignoreActor)continue;
         if(p.x<b.min.x-radius || p.x>b.max.x+radius || p.y<b.min.y-radius || p.y>b.max.y+radius || p.z<b.min.z-radius || p.z>b.max.z+radius) continue;
@@ -103,7 +103,7 @@
           if(toward<0)velocity.addScaledVector(normal,-1.25*toward);
           velocity.x*=.6;velocity.z*=.6;
         }
-        contact.hit=true;if(b.actor!==undefined)contact.actor=b.actor;if(normal.y>.5)contact.landed=true;
+        contact.hit=true;if(b.actor!==undefined)contact.actor=b.actor;if(b.audience!==undefined)contact.audience=b.audience;if(normal.y>.5)contact.landed=true;
       }}
       return contact;
     }
@@ -155,6 +155,26 @@
       contacts.sort(function(a,b){return a.t-b.t;});var guides=[];contacts.forEach(function(c){guides.push(c.guides[0],c.guides[1]);});
       return {floor:floor,barrier:contacts.length?contacts[0].barrier:null,contacts:contacts,separations:separations,guides:guides,slideTop:slideTop,endSupportTop:endSupportTop};
     }
-    return {boxes:boxes, collide:collide,blocked:blocked,setActors:setActors,barrierCrosses:barrierCrosses,dropRoute:dropRoute,actorBounds:function(){return actorBoxes;},actorRevision:function(){return actorRevision;},snapshotActors:function(){return {grid:actorGrid,boxes:actorBoxes,revision:actorRevision};}};
+    var bodyA=new THREE.Vector3(),bodyB=new THREE.Vector3();
+    function bodySegment(a,b,freeA,freeB,radius) {
+      var hit=false;
+      for(var x=Math.floor(Math.min(a.x,b.x)-radius);x<=Math.floor(Math.max(a.x,b.x)+radius);x++)for(var z=Math.floor(Math.min(a.z,b.z)-radius);z<=Math.floor(Math.max(a.z,b.z)+radius);z++){
+        var nearby=grid.get(x+':'+z)||empty;
+        for(var i=0;i<nearby.length;i++){
+          var box=nearby[i];if(box.audience===undefined||Math.max(a.y,b.y)<box.min.y-radius||Math.min(a.y,b.y)>box.max.y+radius)continue;
+          bodyA.copy(a).applyMatrix4(box.inverse);bodyB.copy(b).applyMatrix4(box.inverse);var near=0,far=1;
+          for(var k=0;k<3;k++){var axis=axes[k],r=radius/box.scale[k],lo=box.localBounds.min[axis]-r,hi=box.localBounds.max[axis]+r,delta=bodyB[axis]-bodyA[axis];if(Math.abs(delta)<1e-9){if(bodyA[axis]<lo||bodyA[axis]>hi){near=2;break;}continue;}var t1=(lo-bodyA[axis])/delta,t2=(hi-bodyA[axis])/delta;near=Math.max(near,Math.min(t1,t2));far=Math.min(far,Math.max(t1,t2));if(near>far)break;}
+          if(near>far||far<=1e-6||near>=1-1e-6)continue;hit=true;
+          // Drape free links over the body; fixed ends select a compatible separating face.
+          var axis='y',sign=1,fixed=!freeA?bodyA:!freeB?bodyB:null,best=-Infinity;
+          if(fixed)for(var preference=0;preference<2&&best===-Infinity;preference++)for(var k=0;k<3;k++){var key=axes[k];if(preference===0&&key==='y'||preference===1&&key!=='y')continue;var r=(radius+.002)/box.scale[k],below=box.localBounds.min[key]-r-fixed[key],above=fixed[key]-box.localBounds.max[key]-r;if(below>best&&below>=0){best=below;axis=key;sign=-1;}if(above>best&&above>=0){best=above;axis=key;sign=1;}}
+          var edge=sign<0?box.localBounds.min[axis]-(radius+.002)/box.scale[axes.indexOf(axis)]:box.localBounds.max[axis]+(radius+.002)/box.scale[axes.indexOf(axis)];
+          if(freeA){bodyA[axis]=sign<0?Math.min(bodyA[axis],edge):Math.max(bodyA[axis],edge);a.copy(bodyA).applyMatrix4(box.transform);}
+          if(freeB){bodyB[axis]=sign<0?Math.min(bodyB[axis],edge):Math.max(bodyB[axis],edge);b.copy(bodyB).applyMatrix4(box.transform);}
+        }
+      }return hit;
+    }
+    function updateAudience(id,matrices){var changed=false;for(var i=0;i<boxes.length;i++){var old=boxes[i],transform=matrices[old.instanceName];if(old.audience!==id||!transform||old.transform.equals(transform))continue;var b=addMeshBounds(old.geometry,transform,old.blocksTarget,undefined,true);b.audience=id;b.instanceName=old.instanceName;b.instanceIndex=old.instanceIndex;boxes[i]=b;changed=true;}if(changed){grid=new Map();boxes.forEach(function(b){index(b,grid);});actorRevision++;}}
+    return {boxes:boxes, collide:collide,updateAudience:updateAudience,snapshotBodies:function(){return {grid:grid};},bodyCrosses:function(a,b){return bodySegment(a,b,false,false,0);},constrainBodySegment:bodySegment,blocked:blocked,setActors:setActors,barrierCrosses:barrierCrosses,dropRoute:dropRoute,actorBounds:function(){return actorBoxes;},actorRevision:function(){return actorRevision;},snapshotActors:function(){return {grid:actorGrid,boxes:actorBoxes,revision:actorRevision};}};
   };
 })(typeof window==='undefined'?globalThis:window);
