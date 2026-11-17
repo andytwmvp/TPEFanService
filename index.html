@@ -1511,6 +1511,230 @@ details.members tr.tbd td {
     transition: none;
   }
 }
+
+.startpanel #ribbonStart {
+  width: 100%;
+  min-height: 42px;
+  border-color: rgba(242, 178, 92, .7);
+  color: #ffe0ac;
+  background: rgba(242, 178, 92, .1);
+  font-weight: 700;
+}
+.startpanel.compact > #ribbonStart {
+  grid-column: 1 / -1;
+}
+#ribbonPreview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  pointer-events: none;
+}
+.ribbonhud {
+  position: absolute;
+  z-index: 7;
+  top: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(440px, calc(100% - 24px));
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, .17);
+  border-radius: 10px;
+  background: rgba(13, 10, 16, .87);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
+  backdrop-filter: blur(7px);
+  font-size: 12px;
+}
+.ribbonhud[hidden], #ribbonTargetMark[hidden], #ribbonSummary[hidden] {
+  display: none !important;
+}
+.ribbon-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ribbon-head b {
+  color: #ffe0ac;
+  font-size: 14px;
+}
+.ribbon-head small {
+  display: block;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.ribbon-head button {
+  padding: 3px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.ribbon-target-text {
+  text-align: center;
+  color: #ffe2f0;
+  margin: 4px 0 5px;
+  font-weight: 700;
+}
+.ribbon-meter {
+  position: relative;
+  height: 13px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .13);
+  border: 1px solid rgba(255, 255, 255, .16);
+}
+.ribbon-meter i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: linear-gradient(90deg, #69d9a4, #f2b25c 72%, #ff6b7a);
+  transition: width .06s linear;
+}
+.ribbon-meter span {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  line-height: 11px;
+  font-size: 10px;
+  text-shadow: 0 1px 2px #000;
+}
+.ribbon-stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 11px;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.ribbon-stats b {
+  color: var(--accent);
+}
+.ribbon-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 17px;
+  margin: 4px 0 2px;
+}
+.ribbon-dots i {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--ribbon-color, var(--accent));
+  border-radius: 50%;
+  opacity: .45;
+}
+.ribbon-dots i.now {
+  opacity: 1;
+  box-shadow: 0 0 0 2px #fff, 0 0 9px var(--ribbon-color, var(--accent));
+  transform: scale(1.22);
+}
+.ribbon-dots i.hit {
+  opacity: 1;
+  background: var(--ribbon-color, var(--accent));
+}
+.ribbon-dots i.miss {
+  opacity: 1;
+  border-color: #ff6b7a;
+  background: linear-gradient(135deg, transparent 42%, #ff6b7a 43% 57%, transparent 58%);
+}
+.ribbonhud p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.4;
+}
+#ribbonTargetMark {
+  position: absolute;
+  z-index: 6;
+  transform: translate(-50%, -115%);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  filter: drop-shadow(0 2px 3px #000);
+  white-space: nowrap;
+}
+#ribbonTargetMark i {
+  display: block;
+  width: 27px;
+  height: 27px;
+  border: 3px solid #ffd978;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(13, 10, 16, .55), 0 0 16px #ffd978;
+  animation: ribbonTargetPulse .8s ease-in-out infinite alternate;
+}
+#ribbonTargetMark span {
+  color: #1c1206;
+  background: #ffd978;
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 800;
+}
+@keyframes ribbonTargetPulse {
+  to { transform: scale(1.15); opacity: .72; }
+}
+.ribbon-summary {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(8, 6, 10, .64);
+  backdrop-filter: blur(4px);
+}
+.ribbon-result-card {
+  width: min(380px, 100%);
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--accent);
+  border-radius: 12px;
+  background: rgba(23, 18, 27, .97);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .55);
+  text-align: center;
+}
+.ribbon-result-card h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 23px;
+}
+.ribbon-result-card p {
+  margin: 0;
+  color: #ffd6e8;
+}
+.ribbon-result-stats {
+  margin: 12px 0 16px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.8;
+}
+.ribbon-result-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ribbon-result-actions button {
+  min-height: 38px;
+  padding: 7px 12px;
+}
+#app:not(.portrait).playing .ribbonhud {
+  left: 12px;
+  top: 10px;
+  transform: none;
+  width: min(360px, calc(100% - 300px));
+  min-width: 250px;
+}
+@media (max-width: 400px) {
+  .ribbonhud { padding: 7px 8px; }
+  .ribbon-stats { gap: 4px 8px; font-size: 11px; }
+  .ribbon-dots { gap: 6px; }
+}
+
 </style>
 </head>
 <body class="page-idol">
@@ -1553,6 +1777,8 @@ details.members tr.tbd td {
       <label><input type="radio" name="gTime" value="100">100 秒</label>
     </div>
     <button type="button" class="primary big" id="gStart">開始遊戲</button>
+    <button type="button" id="ribbonStart">丟彩帶挑戰</button>
+    <p class="note" id="ribbonStartNote">快速向上滑動投出彩帶；滑動方向控制落點，滑動速度控制力度。</p>
   </div>
 
   <div id="gameHud" class="gamehud" hidden>
@@ -1561,6 +1787,24 @@ details.members tr.tbd td {
     <div class="tbar" aria-label="剩餘時間"><i id="gBar"></i><b id="gTimeLeft">50</b></div>
     <div class="gstats"><span>找到 <b id="gCount">0 / 0</b></span><span>分數 <b id="gScore">0</b></span><span id="gCombo" class="combo"></span>
       <button type="button" id="gStop">結束</button></div>
+  </div>
+  <canvas id="ribbonPreview" aria-hidden="true"></canvas>
+  <div id="ribbonHud" class="ribbonhud" hidden aria-live="polite">
+    <div class="ribbon-head"><div><b id="ribbonWho"></b><small id="ribbonRound"></small></div><button type="button" id="ribbonStop">結束挑戰</button></div>
+    <div id="ribbonTargetText" class="ribbon-target-text"></div>
+    <div class="ribbon-meter" role="meter" aria-label="彩帶投擲力度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="ribbonPowerFill"></i><span>力度</span></div>
+    <div class="ribbon-stats"><span>投出 <b id="ribbonAttempt">0</b></span><span>命中 <b id="ribbonHits">0</b></span><span>完美 <b id="ribbonPerfect">0</b> ★</span><span>連擊 <b id="ribbonCombo">0</b></span></div>
+    <div id="ribbonDots" class="ribbon-dots" aria-label="本輪八投進度"></div>
+    <p id="ribbonHint">向上快速滑動投出彩帶；左右微偏調整方向。前八投完成後進入挑戰輪，失手即結束。</p>
+  </div>
+  <div id="ribbonTargetMark" hidden aria-hidden="true"><i></i><span>目標粉絲</span></div>
+  <div id="ribbonSummary" class="ribbon-summary" hidden>
+    <div class="ribbon-result-card">
+      <h2 id="ribbonResultTitle">彩帶挑戰結束</h2>
+      <p id="ribbonResultMessage"></p>
+      <div id="ribbonResultStats" class="ribbon-result-stats"></div>
+      <div class="ribbon-result-actions"><button type="button" class="primary" id="ribbonAgain">再玩一次</button><button type="button" id="ribbonClose">回到選單</button></div>
+    </div>
   </div>
   <div id="seatBar" class="seatbar idol-only" hidden>
     <span>從</span>
@@ -4056,7 +4300,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     $("hudInfo").textContent = S.cam && S.cam.idol && !S.overview ? "站在舞台前段中央，看向觀眾席" : (S.overview ? name + "・" : "") + "距舞台中央 " + d.toFixed(1) + " m・眼睛" + (dy >= 0 ? "高於" : "低於") + "舞台面 " + Math.abs(dy * 100).toFixed(0) + " cm";
     $("btnReset").textContent = S.cam && S.cam.idol ? "看向觀眾席中央" : "看向舞台中央";
     $("btnReset").hidden = !!(S.overview && IDOL);
-    $("hudHint").textContent = S.overview ? IDOL ? "拖曳旋轉場館，滾輪或雙指縮放" : "拖曳旋轉場館，滾輪拉近拉遠；金色人形是你的位置" : S.cam && S.cam.idol ? "拖曳畫面轉頭看觀眾席；遊戲中點一下粉絲就算找到" : IDOL ? "拖曳畫面轉頭看看四周" : "拖曳畫面轉頭看別處，方向鍵微調";
+    $("hudHint").textContent = RIBBON && RIBBON.active ? "彩帶挑戰：瞄準金色標記，快速向上滑動投出" : S.overview ? IDOL ? "拖曳旋轉場館，滾輪或雙指縮放" : "拖曳旋轉場館，滾輪拉近拉遠；金色人形是你的位置" : S.cam && S.cam.idol ? "拖曳畫面轉頭看觀眾席；遊戲中點一下粉絲就算找到" : IDOL ? "拖曳畫面轉頭看看四周" : "拖曳畫面轉頭看別處，方向鍵微調";
     $("btnOverview").textContent = S.overview ? "回到座位視野" : "場館鳥瞰";
   }
   var map = $("map"), mctx = map.getContext("2d");
@@ -4770,7 +5014,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   document.addEventListener("visibilitychange", function() {
     var now = performance.now();
     if (document.hidden) {
+      if (RIBBON.active) RIBBON.pausedAt = now;
       if (G2.phase === "play" || G2.phase === "countdown") G2.pausedAt = now;
+    } else if (RIBBON.pausedAt) {
+      var ribbonPause = now - RIBBON.pausedAt;
+      RIBBON.pausedAt = 0;
+      if (RIBBON.phase === "countdown") RIBBON.cdStart += ribbonPause;
+      if (RIBBON.nextAt) RIBBON.nextAt += ribbonPause;
+      RIBBON.lastFrame = now;
     } else if (G2.pausedAt) {
       var dt = now - G2.pausedAt;
       G2.pausedAt = 0;
@@ -4923,7 +5174,504 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       gToast.hidden = true;
     }, 1600);
   }
-  function startGame() {
+  var RIBBON = {
+    active: false, phase: "idle", attempts: 0, hits: 0, perfect: 0, misses: 0,
+    combo: 0, bestCombo: 0, score: 0, results: [], targets: [], used: new Set(),
+    target: null, flight: null, gesture: null, nextAt: 0, cdStart: 0, lastCd: 0,
+    lastFrame: 0, pausedAt: 0, finishReason: "", color: "#f2b25c", power: 0
+  };
+  var ribbonMark = $("ribbonTargetMark"), ribbonPreview = $("ribbonPreview");
+  var ribbonCtx = ribbonPreview.getContext("2d"), ribbonWorld = new THREE.Vector3();
+  var ribbonProject = new THREE.Vector3(), ribbonHead = new THREE.Vector3();
+  var RIBBON_MAX = 200, RIBBON_SEGMENT = 0.12, RIBBON_DT = 1 / 120;
+  var RIBBON_PHYSICS = { g: 9.8, air: 1.2, tapeLen: 30, rollMass: 0.025, rollCdA: 0.0013, pullForce: 0.02, liftA: 0.005, dragN: 11, dragT: 0.4, flutter: 0.45, inherit: 0.08, rollR: 0.03, vMin: 2, vMax: 9.4, elev0: 6, elev1: 32, yawGain: 0.25, yawDead: 2, tiltGain: 1.2, wildFrom: 50, reachR: 0.36, reachUp: 0.45, perfect: 0.3 };
+  function ribbonCandidateSeats() {
+    var front = RIBBON.targets.filter(function(s) {
+      var row = FRONT.findIndex(function(r) { return r[0] === s.row; });
+      return !s.side && row >= 0 && row <= 4 && s.i !== S.my;
+    });
+    return front.length ? front : RIBBON.targets.filter(function(s) { return s.i !== S.my; });
+  }
+  function ribbonPickTarget() {
+    var options = ribbonCandidateSeats().filter(function(s) { return !RIBBON.used.has(s.i); });
+    if (!options.length) {
+      RIBBON.used.clear();
+      options = ribbonCandidateSeats();
+    }
+    if (!options.length) return null;
+    var weights = options.map(function(s) {
+      var row = FRONT.findIndex(function(r) { return r[0] === s.row; });
+      return row <= 1 ? 3 : row <= 3 ? 2 : 1;
+    });
+    var total = weights.reduce(function(a, b) { return a + b; }, 0), pick = Math.random() * total;
+    for (var i = 0; i < options.length; i++) {
+      pick -= weights[i];
+      if (pick <= 0) return options[i];
+    }
+    return options[options.length - 1];
+  }
+  function ribbonPowerOf(speed) {
+    var u = Math.max(0, Math.min(1, (speed - 0.5) / (7 - 0.5)));
+    return 1.35 * Math.pow(u, 0.75);
+  }
+  function ribbonMetrics(g, last) {
+    var pts = g.points.slice();
+    if (last) pts.push(last);
+    if (pts.length < 2) return { speed: 0, alpha: 0, travel: 0, power: 0 };
+    var end = pts[pts.length - 1], i = pts.length - 1;
+    while (i > 0 && end.t - pts[i - 1].t <= 100) i--;
+    var first = pts[i], elapsed = Math.max(16, end.t - first.t) / 1000;
+    var dx = end.x - first.x, dy = end.y - first.y;
+    var speed = Math.hypot(dx, dy) / elapsed / Math.max(1, $("view").clientHeight);
+    return { speed: speed, alpha: Math.atan2(dx, -dy) * 180 / Math.PI,
+      travel: Math.hypot(end.x - g.x0, end.y - g.y0) / Math.max(1, $("view").clientHeight),
+      power: ribbonPowerOf(speed) };
+  }
+  function ribbonAimOffset(deg) {
+    var sign = Math.sign(deg), mag = Math.min(180, Math.abs(deg)), wild = RIBBON_PHYSICS.wildFrom;
+    var offset = sign * Math.max(0, Math.min(mag, wild) - RIBBON_PHYSICS.yawDead) * Math.PI / 180;
+    var normal = offset * RIBBON_PHYSICS.yawGain;
+    return mag <= wild ? normal : sign * (Math.abs(normal) + (mag - wild) * (Math.PI - Math.abs(normal)) / (180 - wild));
+  }
+  function ribbonBuildLaunch(power, alpha) {
+    if (!RIBBON.target) return null;
+    headWorld(RIBBON.target, ribbonWorld);
+    var target = ribbonWorld.clone();
+    target.y += 0.22;
+    var forward = camera.getWorldDirection(new THREE.Vector3());
+    var origin = camera.position.clone().addScaledVector(forward, 0.38);
+    origin.y -= 0.12;
+    var dx = target.x - origin.x, dz = target.z - origin.z, dist = Math.hypot(dx, dz) || 1;
+    var fx = dx / dist, fz = dz / dist, rawAlpha = alpha || 0, a = ribbonAimOffset(rawAlpha);
+    var hx = fx * Math.cos(a) - fz * Math.sin(a), hz = fz * Math.cos(a) + fx * Math.sin(a);
+    var u = Math.max(0, Math.min(1.35, power)), speed = RIBBON_PHYSICS.vMin + (RIBBON_PHYSICS.vMax - RIBBON_PHYSICS.vMin) * u;
+    var elev = (RIBBON_PHYSICS.elev0 + RIBBON_PHYSICS.elev1 * u) * Math.PI / 180;
+    var sign = Math.sign(rawAlpha), mag = Math.min(180, Math.abs(rawAlpha));
+    var off = sign * Math.max(0, Math.min(mag, RIBBON_PHYSICS.wildFrom) - RIBBON_PHYSICS.yawDead) * Math.PI / 180;
+    return { origin: origin, velocity: new THREE.Vector3(hx * speed * Math.cos(elev), speed * Math.sin(elev), hz * speed * Math.cos(elev)), tilt: off * RIBBON_PHYSICS.tiltGain };
+  }
+  function ribbonSetPower(power) {
+    RIBBON.power = Math.max(0, Math.min(1.35, power || 0));
+    var pct = 100 * RIBBON.power / 1.35;
+    $("ribbonPowerFill").style.width = pct.toFixed(1) + "%";
+    $("ribbonPowerFill").parentNode.setAttribute("aria-valuenow", String(Math.round(pct)));
+  }
+  function ribbonUpdateHud() {
+    var member = TEAMS[G2.team].members[G2.member];
+    $("ribbonWho").textContent = "你是 " + member.n + "（" + member.nick + "）";
+    $("ribbonRound").textContent = RIBBON.attempts < 8 ? "第一輪・前八投" : "挑戰輪・失手即結束";
+    $("ribbonTargetText").textContent = RIBBON.target ? "目標粉絲：" + seatLabel(RIBBON.target) : "正在尋找下一位目標…";
+    $("ribbonAttempt").textContent = String(RIBBON.attempts);
+    $("ribbonHits").textContent = String(RIBBON.hits);
+    $("ribbonPerfect").textContent = String(RIBBON.perfect);
+    $("ribbonCombo").textContent = String(RIBBON.combo);
+    $("ribbonDots").style.setProperty("--ribbon-color", RIBBON.color);
+    var base = Math.floor(RIBBON.attempts / 8) * 8, inRound = RIBBON.attempts % 8, dots = [];
+    for (var i = 0; i < 8; i++) {
+      var cls = i < inRound ? (RIBBON.results[base + i] && RIBBON.results[base + i].ok ? "hit" : "miss") : i === inRound && RIBBON.phase === "play" ? "now" : "";
+      dots.push('<i class="' + cls + '"></i>');
+    }
+    $("ribbonDots").innerHTML = dots.join("");
+    $("ribbonHint").textContent = RIBBON.attempts < 8
+      ? "快向上滑動投出彩帶；滑動方向控制落點，滑動速度控制力度。"
+      : "挑戰輪開始了：再投一次，失手就會結束。";
+  }
+  function ribbonUpdateMarker() {
+    if (!RIBBON.active || !RIBBON.target || RIBBON.phase === "countdown" || RIBBON.phase === "resultWait") {
+      ribbonMark.hidden = true;
+      return;
+    }
+    headWorld(RIBBON.target, ribbonProject);
+    ribbonProject.y += 0.32;
+    ribbonProject.project(camera);
+    var w = $("view").clientWidth, h = $("view").clientHeight;
+    if (ribbonProject.z > 1.2) { ribbonMark.hidden = true; return; }
+    var x = (ribbonProject.x + 1) * 0.5 * w, y = (1 - ribbonProject.y) * 0.5 * h;
+    x = Math.max(24, Math.min(w - 24, x));
+    y = Math.max(92, Math.min(h - 24, y));
+    ribbonMark.style.left = x + "px";
+    ribbonMark.style.top = y + "px";
+    ribbonMark.querySelector("span").textContent = seatLabel(RIBBON.target);
+    ribbonMark.hidden = false;
+  }
+  function ribbonMakeTrail(color) {
+    var geo = new THREE.BufferGeometry(), positions = new Float32Array(RIBBON_MAX * 2 * 3), colors = new Float32Array(RIBBON_MAX * 2 * 3), indices = [];
+    for (var i = 0; i < RIBBON_MAX - 1; i++) {
+      var j = i * 2;
+      indices.push(j, j + 1, j + 2, j + 1, j + 3, j + 2);
+    }
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
+    geo.setAttribute("color", new THREE.BufferAttribute(colors, 3).setUsage(THREE.DynamicDrawUsage));
+    geo.setIndex(indices);
+    var mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide, transparent: true, opacity: 0.94, depthWrite: false, toneMapped: false });
+    var meshTape = new THREE.Mesh(geo, mat);
+    meshTape.frustumCulled = false;
+    scene.add(meshTape);
+    var c = new THREE.Color(color);
+    return { geo: geo, mesh: meshTape, color: c, nodes: [] };
+  }
+  function ribbonAddPoint(f, p, velocity) {
+    var q = p.clone(), prev = q.clone();
+    if (velocity) prev.addScaledVector(velocity, -0.08 * RIBBON_DT);
+    f.nodes.push({ p: q, prev: prev });
+  }
+  function ribbonAddTrail(f, end) {
+    var nodes = f.nodes, tail = nodes[nodes.length - 1], delta = end.clone().sub(tail.p), d = delta.length();
+    if (d > RIBBON_SEGMENT * 1.2 && nodes.length < RIBBON_MAX) {
+      var dir = delta.normalize();
+      while (d > RIBBON_SEGMENT * 1.2 && nodes.length < RIBBON_MAX - 1) {
+        tail = nodes[nodes.length - 1];
+        var q = tail.p.clone().addScaledVector(dir, RIBBON_SEGMENT);
+        ribbonAddPoint(f, q, f.velocity);
+        d = end.distanceTo(q);
+      }
+      ribbonAddPoint(f, end, f.velocity);
+    } else {
+      tail.p.copy(end);
+      tail.prev.copy(end);
+    }
+  }
+  function ribbonRopeStep(f, dt) {
+    var nodes = f.nodes, last = nodes.length - 1;
+    if (last < 2) return;
+    var dampN = Math.exp(-RIBBON_PHYSICS.dragN * dt), dampT = Math.exp(-RIBBON_PHYSICS.dragT * dt);
+    for (var i = 1; i < last; i++) {
+      var node = nodes[i], before = nodes[i - 1].p, after = nodes[i + 1].p;
+      var tx = after.x - before.x, ty = after.y - before.y, tz = after.z - before.z, tl = Math.hypot(tx, ty, tz) || 1;
+      tx /= tl; ty /= tl; tz /= tl;
+      var vx = (node.p.x - node.prev.x) / dt, vy = (node.p.y - node.prev.y) / dt, vz = (node.p.z - node.prev.z) / dt;
+      var along = vx * tx + vy * ty + vz * tz;
+      var gravAlong = -RIBBON_PHYSICS.g * ty * dt, gravX = tx * gravAlong, gravY = ty * gravAlong, gravZ = tz * gravAlong;
+      var nx = (vx - tx * along - gravX) * dampN, ny = (vy - ty * along - RIBBON_PHYSICS.g * dt - gravY) * dampN, nz = (vz - tz * along - gravZ) * dampN;
+      var flutter = RIBBON_PHYSICS.flutter * RIBBON_PHYSICS.g * dt;
+      nx += Math.cos(f.time * 7 + i * 1.7) * flutter * dampN;
+      nz += Math.sin(f.time * 5 + i * 1.3) * flutter * dampN;
+      var tv = (along * dt + gravAlong) * dampT;
+      node.prev.copy(node.p);
+      node.p.x += nx * dt + tx * tv;
+      node.p.y += ny * dt + ty * tv;
+      node.p.z += nz * dt + tz * tv;
+    }
+    for (var pass = 0; pass < 4; pass++) {
+      nodes[0].p.copy(f.anchor);
+      nodes[last].p.copy(f.roll);
+      for (var j = 0; j < last; j++) {
+        var a = nodes[j].p, b = nodes[j + 1].p, dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z;
+        var d = Math.hypot(dx, dy, dz);
+        if (d <= RIBBON_SEGMENT || !d) continue;
+        var k = (d - RIBBON_SEGMENT) / d;
+        if (j === 0) { b.x -= dx * k; b.y -= dy * k; b.z -= dz * k; }
+        else if (j + 1 === last) { a.x += dx * k; a.y += dy * k; a.z += dz * k; }
+        else { a.x += dx * k * 0.5; a.y += dy * k * 0.5; a.z += dz * k * 0.5; b.x -= dx * k * 0.5; b.y -= dy * k * 0.5; b.z -= dz * k * 0.5; }
+      }
+    }
+  }
+  function ribbonUpdateMesh(f) {
+    var nodes = f.nodes, count = nodes.length, attr = f.geo.attributes.position, colors = f.geo.attributes.color, arr = attr.array, col = colors.array;
+    for (var i = 0; i < count; i++) {
+      var before = nodes[Math.max(0, i - 1)].p, after = nodes[Math.min(count - 1, i + 1)].p, p = nodes[i].p;
+      var tangent = after.clone().sub(before), view = camera.position.clone().sub(p), side = new THREE.Vector3().crossVectors(tangent, view);
+      if (side.lengthSq() < 1e-8) side.set(1, 0, 0);
+      side.normalize().multiplyScalar(0.009 * (1 + 0.16 * Math.sin(f.time * 9 + i * 0.7)));
+      var k = i * 6, shade = 0.82 + 0.18 * Math.cos(i * 0.7 + f.time * 2);
+      arr[k] = p.x - side.x; arr[k + 1] = p.y - side.y; arr[k + 2] = p.z - side.z;
+      arr[k + 3] = p.x + side.x; arr[k + 4] = p.y + side.y; arr[k + 5] = p.z + side.z;
+      col[k] = col[k + 3] = f.color.r * shade; col[k + 1] = col[k + 4] = f.color.g * shade; col[k + 2] = col[k + 5] = f.color.b * shade;
+    }
+    attr.needsUpdate = true;
+    colors.needsUpdate = true;
+    f.geo.setDrawRange(0, Math.max(0, count - 1) * 6);
+    f.geo.computeBoundingSphere();
+  }
+  function ribbonDisposeFlight() {
+    if (!RIBBON.flight) return;
+    scene.remove(RIBBON.flight.mesh);
+    RIBBON.flight.geo.dispose();
+    RIBBON.flight.mesh.material.dispose();
+    RIBBON.flight = null;
+  }
+  function ribbonCatchAt(p) {
+    var best = null, bestD = Infinity;
+    for (var i = 0; i < seats.length; i++) {
+      var s = seats[i];
+      if (s.i === S.my || !seatOcc(s)) continue;
+      headWorld(s, ribbonHead);
+      var dx = p.x - ribbonHead.x, dz = p.z - ribbonHead.z, horizontal = Math.hypot(dx, dz);
+      if (horizontal > RIBBON_PHYSICS.reachR || p.y < s.pos.y || p.y > ribbonHead.y + RIBBON_PHYSICS.reachUp) continue;
+      var score = s === RIBBON.target ? -1 : Math.hypot(dx, p.y - (ribbonHead.y + 0.25), dz);
+      if (score < bestD) { best = s; bestD = score; }
+    }
+    return best ? { seat: best, distance: bestD } : null;
+  }
+  function ribbonOutcome(caught, now) {
+    var f = RIBBON.flight, target = RIBBON.target, ok = !!caught && caught.seat === target;
+    var perfect = ok && caught.distance < RIBBON_PHYSICS.perfect && !f.hit && !f.snag;
+    RIBBON.attempts++;
+    RIBBON.used.add(target.i);
+    RIBBON.results.push({ ok: ok, perfect: perfect });
+    f.resolved = true;
+    f.removeAt = now + 900;
+    if (ok) {
+      RIBBON.hits++;
+      RIBBON.combo++;
+      RIBBON.bestCombo = Math.max(RIBBON.bestCombo, RIBBON.combo);
+      if (perfect) RIBBON.perfect++;
+      var points = 100 + (perfect ? 100 : 0) + 10 * Math.min(10, RIBBON.combo - 1);
+      RIBBON.score += points;
+      target.found = true;
+      target.pts = points;
+      G2.found = RIBBON.hits;
+      G2.score = RIBBON.score;
+      G2.combo = RIBBON.combo;
+      G2.maxCombo = RIBBON.bestCombo;
+      burst(target);
+      showMood(target, perfect ? "🤩" : "😍");
+      SFX.found();
+      toast((perfect ? "完美接住！★　" : "接到彩帶！　") + seatLabel(target) + "　+" + points);
+    } else {
+      RIBBON.misses++;
+      RIBBON.combo = 0;
+      if (caught) {
+        missMark(caught.seat);
+        showMood(caught.seat, "😮");
+        toast(seatLabel(caught.seat) + " 把彩帶接走了，沒有送到目標粉絲手上");
+      } else toast("彩帶沒有被接住，再調整力度與方向試試看");
+      SFX.miss();
+    }
+    var firstLapFailed = RIBBON.attempts === 8 && RIBBON.results.slice(0, 8).some(function(r) { return !r.ok; });
+    var challengeMiss = RIBBON.attempts > 8 && !ok;
+    if (firstLapFailed || challengeMiss) {
+      RIBBON.phase = "resultWait";
+      RIBBON.finishReason = firstLapFailed ? "第一輪沒有全數命中。" : "挑戰輪失手，挑戰結束。";
+      RIBBON.nextAt = now + 700;
+    } else {
+      if (RIBBON.attempts === 8) toast("八投全中！挑戰輪開始，接下來失手就會結束。");
+      RIBBON.nextAt = now + 900;
+    }
+    ribbonUpdateHud();
+  }
+  function ribbonPhysicsStep(f, dt, now) {
+    f.time += dt;
+    var speed = f.velocity.length(), mass = Math.max(0.004, RIBBON_PHYSICS.rollMass * (1 - f.paid / RIBBON_PHYSICS.tapeLen));
+    var dampK = 0.5 * RIBBON_PHYSICS.air * RIBBON_PHYSICS.rollCdA / mass * speed + RIBBON_PHYSICS.pullForce / mass / Math.max(speed, 1e-6);
+    var damp = 1 / (1 + dampK * dt);
+    f.velocity.multiplyScalar(damp);
+    f.velocity.y -= RIBBON_PHYSICS.g * dt;
+    if (f.tilt && !f.hit) {
+      var vh = Math.hypot(f.velocity.x, f.velocity.z) || 1e-6;
+      var sx = -f.velocity.z / vh, sz = f.velocity.x / vh;
+      var lift = 0.5 * RIBBON_PHYSICS.air * RIBBON_PHYSICS.liftA / mass * speed * speed * f.tilt * dt;
+      f.velocity.x += lift * sx;
+      f.velocity.z += lift * sz;
+    }
+    f.roll.addScaledVector(f.velocity, dt);
+    f.paid += speed * dt;
+    if (f.roll.y > f.apex) f.apex = f.roll.y;
+    ribbonAddTrail(f, f.roll);
+    ribbonRopeStep(f, dt);
+    var caught = ribbonCatchAt(f.roll);
+    if (caught) { ribbonOutcome(caught, now); return; }
+    if (f.roll.y <= 0.08 || f.time > 8 || Math.abs(f.roll.x) > 8.2 || f.roll.z > 15 || f.roll.y > 6.7) ribbonOutcome(null, now);
+  }
+  function ribbonLaunch(power, alpha, now) {
+    var shot = ribbonBuildLaunch(power, alpha);
+    if (!shot) return;
+    var color = RIBBON.color, f = ribbonMakeTrail(color);
+    f.anchor = shot.origin.clone();
+    f.roll = shot.origin.clone();
+    f.velocity = shot.velocity;
+    f.acc = 0;
+    f.time = 0;
+    f.resolved = false;
+    f.alpha = alpha;
+    f.power = power;
+    f.tilt = shot.tilt;
+    f.paid = 0;
+    f.apex = shot.origin.y;
+    f.hit = false;
+    f.snag = false;
+    f.startAt = now;
+    ribbonAddPoint(f, f.anchor);
+    ribbonAddPoint(f, f.roll, f.velocity);
+    RIBBON.flight = f;
+    RIBBON.gesture = null;
+    ribbonSetPower(power);
+    ribbonUpdateHud();
+    SFX.go();
+  }
+  function ribbonBeginSession(member) {
+    RIBBON.targets = G2.fans.slice();
+    if (!RIBBON.targets.length) {
+      G2.phase = "idle";
+      $("startPanel").hidden = false;
+      toast("目前沒有可投遞的應援粉絲，請換一位成員再試。");
+      return;
+    }
+    ribbonDisposeFlight();
+    RIBBON.active = true;
+    RIBBON.phase = "countdown";
+    RIBBON.attempts = RIBBON.hits = RIBBON.perfect = RIBBON.misses = 0;
+    RIBBON.combo = RIBBON.bestCombo = RIBBON.score = 0;
+    RIBBON.results = [];
+    RIBBON.used.clear();
+    RIBBON.target = null;
+    RIBBON.gesture = null;
+    RIBBON.nextAt = 0;
+    RIBBON.lastCd = 0;
+    RIBBON.pausedAt = 0;
+    RIBBON.cdStart = performance.now();
+    RIBBON.lastFrame = RIBBON.cdStart;
+    RIBBON.color = "#" + new THREE.Color(member.c && member.c[0] || "#f2b25c").getHexString();
+    RIBBON.finishReason = "";
+    G2.on = false;
+    G2.result = false;
+    G2.phase = "ribbon";
+    S.blackout = false;
+    $("gameHud").hidden = true;
+    $("ribbonSummary").hidden = true;
+    $("ribbonHud").hidden = true;
+    ribbonMark.hidden = true;
+    $("countdown").hidden = false;
+    $("cdNum").textContent = "3";
+    $("app").classList.add("playing");
+    $("modeBar").hidden = true;
+    ribbonSetPower(0);
+    ribbonUpdateHud();
+    updateHud();
+  }
+  function finishRibbonGame(reason) {
+    if (!RIBBON.active) return;
+    RIBBON.active = false;
+    RIBBON.phase = "result";
+    RIBBON.gesture = null;
+    RIBBON.target = null;
+    G2.on = false;
+    G2.phase = "idle";
+    S.blackout = false;
+    ribbonDisposeFlight();
+    $("countdown").hidden = true;
+    $("ribbonHud").hidden = true;
+    ribbonMark.hidden = true;
+    $("app").classList.remove("playing");
+    $("ribbonResultTitle").textContent = RIBBON.hits >= 8 ? "彩帶挑戰完成" : "彩帶挑戰結束";
+    $("ribbonResultMessage").textContent = reason || RIBBON.finishReason || "挑戰已結束。";
+    $("ribbonResultStats").textContent = "投出 " + RIBBON.attempts + " 次・命中 " + RIBBON.hits + " 次・完美 " + RIBBON.perfect + " 次・最高連擊 " + RIBBON.bestCombo + "・分數 " + RIBBON.score;
+    $("ribbonSummary").hidden = false;
+    syncModeBar();
+  }
+  function closeRibbonSummary() {
+    $("ribbonSummary").hidden = true;
+    RIBBON.phase = "idle";
+    RIBBON.target = null;
+    RIBBON.used.clear();
+    ribbonDisposeFlight();
+    if (typeof MODE === "undefined" || MODE === "game") $("startPanel").hidden = false;
+    updateHud();
+  }
+  function ribbonStartPlay(now) {
+    RIBBON.phase = "play";
+    RIBBON.nextAt = now;
+    $("countdown").hidden = true;
+    $("ribbonHud").hidden = false;
+    RIBBON.target = ribbonPickTarget();
+    if (!RIBBON.target) { finishRibbonGame("沒有可投遞的目標粉絲。"); return; }
+    ribbonUpdateHud();
+    ribbonUpdateMarker();
+    toast("瞄準金色標記，快速向上滑動投出彩帶。");
+    SFX.go();
+  }
+  function ribbonDrawPreview(now) {
+    var w = $("view").clientWidth, h = $("view").clientHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (ribbonPreview.width !== Math.round(w * dpr) || ribbonPreview.height !== Math.round(h * dpr)) {
+      ribbonPreview.width = Math.round(w * dpr);
+      ribbonPreview.height = Math.round(h * dpr);
+    }
+    ribbonCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ribbonCtx.clearRect(0, 0, w, h);
+    var g = RIBBON.gesture;
+    if (!RIBBON.active || RIBBON.phase !== "play" || !g || !RIBBON.target) return;
+    var m = ribbonMetrics(g);
+    if (m.travel < 0.025) return;
+    var shot = ribbonBuildLaunch(m.power, m.alpha);
+    if (shot) {
+      ribbonCtx.save();
+      ribbonCtx.beginPath();
+      var open = false;
+      for (var t = 0; t <= 1.8; t += 0.06) {
+        var pt = shot.origin.clone().addScaledVector(shot.velocity, t);
+        pt.y -= 4.9 * t * t;
+        pt.project(camera);
+        if (pt.z < 1 && Math.abs(pt.x) < 1.3 && Math.abs(pt.y) < 1.3) {
+          var px = (pt.x + 1) * 0.5 * w, py = (1 - pt.y) * 0.5 * h;
+          if (!open) { ribbonCtx.moveTo(px, py); open = true; } else ribbonCtx.lineTo(px, py);
+        } else if (open) open = false;
+      }
+      ribbonCtx.setLineDash([6, 6]);
+      ribbonCtx.lineWidth = 2;
+      ribbonCtx.strokeStyle = RIBBON.color;
+      ribbonCtx.shadowColor = RIBBON.color;
+      ribbonCtx.shadowBlur = 9;
+      ribbonCtx.stroke();
+      ribbonCtx.restore();
+    }
+    var pts = g.points;
+    if (pts.length > 1) {
+      ribbonCtx.beginPath();
+      ribbonCtx.moveTo(pts[0].x, pts[0].y);
+      for (var i = 1; i < pts.length; i++) ribbonCtx.lineTo(pts[i].x, pts[i].y);
+      ribbonCtx.lineWidth = 3;
+      ribbonCtx.lineCap = "round";
+      ribbonCtx.strokeStyle = "rgba(255,255,255,.72)";
+      ribbonCtx.stroke();
+    }
+  }
+  function ribbonTick(now) {
+    if (!RIBBON.active) { ribbonDrawPreview(now); return; }
+    if (RIBBON.pausedAt) return;
+    var dt = Math.max(0, Math.min(0.05, (now - RIBBON.lastFrame) / 1000));
+    RIBBON.lastFrame = now;
+    if (RIBBON.phase === "countdown") {
+      var elapsed = now - RIBBON.cdStart, count = 3 - Math.floor(elapsed / 1000);
+      if (elapsed < 3000 && count !== RIBBON.lastCd) {
+        RIBBON.lastCd = count;
+        $("cdNum").textContent = String(count);
+        $("cdNum").classList.remove("pop");
+        void $("cdNum").offsetWidth;
+        $("cdNum").classList.add("pop");
+        SFX.count();
+      }
+      if (elapsed >= 3000) ribbonStartPlay(now);
+      ribbonDrawPreview(now);
+      return;
+    }
+    if (RIBBON.phase === "resultWait") {
+      if (now >= RIBBON.nextAt) finishRibbonGame(RIBBON.finishReason);
+      ribbonDrawPreview(now);
+      return;
+    }
+    if (RIBBON.flight && !RIBBON.flight.resolved) {
+      var f = RIBBON.flight;
+      f.acc += dt;
+      var steps = 0;
+      while (f.acc >= RIBBON_DT && steps++ < 8 && !f.resolved) {
+        f.acc -= RIBBON_DT;
+        ribbonPhysicsStep(f, RIBBON_DT, now);
+      }
+      if (steps >= 8) f.acc = 0;
+      ribbonUpdateMesh(f);
+    } else if (RIBBON.flight && RIBBON.flight.resolved && now >= RIBBON.flight.removeAt) {
+      ribbonDisposeFlight();
+    }
+    if (RIBBON.phase === "play" && !RIBBON.flight && now >= RIBBON.nextAt) {
+      RIBBON.target = ribbonPickTarget();
+      if (!RIBBON.target) finishRibbonGame("沒有可投遞的目標粉絲。");
+      else ribbonUpdateHud();
+    }
+    ribbonUpdateMarker();
+    ribbonDrawPreview(now);
+  }
+
+  function startGame(kind) {
     initAudio();
     closeResult();
     $("startPanel").hidden = true;
@@ -4957,6 +5705,10 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     G2.wrongOther = 0;
     G2.miss = 0;
     var m = TEAMS[G2.team].members[G2.member];
+    if (kind === "ribbon") {
+      ribbonBeginSession(m);
+      return;
+    }
     $("gWho").textContent = "你是 " + m.n + "（" + m.nick + "）";
     $("gFind").innerHTML = "要找：" + (G2.easy ? "" : colorWords(m) + "手燈、") + "寫「" + esc(m.nick) + "」或「" + esc(m.n) + "」的應援扇、「" + esc(m.n) + "」毛巾";
     G2.phase = "countdown";
@@ -5687,9 +6439,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (IDOL && !G2.on && G2.phase !== "countdown" && (typeof MODE === "undefined" || MODE === "game")) $("startPanel").hidden = false;
   }
   $("gStart").addEventListener("click", startGame);
+  $("ribbonStart").addEventListener("click", function() { startGame("ribbon"); });
+  $("ribbonStop").addEventListener("click", function() { finishRibbonGame("你提前結束了這一局。"); });
+  $("ribbonAgain").addEventListener("click", function() { startGame("ribbon"); });
+  $("ribbonClose").addEventListener("click", closeRibbonSummary);
   var MODE = "game";
   function setMode(m) {
-    if (G2.on || G2.phase === "countdown") return;
+    if (G2.on || G2.phase === "countdown" || RIBBON.active) return;
+    if (RIBBON.phase === "result") closeRibbonSummary();
     var wasSeat = MODE === "seat";
     MODE = m;
     closeResult();
@@ -5828,7 +6585,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     lastFit = -1e9;
   });
   function syncModeBar() {
-    var h = !!(G2.on || G2.phase === "countdown");
+    var h = !!(G2.on || G2.phase === "countdown" || RIBBON.active);
     if (app.classList.contains("playing") !== h) app.classList.toggle("playing", h);
     if (h !== modeBarHidden) {
       modeBarHidden = h;
@@ -5846,6 +6603,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     endGame(false);
   });
   function onAudienceChanged() {
+    if (RIBBON.active) { finishRibbonGame("觀眾設定變更，這一局已結束。"); return; }
     if (!G2 || !G2.on && !G2.result && G2.phase !== "countdown") return;
     var still = G2.fans.every(isTarget);
     if (!still) {
@@ -6024,6 +6782,46 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     drawMap();
   }
   canvas.addEventListener("pointerdown", function(e) {
+    if (!RIBBON.active) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (RIBBON.phase !== "play" || RIBBON.flight && !RIBBON.flight.resolved || RIBBON.gesture) return;
+    var p = elLocal(canvas, e.clientX, e.clientY);
+    RIBBON.gesture = { id: e.pointerId, x0: p.x, y0: p.y, points: [{ x: p.x, y: p.y, t: e.timeStamp }] };
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  }, true);
+  canvas.addEventListener("pointermove", function(e) {
+    if (!RIBBON.active) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var g = RIBBON.gesture;
+    if (!g || e.pointerId !== g.id) return;
+    var p = elLocal(canvas, e.clientX, e.clientY);
+    g.points.push({ x: p.x, y: p.y, t: e.timeStamp });
+    if (g.points.length > 40) g.points.shift();
+    var m = ribbonMetrics(g);
+    ribbonSetPower(m.power);
+  }, true);
+  canvas.addEventListener("pointerup", function(e) {
+    if (!RIBBON.active) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var g = RIBBON.gesture;
+    if (!g || e.pointerId !== g.id) return;
+    var p = elLocal(canvas, e.clientX, e.clientY), m = ribbonMetrics(g, { x: p.x, y: p.y, t: e.timeStamp });
+    RIBBON.gesture = null;
+    if (m.travel < 0.06) { ribbonSetPower(0); return; }
+    if (m.speed < 0.5) { ribbonSetPower(0); toast("請再快一點向上滑動，才能投出彩帶。"); SFX.miss(); return; }
+    ribbonLaunch(m.power, m.alpha, performance.now());
+  }, true);
+  canvas.addEventListener("pointercancel", function(e) {
+    if (!RIBBON.active) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (RIBBON.gesture && e.pointerId === RIBBON.gesture.id) RIBBON.gesture = null;
+    ribbonSetPower(0);
+  }, true);
+  canvas.addEventListener("pointerdown", function(e) {
     var p = elLocal(canvas, e.clientX, e.clientY);
     ptrs[e.pointerId] = p;
     canvas.setPointerCapture(e.pointerId);
@@ -6122,6 +6920,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     updateLights(t);
     updateCamera();
     tickGame(now);
+    ribbonTick(now);
     placeMoods(now);
     updateFx(now);
     tickAudio();
