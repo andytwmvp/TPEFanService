@@ -14,3 +14,7 @@
 `tests/reference-launch-fixtures.json` 是由該版本公開 `Tape.launchOf` API 產生的 20 組數值輸入／輸出，驗證發射速度與傾斜映射；並非原站原始碼或整體物理等價證明。
 
 既有 Three.js r128 使用 MIT 授權，正式頁面延續透過 cdnjs 載入。測試開發依賴透過 npm 安裝 Three.js 與 Playwright，各自授權隨套件提供。TPE 的劇場、成員與原始內容沿用 repository 原有資料；本文件不改變其權利歸屬。
+
+`tests/reference-roll-fixtures.json` 記錄原站無碰撞飛行在第 1、12、24 個彩帶步進的數值，用於驗證卷軸雙子步進；同樣不代表完整碰撞／繩帶等價。另參照原站視野比例、卷軸顯示交接、八人四排實績與稱號條件，使用 TPE 原有視覺樣式及獨立記錄模組實作。
+
+`tests/artifacts/reference-play.png` 與 `tests/reference-interaction-log.txt` 為原站 WebGL 操作對照證據；畫面中的原站素材權利仍屬原作者，不是本專案的可再授權素材。
