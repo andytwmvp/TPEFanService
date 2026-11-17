@@ -5194,7 +5194,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     });
     return front.length ? front : RIBBON.targets.filter(function(s) { return s.i !== S.my; });
   }
-  function ribbonPickTarget() {
+  async function ribbonPickTarget() {
+    var session = RIBBON.session;
     var options = ribbonCandidateSeats().filter(function(s) { return !RIBBON.used.has(s.i); });
     if (!options.length) {
       RIBBON.used.clear();
@@ -5206,7 +5207,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     options = options.concat(remaining);
     for (var i = 0; i < options.length; i++) {
       RIBBON.target = options[i];
-      var win = ribbonFindWindow();
+      var win = await ribbonFindWindow(session);
+      if (!RIBBON.active || RIBBON.session !== session) return null;
       if (win) { RIBBON.window = win; RIBBON.nextAt = Infinity; ribbonFaceTarget(); return options[i]; }
     }
     RIBBON.window = null;
@@ -5220,9 +5222,13 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     S.pitch = Math.max(-0.45, Math.min(0.05, 0.55 * Math.atan2(ribbonWorld.y - eye.y, Math.hypot(ribbonWorld.x-eye.x,ribbonWorld.z-eye.z)) - 0.06));
     updateCamera();
   }
-  function ribbonFindWindow() {
+  async function ribbonFindWindow(session) {
     var hits = [], best = [], run = [];
     for (var i = 0; i <= 120; i++) {
+      if(i % 8 === 0) {
+        await new Promise(function(resolve){ setTimeout(resolve, 0); });
+        if(!RIBBON.active || RIBBON.session !== session) return null;
+      }
       var power = 1.35 * i / 120, shot = ribbonBuildLaunch(power, 0);
       var f = { roll: shot.origin.clone(), velocity: shot.velocity.clone(), tilt: shot.tilt, paid: 0, apex: shot.origin.y, hit: false, time: 0 };
       var outcome = null;
@@ -5237,7 +5243,11 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       } else run = [];
     }
     if (best.length < 5) return null;
-    var pf = best.filter(function(v){return v.perfect;});
+    var pf = [], pfRun = [];
+    best.forEach(function(v){
+      if(v.perfect) { pfRun.push(v); if(pfRun.length > pf.length) pf = pfRun.slice(); }
+      else pfRun = [];
+    });
     return { lo: best[0].u, hi: best[best.length-1].u, pfLo: pf.length ? pf[0].u : null, pfHi: pf.length ? pf[pf.length-1].u : null };
   }
   function ribbonPowerOf(speed) {
@@ -5377,7 +5387,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       var flutter = RIBBON_PHYSICS.flutter * RIBBON_PHYSICS.g * dt;
       nx += Math.cos(f.time * 7 + i * 1.7) * flutter * dampN;
       nz += Math.sin(f.time * 5 + i * 1.3) * flutter * dampN;
-      var tv = (along * dt + gravAlong) * dampT;
+      var tv = (along + gravAlong) * dampT * dt;
       node.prev.copy(node.p);
       node.p.x += nx * dt + tx * tv;
       node.p.y += ny * dt + ty * tv;
@@ -5425,20 +5435,30 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.flight.mesh.material.dispose();
     RIBBON.flight = null;
   }
-  function ribbonCatchAt(p) {
-    var best = null, bestD = Infinity;
-    for (var i = 0; i < seats.length; i++) {
-      var s = seats[i];
-      if (s.i === S.my || !seatOcc(s)) continue;
+  function ribbonBuildCatchGrid() {
+    RIBBON.catchGrid = new Map();
+    seats.forEach(function(s){
+      if(s.i === S.my || !seatOcc(s)) return;
       headWorld(s, ribbonHead);
-      var dx = p.x - ribbonHead.x, dz = p.z - ribbonHead.z, horizontal = Math.hypot(dx, dz);
-      if (horizontal > RIBBON_PHYSICS.reachR || p.y < s.pos.y || p.y > ribbonHead.y + RIBBON_PHYSICS.reachUp) continue;
-      var score = s === RIBBON.target ? -1 : Math.hypot(dx, p.y - (ribbonHead.y + 0.25), dz);
-      if (score < bestD) { best = s; bestD = score; }
+      var q = {seat:s, x:ribbonHead.x, y:ribbonHead.y, z:ribbonHead.z, floor:s.pos.y};
+      var key = Math.floor(q.x / 0.8) + ":" + Math.floor(q.z / 0.8);
+      if(!RIBBON.catchGrid.has(key)) RIBBON.catchGrid.set(key, []);
+      RIBBON.catchGrid.get(key).push(q);
+    });
+  }
+  function ribbonCatchAt(p) {
+    var best = null, bestD = Infinity, bx = Math.floor(p.x/0.8), bz = Math.floor(p.z/0.8);
+    if(!RIBBON.catchGrid) return null;
+    for(var x=bx-1;x<=bx+1;x++) for(var z=bz-1;z<=bz+1;z++) {
+      var bucket = RIBBON.catchGrid.get(x+":"+z) || [];
+      for(var i=0;i<bucket.length;i++) {
+        var q=bucket[i], dx=p.x-q.x, dz=p.z-q.z;
+        if(Math.hypot(dx,dz)>RIBBON_PHYSICS.reachR || p.y<q.floor || p.y>q.y+RIBBON_PHYSICS.reachUp) continue;
+        var distance=Math.hypot(dx,p.y-q.y-0.25,dz), score=q.seat===RIBBON.target?-1:distance;
+        if(score<bestD) {bestD=score;best={seat:q.seat,distance:distance};}
+      }
     }
-    if (!best) return null;
-    headWorld(best, ribbonHead);
-    return { seat: best, distance: Math.hypot(p.x - ribbonHead.x, p.y - ribbonHead.y - 0.25, p.z - ribbonHead.z) };
+    return best;
   }
   function ribbonOutcome(caught, now) {
     var f = RIBBON.flight, target = RIBBON.target, ok = !!caught && caught.seat === target;
@@ -5549,6 +5569,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     }
     ribbonDisposeFlight();
     ribbonDisposeSettled();
+    RIBBON.session = (RIBBON.session || 0) + 1;
+    ribbonBuildCatchGrid();
     RIBBON.active = true;
     RIBBON.phase = "countdown";
     RIBBON.attempts = RIBBON.hits = RIBBON.perfect = RIBBON.misses = 0;
@@ -5583,13 +5605,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   function finishRibbonGame(reason) {
     if (!RIBBON.active) return;
     RIBBON.active = false;
+    RIBBON.session++;
     RIBBON.phase = "result";
     RIBBON.gesture = null;
     RIBBON.target = null;
     G2.on = false;
     G2.phase = "idle";
     S.blackout = false;
-    ribbonDisposeFlight();
+    if(RIBBON.flight) { RIBBON.settled.push(RIBBON.flight); RIBBON.flight = null; }
     $("countdown").hidden = true;
     $("ribbonHud").hidden = true;
     ribbonMark.hidden = true;
@@ -5610,12 +5633,15 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (typeof MODE === "undefined" || MODE === "game") $("startPanel").hidden = false;
     updateHud();
   }
-  function ribbonStartPlay(now) {
-    RIBBON.phase = "play";
-    RIBBON.nextAt = now;
+  async function ribbonStartPlay(now) {
+    RIBBON.phase = "selecting";
+    RIBBON.nextAt = Infinity;
     $("countdown").hidden = true;
     $("ribbonHud").hidden = false;
-    RIBBON.target = ribbonPickTarget();
+    var session = RIBBON.session;
+    RIBBON.target = await ribbonPickTarget();
+    if(!RIBBON.active || session !== RIBBON.session) return;
+    RIBBON.phase = "play";
     if (!RIBBON.target) { finishRibbonGame("沒有可投遞的目標粉絲。"); return; }
     ribbonSetPower(0);
     ribbonUpdateHud();
@@ -5671,11 +5697,31 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       ribbonCtx.stroke();
     }
   }
+  function ribbonTickSettled(dt) {
+    RIBBON.settled.forEach(function(f){
+      f.acc += dt;
+      var steps = 0;
+      while(f.acc >= RIBBON_DT && steps++ < 8) { f.acc -= RIBBON_DT; f.time += RIBBON_DT; ribbonRopeStep(f, RIBBON_DT); }
+      if(steps >= 8) f.acc = 0;
+      ribbonUpdateMesh(f);
+    });
+  }
   function ribbonTick(now) {
-    if (!RIBBON.active) { ribbonDrawPreview(now); return; }
+    if (!RIBBON.active) {
+      var idleDt = Math.max(0,Math.min(.05,(now-RIBBON.lastFrame)/1000));
+      RIBBON.lastFrame = now;
+      if(RIBBON.phase === "result") ribbonTickSettled(idleDt);
+      ribbonDrawPreview(now); return;
+    }
     if (RIBBON.pausedAt) return;
     var dt = Math.max(0, Math.min(0.05, (now - RIBBON.lastFrame) / 1000));
     RIBBON.lastFrame = now;
+    ribbonTickSettled(dt);
+    if (RIBBON.flight && RIBBON.flight.resolved) {
+      RIBBON.flight.acc += dt;
+      while(RIBBON.flight.acc >= RIBBON_DT) {RIBBON.flight.acc -= RIBBON_DT; RIBBON.flight.time += RIBBON_DT; ribbonRopeStep(RIBBON.flight,RIBBON_DT);}
+      ribbonUpdateMesh(RIBBON.flight);
+    }
     if (RIBBON.phase === "countdown") {
       var elapsed = now - RIBBON.cdStart, count = 3 - Math.floor(elapsed / 1000);
       if (elapsed < 3000 && count !== RIBBON.lastCd) {
@@ -5709,17 +5755,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       RIBBON.settled.push(RIBBON.flight);
       RIBBON.flight = null;
     }
-    RIBBON.settled.forEach(function(f){
-      f.acc += dt;
-      var steps = 0;
-      while(f.acc >= RIBBON_DT && steps++ < 8) { f.acc -= RIBBON_DT; f.time += RIBBON_DT; ribbonRopeStep(f, RIBBON_DT); }
-      if(steps >= 8) f.acc = 0;
-      ribbonUpdateMesh(f);
-    });
     if (RIBBON.phase === "play" && !RIBBON.flight && !RIBBON.gesture && Number.isFinite(RIBBON.nextAt) && now >= RIBBON.nextAt) {
-      RIBBON.target = ribbonPickTarget();
-      if (!RIBBON.target) finishRibbonGame("沒有可投遞的目標粉絲。");
-      else { ribbonSetPower(0); ribbonUpdateHud(); }
+      ribbonStartPlay(now);
     }
     ribbonUpdateMarker();
     ribbonDrawPreview(now);
