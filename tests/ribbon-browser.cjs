@@ -10,6 +10,7 @@ const root=path.resolve(__dirname,'..');
  await page.route('**/TPEFanService/',r=>r.fulfill({body:html,contentType:'text/html'}));
  await page.route('**/ribbon-world.js',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-world.js')),contentType:'application/javascript'}));
  await page.route('**/three.min.js',r=>r.fulfill({body:fs.readFileSync(process.env.THREE_PATH||require.resolve("three/build/three.min.js")),contentType:'application/javascript'}));
+ await page.route('**/ribbon-records.js',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-records.js')),contentType:'application/javascript'}));
  await page.goto('http://127.0.0.1:8765/TPEFanService/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!!window.testRibbon);
  const fixtures=JSON.parse(fs.readFileSync(path.join(__dirname,"reference-launch-fixtures.json"),"utf8"));

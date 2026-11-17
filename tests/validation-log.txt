@@ -1,7 +1,71 @@
 
 > test
-> node tests/ribbon-browser.cjs && node tests/ribbon-ui.cjs
+> node tests/ribbon-records.cjs && node tests/ribbon-world.cjs && node tests/ribbon-review.cjs && node tests/ribbon-browser.cjs && node tests/ribbon-ui.cjs && node tests/ribbon-visibility.cjs
 
+record persistence, per-member rows, best score, milestones, perfect preservation and storage errors passed
+rotated obstacle bounds: no invisible AABB corners; actual oriented wall collision passed
+[
+  {
+    "name": "reference roll parity after 1 tape steps",
+    "pass": true,
+    "maxError": 0
+  },
+  {
+    "name": "reference roll parity after 12 tape steps",
+    "pass": true,
+    "maxError": 0
+  },
+  {
+    "name": "reference roll parity after 24 tape steps",
+    "pass": true,
+    "maxError": 0
+  },
+  {
+    "name": "other spectators ranked by horizontal reach with separate real hand distance",
+    "pass": true
+  },
+  {
+    "name": "interrupted flight completes visually without scoring",
+    "pass": true,
+    "distance": 4.317384574078282,
+    "resolved": true,
+    "attempts": 0
+  },
+  {
+    "name": "completed finale skips per-ribbon skeleton walks",
+    "pass": true,
+    "skeletonUpdates": 0
+  },
+  {
+    "name": "idle result skips empty preview redraw",
+    "pass": true,
+    "previewClears": 0
+  },
+  {
+    "name": "ribbon marker uses current camera before renderer",
+    "pass": true,
+    "pixelError": 0.00040389158332401634
+  },
+  {
+    "name": "swipe started before orientation change",
+    "pass": true
+  },
+  {
+    "name": "ribbon rotation cancels old-coordinate swipe",
+    "pass": true
+  },
+  {
+    "name": "ribbon resize updates lens immediately",
+    "pass": true,
+    "resizeFov": 86,
+    "expected": 86
+  },
+  {
+    "name": "wild throw follows roll without changing target",
+    "pass": true,
+    "yawChange": 0.9087454485663309
+  }
+]
 WebGL context
 selecting hides candidate and bands
 old search cannot publish into restarted session
@@ -22,6 +86,7 @@ hit interval sample 7
 hit interval sample 8
 hit interval sample 9
 hit interval sample 10
+hit interval sample 11
 perfect uses actual distance
 perfect uses actual distance
 perfect uses actual distance
@@ -75,11 +140,11 @@ challenge transitions to result
 result keeps ribbon
 settled ribbon sleeps
 64 sleeping ribbons retain display without physics
-64 ribbons / 1000 ticks ms: 4.9
+64 ribbons / 1000 ticks ms: 9.7
 endpoint motion wakes ribbon
 64 tape and roll meshes removed
 uploaded ribbon GPU geometries disposed
-GPU geometry count: 279 -> 153
+GPU geometry count: 346 -> 158
 return menu disposes ribbons
 background search waits before publishing
 background search resumes
@@ -107,19 +172,209 @@ first-lap miss completes all eight throws 7
 first lap with one miss ends at eight
 settings change disposes flight and cancels session
 replay after result preserves newly selected member and hides menu
-desktop: native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
-mobile: native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
-
-Game-picker UI regression: node tests/ribbon-ui.cjs
-desktop: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
-mobile: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
-
-Game camera regression: node tests/ribbon-ui.cjs
 desktop camera 1100x760: {"vertical":46.00000000000001,"horizontal":52.347970966159686,"eye":1.4960000000000002,"height":1.6}
-desktop camera 390x844: {"vertical":54.08658372839446,"horizontal":29.999999999999996,"eye":1.4960000000000002,"height":1.6}
+desktop camera 390x844: {"vertical":46.00000000000001,"horizontal":52.347970966159686,"eye":1.4960000000000002,"height":1.6}
 desktop camera 844x390: {"vertical":46.00000000000001,"horizontal":72.52602111421349,"eye":1.4960000000000002,"height":1.6}
 desktop: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
 mobile camera 1100x760: {"vertical":46.00000000000001,"horizontal":52.347970966159686,"eye":1.4960000000000002,"height":1.6}
 mobile camera 390x844: {"vertical":54.08658372839446,"horizontal":29.999999999999996,"eye":1.4960000000000002,"height":1.6}
 mobile camera 844x390: {"vertical":46.00000000000001,"horizontal":72.52602111421349,"eye":1.4960000000000002,"height":1.6}
 mobile: game picker, both games, cancel / Escape; native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
+1100x760: [{"blockedTargets":8,"slot":0,"ndc":[-0.044130418871239856,0.12435297890748122,0.5955304246466051],"handError":4.965068306494546e-16,"release":[-2.86178170103147,1.4905319582223102,-2.1062412962704116],"hand":[-2.8617817010314694,1.4905319582223104,-2.1062412962704116],"heading":0.9577887554252063,"bodyYaw":4.099381409014999,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":7,"ndc":[-0.04404197675297442,0.060015219192231586,0.5963435319935064],"handError":3.1401849173675503e-16,"release":[3.0033494687242537,1.4905319582223107,-1.9851891920409581],"hand":[3.0033494687242537,1.4905319582223104,-1.985189192040958],"heading":-0.45708576396974454,"bodyYaw":2.6845068896200486,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":1,"ndc":[-0.044022397702603654,0.03129066656048746,0.5965235352545599],"handError":4.965068306494546e-16,"release":[-2.0481673265498186,1.4905319582223102,-2.0173769382034865],"hand":[-2.048167326549818,1.4905319582223104,-2.0173769382034865],"heading":0.5990134624098331,"bodyYaw":3.7406061159996264,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":6,"ndc":[-0.044021786685217286,0.029954556631850444,0.5965291527446966],"handError":4.440892098500626e-16,"release":[2.1438905471704013,1.4905319582223104,-1.9693143378501472],"hand":[2.1438905471704013,1.4905319582223104,-1.9693143378501468],"heading":-0.33163845315926976,"bodyYaw":2.809954200430523,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":2,"ndc":[-0.04419502099152016,0.1553805787229822,0.5949364942924588],"handError":9.155133597044475e-16,"release":[-1.1501071240661322,1.4905319582223102,-2.0160016526770437],"hand":[-1.1501071240661314,1.4905319582223104,-2.0160016526770437],"heading":0.5921665981473191,"bodyYaw":3.733759251737112,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":5,"ndc":[-0.04404607092692761,0.06442368294490339,0.5963058915232402],"handError":9.155133597044475e-16,"release":[1.3824409506995032,1.4905319582223104,-1.95422578486967],"hand":[1.3824409506995041,1.4905319582223104,-1.9542257848696698],"heading":0.07240726418330853,"bodyYaw":3.213999917773102,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":3,"ndc":[-0.04408362982800992,0.09584029948234091,0.5959605875096354],"handError":5.978733960281817e-16,"release":[-0.27910844148950653,1.4905319582223104,-1.9976619468853813],"hand":[-0.279108441489506,1.4905319582223104,-1.9976619468853816],"heading":0.4933233345448796,"bodyYaw":3.6349159881346726,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":4,"ndc":[-0.04409997222312466,0.10666527037403818,0.5958103409778509],"handError":7.870063977598499e-16,"release":[0.39768500238930404,1.4905319582223107,-1.9566701816674288],"hand":[0.39768500238930476,1.4905319582223104,-1.9566701816674286],"heading":-0.17235229762766496,"bodyYaw":2.9692403559621283,"visible":true,"early":[true,true,true]}]
+390x844: [{"blockedTargets":8,"slot":0,"ndc":[-0.06089714214314966,0.09617431668856598,0.594966628458954],"handError":6.280369834735101e-16,"release":[-2.959789875671595,1.4905319582223104,-2.0094275791919403],"hand":[-2.9597898756715946,1.4905319582223104,-2.0094275791919407],"heading":0.5584654922738553,"bodyYaw":3.7000581458636486,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":7,"ndc":[-0.06069271001422293,0.03846447747903637,0.596330527181991],"handError":2.220446049250313e-16,"release":[2.9798857764080786,1.4905319582223104,-1.997223887892388],"hand":[2.9798857764080786,1.4905319582223104,-1.9972238878923878],"heading":-0.5330343046572901,"bodyYaw":2.608558348932503,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":1,"ndc":[-0.060692548559515065,0.038384760525332004,0.596331604350596],"handError":4.965068306494546e-16,"release":[-2.0866144079027116,1.4905319582223102,-1.9935405876363042],"hand":[-2.086614407902711,1.4905319582223104,-1.9935405876363042],"heading":0.46866624725329786,"bodyYaw":3.6102589008430908,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":6,"ndc":[-0.06073861179186459,0.05676142794996585,0.596024286787026],"handError":0,"release":[2.027495191308576,1.4905319582223104,-2.033346979689942],"hand":[2.027495191308576,1.4905319582223104,-2.033346979689942],"heading":-0.7165286136499126,"bodyYaw":2.4250640399398806,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":2,"ndc":[-0.06074750411109273,0.05966194297112907,0.5959649603841229],"handError":8.005932084973442e-16,"release":[-1.1570129198208217,1.4905319582223104,-2.0112644635393857],"hand":[-1.157012919820821,1.4905319582223104,-2.011264463539386],"heading":0.5680525678396707,"bodyYaw":3.7096452214294637,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":5,"ndc":[-0.06069785461222454,0.04092346006534537,0.5962962042470924],"handError":7.021666937153402e-16,"release":[1.3823165404955537,1.4905319582223104,-1.9542141351331974],"hand":[1.3823165404955544,1.4905319582223104,-1.9542141351331976],"heading":0.07204746839345336,"bodyYaw":3.2136401219832464,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":3,"ndc":[-0.060682547467188375,0.03307481340069379,0.5963983280946619],"handError":9.650801630464006e-16,"release":[-0.10985575565548811,1.4905319582223107,-2.229899242724602],"hand":[-0.1098557556554878,1.4905319582223104,-2.2298992427246027],"heading":1.346410608802246,"bodyYaw":4.48800326239204,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":4,"ndc":[-0.060691070482217446,0.037647136597470106,0.5963414655585444],"handError":6.684427777288335e-16,"release":[0.3761383111562157,1.4905319582223104,-1.9606525761812426],"hand":[0.3761383111562162,1.4905319582223104,-1.9606525761812421],"heading":-0.23545544361110463,"bodyYaw":2.9061372099786884,"visible":true,"early":[true,true,true]}]
+844x390: [{"blockedTargets":8,"slot":0,"ndc":[-0.032406873857569615,0.14673440561669615,0.5953610133042553],"handError":6.280369834735101e-16,"release":[-2.874014470332498,1.4905319582223104,-2.089182044063054],"hand":[-2.8740144703324977,1.4905319582223104,-2.0891820440630546],"heading":0.8973352257309596,"bodyYaw":4.038927879320752,"visible":true,"early":[true,true,true]},{"blockedTargets":8,"slot":7,"ndc":[-0.032315564354953516,0.03880055048065165,0.5965046469985912],"handError":9.930136612989092e-16,"release":[2.9327006433833094,1.4905319582223104,-2.029088182713903],"hand":[2.93270064338331,1.4905319582223104,-2.029088182713902],"heading":-0.6971624311244742,"bodyYaw":2.4444302224653187,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":1,"ndc":[-0.03232797801841811,0.06499739322208282,0.5963491682871546],"handError":5.438959822042073e-16,"release":[-2.1118120241032967,1.4905319582223102,-1.9813837630489375],"hand":[-2.1118120241032963,1.4905319582223104,-1.9813837630489377],"heading":0.3880872619757385,"bodyYaw":3.5296799155655316,"visible":true,"early":[true,true,true]},{"blockedTargets":2,"slot":6,"ndc":[-0.032360258764967134,0.10630408096573615,0.5959448582386732],"handError":4.440892098500626e-16,"release":[2.1701708018350625,1.4905319582223104,-1.962006623953033],"hand":[2.170170801835063,1.4905319582223104,-1.962006623953033],"heading":-0.2530753918877888,"bodyYaw":2.8885172617020043,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":2,"ndc":[-0.03232759377506528,0.06434654634394857,0.5963539808601594],"handError":5.438959822042073e-16,"release":[-1.2990173902283244,1.4905319582223102,-1.9564698024450362],"hand":[-1.299017390228324,1.4905319582223104,-1.956469802445036],"heading":0.126192467542632,"bodyYaw":3.267785121132425,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":5,"ndc":[-0.032330713448046736,0.06945494788319433,0.5963149075651062],"handError":7.021666937153402e-16,"release":[1.195179919717715,1.4905319582223102,-1.989125482111077],"hand":[1.1951799197177158,1.4905319582223104,-1.989125482111077],"heading":-0.48319820246486084,"bodyYaw":2.6583944511249324,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":3,"ndc":[-0.032327862245199256,0.06480197913338046,0.5963506183241457],"handError":6.377745716588144e-16,"release":[-0.3616103238824907,1.4905319582223102,-1.964143649327387],"hand":[-0.36161032388249015,1.4905319582223104,-1.9641436493273867],"heading":0.23620151566019318,"bodyYaw":3.377794169249986,"visible":true,"early":[true,true,true]},{"blockedTargets":0,"slot":4,"ndc":[-0.03236892914500579,0.11490124668144676,0.5958362634213581],"handError":6.377745716588144e-16,"release":[0.48149598843936836,1.4905319582223107,-1.954138429652107],"hand":[0.4814959884393689,1.4905319582223104,-1.9541384296521067],"heading":0.0696747228892055,"bodyYaw":3.2112673764789985,"visible":true,"early":[true,true,true]}]
+[
+  {
+    "name": "reference roll parity after 1 tape steps",
+    "pass": true,
+    "maxError": 0
+  },
+  {
+    "name": "reference roll parity after 12 tape steps",
+    "pass": true,
+    "maxError": 0
+  },
+  {
+    "name": "reference roll parity after 24 tape steps",
+    "pass": true,
+    "maxError": 0
+  },
+  {
+    "name": "both actual TPE pillars physically block maximum-speed rolls from four directions",
+    "pass": true,
+    "columns": 2,
+    "cases": [
+      {
+        "axis": "x",
+        "sign": -1,
+        "hit": true,
+        "crossed": false,
+        "bounced": true
+      },
+      {
+        "axis": "x",
+        "sign": 1,
+        "hit": true,
+        "crossed": false,
+        "bounced": true
+      },
+      {
+        "axis": "z",
+        "sign": -1,
+        "hit": true,
+        "crossed": false,
+        "bounced": true
+      },
+      {
+        "axis": "z",
+        "sign": 1,
+        "hit": true,
+        "crossed": false,
+        "bounced": true
+      },
+      {
+        "axis": "x",
+        "sign": -1,
+        "hit": true,
+        "crossed": false,
+        "bounced": true
+      },
+      {
+        "axis": "x",
+        "sign": 1,
+        "hit": true,
+        "crossed": false,
+        "bounced": true
+      },
+      {
+        "axis": "z",
+        "sign": -1,
+        "hit": true,
+        "crossed": false,
+        "bounced": true
+      },
+      {
+        "axis": "z",
+        "sign": 1,
+        "hit": true,
+        "crossed": false,
+        "bounced": true
+      }
+    ]
+  },
+  {
+    "name": "other spectators ranked by horizontal reach with separate real hand distance",
+    "pass": true
+  },
+  {
+    "name": "interrupted flight completes visually without scoring",
+    "pass": true,
+    "distance": 6.115656427335826,
+    "resolved": true,
+    "attempts": 0
+  },
+  {
+    "name": "catch reaction finishes after transfer to settled ribbons",
+    "pass": true
+  },
+  {
+    "name": "completed finale skips per-ribbon skeleton walks",
+    "pass": true,
+    "skeletonUpdates": 0
+  },
+  {
+    "name": "idle result skips empty preview redraw",
+    "pass": true,
+    "previewClears": 0
+  },
+  {
+    "name": "ribbon marker uses current camera before renderer",
+    "pass": true,
+    "pixelError": 0.00044933437080531404
+  },
+  {
+    "name": "swipe started before orientation change",
+    "pass": true
+  },
+  {
+    "name": "ribbon rotation cancels old-coordinate swipe",
+    "pass": true
+  },
+  {
+    "name": "ribbon resize updates lens immediately",
+    "pass": true,
+    "resizeFov": 86,
+    "expected": 86
+  },
+  {
+    "name": "wild throw follows roll without changing target",
+    "pass": true,
+    "yawChange": 0.8581300895914379
+  }
+]
+[
+  {
+    "name": "reference roll parity after 1 tape steps",
+    "pass": true,
+    "maxError": 0
+  },
+  {
+    "name": "reference roll parity after 12 tape steps",
+    "pass": true,
+    "maxError": 0
+  },
+  {
+    "name": "reference roll parity after 24 tape steps",
+    "pass": true,
+    "maxError": 0
+  },
+  {
+    "name": "other spectators ranked by horizontal reach with separate real hand distance",
+    "pass": true
+  },
+  {
+    "name": "interrupted flight completes visually without scoring",
+    "pass": true,
+    "distance": 6.011843735454033,
+    "resolved": true,
+    "attempts": 0
+  },
+  {
+    "name": "catch reaction finishes after transfer to settled ribbons",
+    "pass": true
+  },
+  {
+    "name": "completed finale skips per-ribbon skeleton walks",
+    "pass": true,
+    "skeletonUpdates": 0
+  },
+  {
+    "name": "idle result skips empty preview redraw",
+    "pass": true,
+    "previewClears": 0
+  },
+  {
+    "name": "ribbon marker uses current camera before renderer",
+    "pass": true,
+    "pixelError": 0.00028459217910384353
+  },
+  {
+    "name": "swipe started before orientation change",
+    "pass": true
+  },
+  {
+    "name": "ribbon rotation cancels old-coordinate swipe",
+    "pass": true
+  },
+  {
+    "name": "ribbon resize updates lens immediately",
+    "pass": true,
+    "resizeFov": 86,
+    "expected": 86
+  },
+  {
+    "name": "wild throw follows roll without changing target",
+    "pass": true,
+    "yawChange": 0.9300497126823495
+  }
+]

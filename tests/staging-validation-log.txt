@@ -1,0 +1,13 @@
+loaded false
+console error Failed to load resource: the server responded with a status of 404 (File not found)
+console error Failed to load resource: the server responded with a status of 404 (File not found)
+target ready false
+native hit false
+result ready false 成果合照已完成，可儲存圖片；手機也可以長按圖片儲存。
+{"mobile":false,"url":"http://127.0.0.1:8765/TPEFanService/","power":1.01812545,"hit":1,"photo":"1200x920","normalRAF":true,"testHooks":false,"devicePixelRatio":0.5,"errors":[]}
+loaded true
+console error Failed to load resource: the server responded with a status of 404 (File not found)
+target ready true
+native hit true
+result ready true 成果合照已完成，可儲存圖片；手機也可以長按圖片儲存。
+{"mobile":true,"url":"http://127.0.0.1:8765/TPEFanService/","power":0.9225004275,"hit":1,"photo":"1200x920","normalRAF":true,"testHooks":false,"devicePixelRatio":0.5,"errors":[]}
