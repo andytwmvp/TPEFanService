@@ -6,7 +6,7 @@ const root=path.resolve(__dirname,'..');
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const page=await browser.newPage({viewport:{width:1000,height:700}});let errors=[];page.on('pageerror',e=>errors.push(e.message));
- const html=fs.readFileSync(path.join(root,'index.html'),'utf8').replaceAll('requestAnimationFrame(frame);','').replace('})();\n</script>','window.testRibbon = {RIBBON, G2, S, seats, camera, renderer, scene, startGame, ribbonStartPlay, ribbonPickTarget, ribbonFindWindow, ribbonBuildLaunch, ribbonStepRoll, ribbonLaunch, ribbonTick, ribbonTickSettled, ribbonUpdateMesh, ribbonMakeTrail, ribbonCancelGesture, finishRibbonGame, closeRibbonSummary, setMode, ribbonPhysicsStep, ribbonOutcome, ribbonRopeStep, ribbonSetPower, getPicker:()=>ribbonPickTarget, setPicker:f=>ribbonPickTarget=f};\n})();\n</script>');
+ const html=fs.readFileSync(path.join(root,'index.html'),'utf8').replaceAll('requestAnimationFrame(frame);','').replace('})();\n</script>','window.testRibbon = {RIBBON, G2, S, seats, camera, renderer, scene, startGame, ribbonStartPlay, ribbonPickTarget, ribbonFindWindow, ribbonBuildLaunch, ribbonStepRoll, ribbonLaunch, ribbonTick, ribbonTickSettled, ribbonUpdateMesh, ribbonMakeTrail, ribbonCancelGesture, finishRibbonGame, closeRibbonSummary, onAudienceChanged, setMode, ribbonPhysicsStep, ribbonOutcome, ribbonRopeStep, ribbonSetPower, getPicker:()=>ribbonPickTarget, setPicker:f=>ribbonPickTarget=f};\n})();\n</script>');
  await page.route('**/TPEFanService/',r=>r.fulfill({body:html,contentType:'text/html'}));
  await page.route('**/ribbon-world.js',r=>r.fulfill({body:fs.readFileSync(path.join(root,'ribbon-world.js')),contentType:'application/javascript'}));
  await page.route('**/three.min.js',r=>r.fulfill({body:fs.readFileSync(process.env.THREE_PATH||require.resolve("three/build/three.min.js")),contentType:'application/javascript'}));
@@ -103,6 +103,9 @@ const root=path.resolve(__dirname,'..');
     r.settled.push(r.flight);r.flight=null;
   }
   t.ribbonTick(r.nextAt+1);check(r.phase==='result' && r.hits===7,'first lap with one miss ends at eight');t.closeRibbonSummary();
+  t.startGame('ribbon');await t.ribbonStartPlay(performance.now());t.ribbonLaunch(r.window.mid,0,performance.now());
+  t.onAudienceChanged();check(!r.active && r.phase==='idle' && !r.flight && !r.settled.length && !r.world && ribbonTargetMark.hidden,'settings change disposes flight and cancels session');
+  t.startGame('ribbon');await t.ribbonStartPlay(performance.now());t.finishRibbonGame();document.getElementById('gMember').value='2';t.startGame('ribbon');check(r.roster[0]===2 && document.getElementById('startPanel').hidden,'replay after result preserves newly selected member and hides menu');t.finishRibbonGame();t.closeRibbonSummary();
   return out;
  },fixtures);
  console.log(report.join('\n'));assert.deepEqual(errors,[]);await browser.close();

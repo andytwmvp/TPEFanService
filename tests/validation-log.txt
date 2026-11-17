@@ -1,4 +1,7 @@
-node tests/ribbon-browser.cjs
+
+> test
+> node tests/ribbon-browser.cjs && node tests/ribbon-ui.cjs
+
 WebGL context
 selecting hides candidate and bands
 old search cannot publish into restarted session
@@ -15,6 +18,10 @@ hit interval sample 3
 hit interval sample 4
 hit interval sample 5
 hit interval sample 6
+hit interval sample 7
+hit interval sample 8
+hit interval sample 9
+hit interval sample 10
 perfect uses actual distance
 perfect uses actual distance
 perfect uses actual distance
@@ -68,11 +75,11 @@ challenge transitions to result
 result keeps ribbon
 settled ribbon sleeps
 64 sleeping ribbons retain display without physics
-64 ribbons / 1000 ticks ms: 5.9
+64 ribbons / 1000 ticks ms: 4.9
 endpoint motion wakes ribbon
 64 tape and roll meshes removed
 uploaded ribbon GPU geometries disposed
-GPU geometry count: 247 -> 122
+GPU geometry count: 279 -> 153
 return menu disposes ribbons
 background search waits before publishing
 background search resumes
@@ -98,7 +105,7 @@ first-lap miss completes all eight throws 6
 first lap failure test target 7
 first-lap miss completes all eight throws 7
 first lap with one miss ends at eight
-
-node tests/ribbon-ui.cjs
+settings change disposes flight and cancels session
+replay after result preserves newly selected member and hides menu
 desktop: native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
 mobile: native swipe, one score, result render, PNG export, replay, multitouch/cancel and cleanup passed
