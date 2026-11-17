@@ -5757,7 +5757,6 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.phase = "idle";
     RIBBON.thrower = null;
     RIBBON.pausedAt = 0;
-    G2.member = RIBBON.roster ? RIBBON.roster[0] : G2.member;
     RIBBON.world = null;
     RIBBON.windowCache = null;
     RIBBON.window = null;
@@ -5951,6 +5950,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
 
   function startGame(kind) {
+    if (RIBBON.active) finishRibbonGame();
+    if (RIBBON.phase === "result") closeRibbonSummary();
     initAudio();
     closeResult();
     $("startPanel").hidden = true;
@@ -6902,7 +6903,12 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     endGame(false);
   });
   function onAudienceChanged() {
-    if (RIBBON.active) { finishRibbonGame("觀眾設定變更，這一局已結束。"); return; }
+    if (RIBBON.active || RIBBON.phase === "result") {
+      if (RIBBON.active) finishRibbonGame("觀眾設定變更，這一局已結束。");
+      closeRibbonSummary();
+      toast("觀眾設定已變更，彩帶挑戰已結束並清除。");
+      return;
+    }
     if (!G2 || !G2.on && !G2.result && G2.phase !== "countdown") return;
     var still = G2.fans.every(isTarget);
     if (!still) {
