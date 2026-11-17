@@ -16,6 +16,8 @@
 npm ci
 # Linux 安裝 Chromium，或設定 CHROMIUM_PATH 指向可用的 Chromium。
 npm test
+# Pages 部署後，直接驗證公開站（不攔截正式資源）：
+node tests/pages-smoke.cjs
 ```
 
 測試透過攔截 HTML 在記憶體中加入測試介面，正式檔案不暴露測試 API。流程測試停止自動 RAF，直接驅動固定步進與 visibility 事件；UI 測試使用 WebGL、Chromium 原生滑鼠／觸控輸入、桌面及手機 viewport，輸出 `tests/artifacts/`。這些測試不代表實體手機或硬體 GPU 驗收。
