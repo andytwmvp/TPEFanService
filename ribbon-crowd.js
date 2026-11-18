@@ -5,7 +5,7 @@
  function bone(mesh,index,a,b,width){direction.subVectors(b,a);var length=direction.length();quaternion.setFromUnitVectors(up,direction.normalize());middle.addVectors(a,b).multiplyScalar(.5);scale.set(width,length,width);matrix.compose(middle,quaternion,scale);mesh.setMatrixAt(index,matrix);mesh.instanceMatrix.needsUpdate=true;}
  function ensure(seat){if(entries.has(seat.i))return entries.get(seat.i);var k=height(seat)/170,e={seat:seat,k:k,base:{},shoulders:[],hands:[],props:[],caught:false};
   ['arm','fore','hand'].forEach(function(name){e.base[name]=[0,1].map(function(side){var m=new T.Matrix4();IM[name].getMatrixAt(seat.i*2+side,m);return m;});});
-  for(var side=0;side<2;side++){e.shoulders.push(new T.Vector3().setFromMatrixPosition(e.base.arm[side]).add(new T.Vector3(0,.15*k,0)));e.hands.push(new T.Vector3().setFromMatrixPosition(e.base.hand[side]));}
+  for(var side=0;side<2;side++){e.shoulders.push(root.RibbonCrowd.shoulder(T,e.base.arm[side],k));e.hands.push(new T.Vector3().setFromMatrixPosition(e.base.hand[side]));}
   e.hold=new T.Vector3(.06*k,0,-.36*k);var inverse=seat.m.clone().invert(),local=e.shoulders[1].clone().applyMatrix4(inverse);e.hold.y=local.y+.08*k;e.hold.z=Math.min(e.hold.z,local.z-.32*k);e.hold.applyMatrix4(seat.m);e.baseShoulders=e.shoulders.map(function(v){return v.clone();});e.body=[];["torso","head","hair","fringe","long","skin","nose","mouth","eye"].forEach(function(name){if(!IM[name])return;var count=name==="eye"?2:1;for(var side=0;side<count;side++){var index=seat.i*count+side,m=new T.Matrix4();IM[name].getMatrixAt(index,m);e.body.push({name:name,index:index,matrix:m});}});
   [props.fans[seat.i],props.towels[seat.i]].forEach(function(o){if(o)e.props.push({object:o,visible:o.visible});});
   e.base.stick=[];for(var j=0;j<3;j++){var m=new T.Matrix4();IM.stick.getMatrixAt(seat.i*3+j,m);e.base.stick.push(m);}e.base.rstick=new T.Matrix4();IM.rstick.getMatrixAt(seat.i,e.base.rstick);
@@ -27,4 +27,4 @@
  function release(i){var e=entries.get(i);if(e){restoreEntry(e);entries.delete(i);}}
 
  return {bodyTransform:function(i){return entries.has(i)?entries.get(i).bodyTransform:null;},beginAnger:beginAnger,tickAnger:tickAnger,angerCount:function(){return anger?anger.mesh.count:0;},has:function(i){return entries.has(i);},entries:entries,ensure:ensure,pose:pose,receive:receive,anticipate:anticipate,clear:clear,release:release,hand:function(i){return entries.has(i)?entries.get(i).hand:null;}};
-};})(typeof window==='undefined'?globalThis:window);
+};root.RibbonCrowd.shoulder=function(T,arm,k){return new T.Vector3().setFromMatrixPosition(arm).add(new T.Vector3(0,.15*k,0));};})(typeof window==='undefined'?globalThis:window);
