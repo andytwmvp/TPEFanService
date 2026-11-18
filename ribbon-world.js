@@ -9,8 +9,9 @@
       boxes.push(box);index(box,grid);
     }
     function index(box,targetGrid) {
-      for (var x=Math.floor(box.min.x-.04);x<=Math.floor(box.max.x+.04);x++)
-        for(var z=Math.floor(box.min.z-.04);z<=Math.floor(box.max.z+.04);z++) {
+      var previous=box.previous;
+      for (var x=Math.floor(Math.min(box.min.x,previous?previous.min.x:box.min.x)-.04);x<=Math.floor(Math.max(box.max.x,previous?previous.max.x:box.max.x)+.04);x++)
+        for(var z=Math.floor(Math.min(box.min.z,previous?previous.min.z:box.min.z)-.04);z<=Math.floor(Math.max(box.max.z,previous?previous.max.z:box.max.z)+.04);z++) {
           var key=x+':'+z;
           if(!targetGrid.has(key))targetGrid.set(key,[]);
           targetGrid.get(key).push(box);
@@ -55,29 +56,32 @@
     });
     // Platforms are a separate static group. Instanced chairs and spectators use their actual matrices.
     room.platforms.children.forEach(function(child){ addMeshBounds(child.geometry,child.matrixWorld); });
-    ['pad','back','torso','head','hair'].forEach(function(name){
+    ['pad','back','torso','head','hair','thigh','shin','foot','arm','fore','hand'].forEach(function(name){
       var im=instances[name];if(!im)return;im.geometry.computeBoundingBox();
-      seats.forEach(function(_,i){ im.getMatrixAt(i,matrix); var person=addMeshBounds(im.geometry,matrix);person.instanceIndex=i;if(name==='torso'||name==='head'||name==='hair'){person.audience=i;person.instanceName=name;person.instanceIndex=i;} });
+      var paired=['thigh','shin','foot','arm','fore','hand'].includes(name),count=paired?2:1;
+      seats.forEach(function(seat,i){for(var side=0;side<count;side++){im.getMatrixAt(i*count+side,matrix);var person=addMeshBounds(im.geometry,matrix);person.instanceIndex=i;
+        if(name!=='pad'&&name!=='back'){person.audience=i;person.instanceName=name;person.side=paired?side:undefined;}
+      }});
     });
     var empty=[], axes=['x','y','z'], faceAxis=['x','x','y','y','z','z'];
     var low=[-room.width/2,0,room.z-room.depth/2], high=[room.width/2,room.height,room.z+room.depth/2];
-    var faces=new Float64Array(6), contact={hit:false,landed:false,actor:undefined,audience:undefined};
+    var faces=new Float64Array(6), contact={hit:false,landed:false,actor:undefined,audience:undefined,part:undefined};
     var localPoint=new THREE.Vector3(), closest=new THREE.Vector3(), normal=new THREE.Vector3();
     // Reuse scratch storage: a rope may query this hundreds of times per step.
-    function collide(p, velocity, radius,ignoreActor,snapshot,bodies) {
-      contact.hit=false;contact.landed=false;contact.actor=undefined;contact.audience=undefined;
+    function collide(p, velocity, radius,ignoreActor,snapshot,bodies,gripSeat) {
+      contact.hit=false;contact.landed=false;contact.actor=undefined;contact.audience=undefined;contact.part=undefined;contact.obstacle=false;
       for(var i=0;i<3;i++) {
         var axis=axes[i], value=Math.max(low[i]+radius,Math.min(high[i]-radius,p[axis]));
         if(value!==p[axis]) {
           p[axis]=value;if(velocity)velocity[axis]*=-.25;
-          contact.hit=true;if(i===1 && value===radius)contact.landed=true;
+          contact.hit=true;contact.obstacle=true;if(i===1 && value===radius)contact.landed=true;
         }
       }
       var cell=Math.floor(p.x)+':'+Math.floor(p.z);
       for(var group=0;group<2;group++){
       var nearby=(group?(snapshot?snapshot.grid:actorGrid):(bodies?bodies.grid:grid)).get(cell)||empty;
       for(var i=0;i<nearby.length;i++) {
-        var b=nearby[i];if(b.actor!==undefined&&b.actor===ignoreActor)continue;
+        var b=nearby[i];if(b.audience===gripSeat&&['hand','fore'].includes(b.instanceName))continue;if(b.actor!==undefined&&b.actor===ignoreActor)continue;
         if(p.x<b.min.x-radius || p.x>b.max.x+radius || p.y<b.min.y-radius || p.y>b.max.y+radius || p.z<b.min.z-radius || p.z>b.max.z+radius) continue;
         // AABB is only the broad phase: resolve against the mesh's oriented box.
         // Otherwise rotated chairs and lights create invisible solid corners.
@@ -103,7 +107,7 @@
           if(toward<0)velocity.addScaledVector(normal,-1.25*toward);
           velocity.x*=.6;velocity.z*=.6;
         }
-        contact.hit=true;if(b.actor!==undefined)contact.actor=b.actor;if(b.audience!==undefined)contact.audience=b.audience;if(normal.y>.5)contact.landed=true;
+        contact.hit=true;if(!['arm','fore','hand'].includes(b.instanceName))contact.obstacle=true;if(b.actor!==undefined)contact.actor=b.actor;if(b.audience!==undefined)contact.audience=b.audience;contact.part=b.instanceName;if(normal.y>.5)contact.landed=true;
       }}
       return contact;
     }
@@ -156,25 +160,44 @@
       return {floor:floor,barrier:contacts.length?contacts[0].barrier:null,contacts:contacts,separations:separations,guides:guides,slideTop:slideTop,endSupportTop:endSupportTop};
     }
     var bodyA=new THREE.Vector3(),bodyB=new THREE.Vector3();
-    function bodySegment(a,b,freeA,freeB,radius) {
+    function bodySegment(a,b,freeA,freeB,radius,minRevision,queryOnly) {
       var hit=false;
       for(var x=Math.floor(Math.min(a.x,b.x)-radius);x<=Math.floor(Math.max(a.x,b.x)+radius);x++)for(var z=Math.floor(Math.min(a.z,b.z)-radius);z<=Math.floor(Math.max(a.z,b.z)+radius);z++){
         var nearby=grid.get(x+':'+z)||empty;
         for(var i=0;i<nearby.length;i++){
-          var box=nearby[i];if(box.audience===undefined||Math.max(a.y,b.y)<box.min.y-radius||Math.min(a.y,b.y)>box.max.y+radius)continue;
-          bodyA.copy(a).applyMatrix4(box.inverse);bodyB.copy(b).applyMatrix4(box.inverse);var near=0,far=1;
+          var entry=nearby[i];if(minRevision!==undefined&&(entry.changedAt||0)<=minRevision)continue;
+          for(var shape=0;shape<(queryOnly&&entry.previous?2:1);shape++){var box=shape?entry.previous:entry;if(box.audience===undefined||Math.max(a.y,b.y)<box.min.y-radius||Math.min(a.y,b.y)>box.max.y+radius||Math.max(a.x,b.x)<box.min.x-radius||Math.min(a.x,b.x)>box.max.x+radius||Math.max(a.z,b.z)<box.min.z-radius||Math.min(a.z,b.z)>box.max.z+radius)continue;
+          bodyA.copy(a).applyMatrix4(box.inverse);bodyB.copy(b).applyMatrix4(box.inverse);
+          // A fixed endpoint may grasp a hand / distal forearm; the rest of the link still collides.
+          if((!freeA||!freeB)&&['hand','fore'].includes(box.instanceName)){
+            var center=box.localBounds.getCenter(new THREE.Vector3()).applyMatrix4(box.transform),tip=box.instanceName==='hand'?center:new THREE.Vector3(0,.5,0).applyMatrix4(box.transform);
+            var grip=!freeA&&a.distanceTo(tip)<.075?a:!freeB&&b.distanceTo(tip)<.075?b:null;
+            if(grip){var other=grip===a?b:a,delta=other.clone().sub(grip),len=delta.length();if(len<=.09)continue;var clipped=grip.clone().addScaledVector(delta,.09/len);if(grip===a)bodyA.copy(clipped).applyMatrix4(box.inverse);else bodyB.copy(clipped).applyMatrix4(box.inverse);}
+          }
+          var near=0,far=1;
           for(var k=0;k<3;k++){var axis=axes[k],r=radius/box.scale[k],lo=box.localBounds.min[axis]-r,hi=box.localBounds.max[axis]+r,delta=bodyB[axis]-bodyA[axis];if(Math.abs(delta)<1e-9){if(bodyA[axis]<lo||bodyA[axis]>hi){near=2;break;}continue;}var t1=(lo-bodyA[axis])/delta,t2=(hi-bodyA[axis])/delta;near=Math.max(near,Math.min(t1,t2));far=Math.min(far,Math.max(t1,t2));if(near>far)break;}
-          if(near>far||far<=1e-6||near>=1-1e-6)continue;hit=true;
-          // Drape free links over the body; fixed ends select a compatible separating face.
-          var axis='y',sign=1,fixed=!freeA?bodyA:!freeB?bodyB:null,best=-Infinity;
-          if(fixed)for(var preference=0;preference<2&&best===-Infinity;preference++)for(var k=0;k<3;k++){var key=axes[k];if(preference===0&&key==='y'||preference===1&&key!=='y')continue;var r=(radius+.002)/box.scale[k],below=box.localBounds.min[key]-r-fixed[key],above=fixed[key]-box.localBounds.max[key]-r;if(below>best&&below>=0){best=below;axis=key;sign=-1;}if(above>best&&above>=0){best=above;axis=key;sign=1;}}
-          var edge=sign<0?box.localBounds.min[axis]-(radius+.002)/box.scale[axes.indexOf(axis)]:box.localBounds.max[axis]+(radius+.002)/box.scale[axes.indexOf(axis)];
-          if(freeA){bodyA[axis]=sign<0?Math.min(bodyA[axis],edge):Math.max(bodyA[axis],edge);a.copy(bodyA).applyMatrix4(box.transform);}
-          if(freeB){bodyB[axis]=sign<0?Math.min(bodyB[axis],edge):Math.max(bodyB[axis],edge);b.copy(bodyB).applyMatrix4(box.transform);}
+          if(near>far||far<=1e-6||near>=1-1e-6)continue;hit=true;if(queryOnly)return true;
+          // Choose the least displacement separating face; fixed ends must already be outside it.
+          // Large upward projections on rotated joints stretch links and can fight the next body part.
+          var bestCost=Infinity,bestAxis=null,bestEdge=0,bestSign=1;
+          for(var k=0;k<3;k++)for(var sign of [-1,1]){
+            var axis=axes[k],edge=sign<0?box.localBounds.min[axis]-(radius+.002)/box.scale[k]:box.localBounds.max[axis]+(radius+.002)/box.scale[k];
+            var da=Math.max(0,sign*(edge-bodyA[axis])),db=Math.max(0,sign*(edge-bodyB[axis]));
+            if(!freeA&&da>1e-9||!freeB&&db>1e-9)continue;
+            var cost=(da*da+db*db)*box.scale[k]*box.scale[k];if(cost<bestCost){bestCost=cost;bestAxis=axis;bestEdge=edge;bestSign=sign;}
+          }
+          if(bestAxis!==null){if(freeA){bodyA[bestAxis]=bestSign<0?Math.min(bodyA[bestAxis],bestEdge):Math.max(bodyA[bestAxis],bestEdge);a.copy(bodyA).applyMatrix4(box.transform);}if(freeB){bodyB[bestAxis]=bestSign<0?Math.min(bodyB[bestAxis],bestEdge):Math.max(bodyB[bestAxis],bestEdge);b.copy(bodyB).applyMatrix4(box.transform);}}
+
+          }
         }
       }return hit;
     }
-    function updateAudience(id,matrices){var changed=false;for(var i=0;i<boxes.length;i++){var old=boxes[i],transform=matrices[old.instanceName];if(old.audience!==id||!transform||old.transform.equals(transform))continue;var b=addMeshBounds(old.geometry,transform,old.blocksTarget,undefined,true);b.audience=id;b.instanceName=old.instanceName;b.instanceIndex=old.instanceIndex;boxes[i]=b;changed=true;}if(changed){grid=new Map();boxes.forEach(function(b){index(b,grid);});actorRevision++;bodyRevision++;}}
-    return {bodyRevision:function(){return bodyRevision;},boxes:boxes, collide:collide,updateAudience:updateAudience,snapshotBodies:function(){return {grid:grid};},bodyCrosses:function(a,b){return bodySegment(a,b,false,false,0);},constrainBodySegment:bodySegment,blocked:blocked,pickupBlocked:function(from,to,seat,owner){return blocked(from,to,owner,null,seat);},setActors:setActors,barrierCrosses:barrierCrosses,dropRoute:dropRoute,actorBounds:function(){return actorBoxes;},actorRevision:function(){return actorRevision;},snapshotActors:function(){return {grid:actorGrid,boxes:actorBoxes,revision:actorRevision};}};
+    function replaceBody(old,transform){var b=addMeshBounds(old.geometry,transform,old.blocksTarget,undefined,true);b.audience=old.audience;b.instanceName=old.instanceName;b.instanceIndex=old.instanceIndex;b.side=old.side;b.changedAt=bodyRevision+1;b.previous=Object.assign({},old,{previous:null});return b;}
+    function rebuildBodies(){grid=new Map();boxes.forEach(function(b){index(b,grid);});actorRevision++;bodyRevision++;}
+    function updateAudience(id,matrices){var changed=false;for(var i=0;i<boxes.length;i++){var old=boxes[i],value=matrices[old.instanceName],transform=Array.isArray(value)?value[old.side]:value;if(old.audience!==id||!transform||old.transform.equals(transform))continue;boxes[i]=replaceBody(old,transform);changed=true;}if(changed)rebuildBodies();}
+    function syncArms(){var changed=false;for(var i=0;i<boxes.length;i++){var old=boxes[i];if(old.instanceName!=='fore'&&old.instanceName!=='hand')continue;instances[old.instanceName].getMatrixAt(old.instanceIndex*2+old.side,matrix);if(old.transform.equals(matrix))continue;boxes[i]=replaceBody(old,matrix);changed=true;}if(changed)rebuildBodies();}
+    function touchesChanged(nodes,since){if(since===undefined)return true;for(var i=0;i<nodes.length-1;i++)if(bodySegment(nodes[i].p,nodes[i+1].p,i>0,i+1<nodes.length-1,.02,since,true))return true;return false;}
+
+    return {syncArms:syncArms,touchesChanged:touchesChanged,bodyRevision:function(){return bodyRevision;},boxes:boxes, collide:collide,updateAudience:updateAudience,snapshotBodies:function(){return {grid:grid};},bodyCrosses:function(a,b){return bodySegment(a,b,false,false,0);},constrainBodySegment:bodySegment,blocked:blocked,pickupBlocked:function(from,to,seat,owner){return blocked(from,to,owner,null,seat);},setActors:setActors,barrierCrosses:barrierCrosses,dropRoute:dropRoute,actorBounds:function(){return actorBoxes;},actorRevision:function(){return actorRevision;},snapshotActors:function(){return {grid:actorGrid,boxes:actorBoxes,revision:actorRevision};}};
   };
 })(typeof window==='undefined'?globalThis:window);
