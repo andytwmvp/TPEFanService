@@ -7,3 +7,6 @@ node_modules/
 /package-lock.json
 *.log
 *-log.txt
+
+# 本機來源查核紀錄
+/SOURCES.md
