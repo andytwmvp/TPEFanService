@@ -20,11 +20,13 @@
 python3 scripts/build.py
 ```
 
-組裝使用 Python 標準函式庫，並同步更新 HTML 的資源雜湊。提交時包含原始碼及部署產物。預覽可使用：
+組裝需要 Python 3 與 Node.js（建議 22）。Python 使用標準函式庫，Node.js 負責 JavaScript 語法檢查，不需 npm 安裝。所有驗證成功後才更新部署產物與 HTML 資源雜湊。提交時包含原始碼及部署產物。預覽可使用：
 
 ```sh
 python3 -m http.server 8080
 ```
+
+提交前可執行 `python3 scripts/build.py --check`，唯讀檢查部署內容與資源雜湊。GitHub Actions 在 push 與 pull request 執行相同檢查；不會部署或修改分支。manifest 必須完整列出所有原始碼片段，且不可重複。
 
 資源使用相對路徑，支援 GitHub Pages repository 子路徑。
 

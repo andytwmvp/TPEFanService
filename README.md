@@ -42,7 +42,7 @@
 
 ## 維護說明
 
-本專案為靜態網站，不需要 npm 安裝。修改 src/app/ 後，執行 python3 scripts/build.py 更新部署產物。測試程式、測試截圖、日誌與開發依賴僅保留在本機，不納入版本控制。
+本專案為靜態網站，不需要 npm 安裝。開發組裝需 Python 3 與 Node.js（建議 22）。修改 src/app/ 後，執行 `python3 scripts/build.py` 更新部署產物，提交前以 `python3 scripts/build.py --check` 確認同步。測試程式、測試截圖、日誌與開發依賴僅保留在本機，不納入版本控制。
 
 `ribbon-crowd.js` 重用現有觀眾的手臂實例，處理接取、姿勢還原與單一 instanced mesh 的全場表情；清場會釋放新增幾何與材質。
 
