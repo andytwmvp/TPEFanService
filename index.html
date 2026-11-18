@@ -1241,6 +1241,13 @@ details.members tr.tbd td {
   #app .result.compact .rpanel { box-sizing: border-box; width: 100%; min-width: 0; flex-wrap: wrap; justify-content: center; gap: 8px; }
   #app .result.compact .ract { width: 100%; min-width: 0; flex: 1 1 100%; flex-wrap: wrap; justify-content: center; }
 }
+@media (max-width: 600px) { #startPanel .story { display: none; } }
+.game-tabs { display: flex; width: 100%; margin-bottom: 12px; }
+.game-tabs button { flex: 1; }
+.game-tabs button[aria-selected="true"] { background: var(--accent); color: #211722; }
+#fanPanel > .seg { margin-bottom: 10px; }
+#ribbonPanel > p { font-size: 14px; line-height: 1.6; }
+#ribbonPanel > button { width: 100%; margin-top: 8px; }
 .marks {
   position: absolute;
   inset: 0;
@@ -1878,7 +1885,7 @@ details.members tr.tbd td {
   }
 }
 
-#gamePicker, #ribbonRecordDialog {
+#ribbonRecordDialog {
   width: min(380px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
   overflow: auto;
@@ -1888,13 +1895,9 @@ details.members tr.tbd td {
   border: 1px solid var(--line);
   border-radius: 14px;
 }
-#gamePicker::backdrop, #ribbonRecordDialog::backdrop { background: rgba(0, 0, 0, .72); }
-#gamePicker h2, #ribbonRecordDialog h2 { margin: 0 0 16px; color: #ffe0ac; }
-#gamePicker .game-choices { display: grid; gap: 12px; }
-#gamePicker .game-choice { width: 100%; min-height: 74px; text-align: left; padding: 12px 16px; }
-#gamePicker .game-choice strong { display: block; font-size: 17px; }
-#gamePicker .game-choice span { display: block; margin-top: 5px; font-size: 12px; font-weight: normal; }
-#gamePickerCancel, #ribbonRecordClose { display: block; margin: 16px auto 0; }
+#ribbonRecordDialog::backdrop { background: rgba(0, 0, 0, .72); }
+#ribbonRecordDialog h2 { margin: 0 0 16px; color: #ffe0ac; }
+#ribbonRecordClose { display: block; margin: 16px auto 0; }
 #ribbonRecordDialog { width: min(620px, calc(100vw - 24px)); }
 .ribbon-record-grid { width: 100%; border-collapse: collapse; text-align: center; margin: 12px 0; }
 .ribbon-record-grid th, .ribbon-record-grid td { padding: 6px 2px; border: 1px solid var(--line); font-size: 12px; }
@@ -2151,11 +2154,16 @@ details.members tr.tbd td {
   </div>
   <div class="hud bl"><div class="chip hint" id="hudHint">拖曳畫面轉頭看別處，方向鍵微調</div></div>
   <div id="startPanel" class="startpanel idol-only">
-    <h2>找出我的粉絲</h2>
+    <div class="orient game-tabs" role="tablist" aria-label="遊戲種類">
+      <button type="button" id="fanTab" role="tab" aria-selected="true" aria-controls="fanPanel">飯灑</button>
+      <button type="button" id="ribbonTab" role="tab" aria-selected="false" aria-controls="ribbonPanel" tabindex="-1">拋彩帶</button>
+    </div>
+    <h2 id="gameHeading">找出我的粉絲</h2>
     <p class="story">一覺醒來，我竟然重生成了踢披偶像。<br>這一世，我要把屬於我的一切，全部找回來……<br>對了，我想起來了——我的名字是……</p>
     <label class="field">隊伍<select id="gTeam"></select></label>
-    <label class="field">我是<select id="gMember"></select></label>
+    <label class="field" id="gameMemberField">我是<select id="gMember"></select></label>
     <div id="gCard" class="gcard"></div>
+    <div id="fanPanel" role="tabpanel" aria-labelledby="fanTab">
     <div class="seg" role="radiogroup" aria-label="難度">
       <label><input type="radio" name="gDiff" value="normal" checked>普通</label>
       <label><input type="radio" name="gDiff" value="easy">簡單（不算手燈）</label>
@@ -2164,18 +2172,15 @@ details.members tr.tbd td {
       <label><input type="radio" name="gTime" value="50" checked>50 秒</label>
       <label><input type="radio" name="gTime" value="100">100 秒</label>
     </div>
-    <button type="button" class="primary big" id="gStart" aria-haspopup="dialog" aria-controls="gamePicker">開始遊戲</button>
-  </div>
-
-  <dialog id="gamePicker" aria-labelledby="gamePickerTitle">
-    <h2 id="gamePickerTitle">選擇遊戲</h2>
-    <div class="game-choices">
-      <button type="button" class="game-choice primary" id="fanStart"><strong>找出我的粉絲</strong><span>在限時內找出支持你的觀眾。</span></button>
-      <button type="button" class="game-choice" id="ribbonStart"><strong>彩帶投擲挑戰</strong><span>向上快速滑動，把彩帶送到目標觀眾手上。</span></button>
+    <button type="button" class="primary big" id="gStart">開始飯灑</button>
     </div>
-    <button type="button" class="ghost" id="ribbonRecordMenu">查看彩帶實績</button>
-    <button type="button" id="gamePickerCancel">返回設定</button>
-  </dialog>
+    <div id="ribbonPanel" role="tabpanel" aria-labelledby="ribbonTab" hidden>
+      <p>快速向上滑動投出彩帶，速度控制力度，左右傾斜控制方向。</p>
+      <p>每輪十投，第一輪五中、挑戰輪七中晉級；決勝輪完成十投後結算。</p>
+      <button type="button" class="primary big" id="ribbonStart">開始拋彩帶</button>
+      <button type="button" class="ghost" id="ribbonRecordMenu">查看彩帶實績</button>
+    </div>
+  </div>
 
   <dialog id="ribbonRecordDialog" aria-labelledby="ribbonRecordTitle">
     <h2 id="ribbonRecordTitle">彩帶實績</h2>
@@ -6891,7 +6896,11 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
         seat.mood = null;
       }
     });
-    if (RIBBON.angrySeats.size) RIBBON.crowd.beginAnger(moodMaterial("😡").map);
+    if (RIBBON.angrySeats.size) {
+      RIBBON.crowd.beginAnger(moodMaterial("😡").map);
+      ribbonFeedback({ roll: target.pos }, "又是他！", "#ff706d");
+      RIBBON.effects[RIBBON.effects.length - 1].popup = true;
+    }
   }
 
 
@@ -6976,10 +6985,23 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   function ribbonDrawFeedback(width,height) {
     var effects=RIBBON.effects||[];camera.updateMatrixWorld(true);
     for(var i=effects.length-1;i>=0;i--) {
-      var effect=effects[i],age=(RIBBON.fxTime||0)-effect.born;if(age>=1){effects.splice(i,1);continue;}
+      var effect=effects[i],age=(RIBBON.fxTime||0)-effect.born;if(age>=(effect.popup ? .7 : 1)){effects.splice(i,1);continue;}
       ribbonProject.copy(effect.at).project(camera);
       var x=Math.max(50,Math.min(width-50,(ribbonProject.x+1)*width/2)),y=Math.max(height*.32,Math.min(height-70,(1-ribbonProject.y)*height/2));
       if(ribbonProject.z>1){x=width/2;y=height*.4;}
+      if (effect.popup) {
+        ribbonCtx.save();
+        ribbonCtx.globalAlpha = Math.min(1, age * 12) * Math.min(1, (.7 - age) * 5);
+        ribbonCtx.font = "bold 32px sans-serif";
+        ribbonCtx.textAlign = "center";
+        ribbonCtx.strokeStyle = "#21101b";
+        ribbonCtx.fillStyle = effect.color;
+        ribbonCtx.lineWidth = 6;
+        ribbonCtx.strokeText(effect.text, width / 2, height * .28);
+        ribbonCtx.fillText(effect.text, width / 2, height * .28);
+        ribbonCtx.restore();
+        continue;
+      }
       ribbonCtx.save();ribbonCtx.globalAlpha=Math.max(0,1-age);ribbonCtx.strokeStyle=effect.color;ribbonCtx.fillStyle=effect.color;ribbonCtx.lineWidth=2;
       ribbonCtx.beginPath();ribbonCtx.arc(x,y,14+age*36,0,Math.PI*2);ribbonCtx.stroke();
       ribbonCtx.font='bold 18px sans-serif';ribbonCtx.textAlign='center';ribbonCtx.shadowColor='#17121b';ribbonCtx.shadowBlur=8;ribbonCtx.fillText(effect.text,x,y-25-age*20);
@@ -7595,7 +7617,6 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
 
   function startGame(kind) {
     if ($("ribbonRecordDialog").open) $("ribbonRecordDialog").close();
-    if ($("gamePicker").open) $("gamePicker").close();
     if (RIBBON.active) finishRibbonGame();
     if (RIBBON.phase === "result") closeRibbonSummary();
     initAudio();
@@ -7603,7 +7624,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (G2.on || G2.phase === "countdown" || fxList.length) clearFanSession();
     $("startPanel").hidden = true;
     G2.team = +$("gTeam").value;
-    G2.member = +$("gMember").value;
+    G2.member = kind === "ribbon" ? Math.floor(Math.random() * TEAMS[G2.team].members.length) : +$("gMember").value;
     G2.dur = +document.querySelector("input[name=gTime]:checked").value;
     G2.easy = document.querySelector("input[name=gDiff]:checked").value === "easy";
     S.seed = newSeed();
@@ -8437,18 +8458,38 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (G2.phase === "result" || G2.result) clearFanSession();
     if (IDOL && !G2.on && G2.phase !== "countdown" && (typeof MODE === "undefined" || MODE === "game")) {
       $("startPanel").hidden = false;
-      if (!RIBBON.active && RIBBON.phase !== "result") $("gStart").focus({ preventScroll: true });
+      if (!RIBBON.active && RIBBON.phase !== "result") $(selectedGame === "ribbon" ? "ribbonStart" : "gStart").focus({ preventScroll: true });
     }
   }
-  $("gStart").addEventListener("click", function() {
-    if (!$("gamePicker").open) $("gamePicker").showModal();
+  var selectedGame = "fan";
+  function selectGameTab(game) {
+    selectedGame = game;
+    ["fan", "ribbon"].forEach(function(name) {
+      var active = name === game;
+      $(name + "Tab").setAttribute("aria-selected", String(active));
+      $(name + "Tab").tabIndex = active ? 0 : -1;
+      $(name + "Panel").hidden = !active;
+    });
+    $("gameMemberField").hidden = game !== "fan";
+    $("gCard").hidden = game !== "fan";
+    $("gameHeading").textContent = game === "fan" ? "找出我的粉絲" : "彩帶投擲挑戰";
+    $("startPanel").querySelector(".story").hidden = game !== "fan";
+    fitPanels();
+  }
+  ["fan", "ribbon"].forEach(function(name) {
+    $(name + "Tab").addEventListener("click", function() { selectGameTab(name); });
+    $(name + "Tab").addEventListener("keydown", function(e) {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+      e.preventDefault();
+      var game = e.key === "Home" ? "fan" : e.key === "End" ? "ribbon" : selectedGame === "fan" ? "ribbon" : "fan";
+      selectGameTab(game);
+      $(game + "Tab").focus();
+    });
   });
-  $("gamePickerCancel").addEventListener("click", function() { $("gamePicker").close(); });
-  $("ribbonRecordMenu").addEventListener("click",ribbonShowRecords);
-  $("ribbonRecordResult").addEventListener("click",ribbonShowRecords);
-  $("ribbonRecordClose").addEventListener("click",function(){$("ribbonRecordDialog").close();});
-  $("fanStart").addEventListener("click", function() {
-    if ($("gamePicker").open) $("gamePicker").close();
+  $("ribbonRecordMenu").addEventListener("click", ribbonShowRecords);
+  $("ribbonRecordResult").addEventListener("click", ribbonShowRecords);
+  $("ribbonRecordClose").addEventListener("click", function() { $("ribbonRecordDialog").close(); });
+  $("gStart").addEventListener("click", function() {
     if (GAME_VER === "1.01") { $("intro").hidden = false; $("introGo").focus(); }
     else startGame();
   });
@@ -8616,25 +8657,13 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       if (bd.style.maxHeight !== mh) bd.style.maxHeight = mh;
     }
     var vb = $("verBox");
-    if (!fitPanels.verHome) fitPanels.verHome = vb.parentNode;
-    vb.hidden = sp.hidden;
-    if (!vb.hidden) {
-      var home = fitPanels.verHome, par = home.getBoundingClientRect(), pr = sp.getBoundingClientRect();
-      var roomLeft = pr.left - par.left - 8 - 104 >= 6;
-      if (!roomLeft && vb.parentNode !== sp) {
-        sp.insertBefore(vb, $("gStart"));
-        vb.classList.add("inpanel");
-      } else if (roomLeft && vb.parentNode === sp) {
-        home.appendChild(vb);
-        vb.classList.remove("inpanel");
-      }
-      if (roomLeft) {
-        var L = Math.round(pr.left - par.left - 8 - vb.offsetWidth) + "px", T = Math.round(pr.bottom - par.top - vb.offsetHeight) + "px";
-        if (vb.style.left !== L) vb.style.left = L;
-        if (vb.style.top !== T) vb.style.top = T;
-      }
+    vb.hidden = sp.hidden || selectedGame === "ribbon";
+    if (vb.parentNode !== $("fanPanel")) {
+      $("fanPanel").insertBefore(vb, $("gStart"));
+      vb.classList.add("inpanel");
     }
   }
+
   var mapHome = map.parentNode, mapNext = map.nextSibling;
   function setMapDock(on) {
     var md = $("mapDock"), body = $("mapDockBody");
