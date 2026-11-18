@@ -6888,7 +6888,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       .filter(function(result) { return result.ok; })
       .map(function(result) { return result.seat; }));
     seats.forEach(function(seat) {
-      if (seat === target || !seatOcc(seat) || winners.has(seat.i)) return;
+      if (seat === target || !seatOcc(seat) || winners.has(seat.i) || RIBBON.crowd.entries.has(seat.i)) return;
       if (RIBBON.roundIndex !== 2 && seat.pos.distanceTo(target.pos) > 1.05) return;
       RIBBON.angrySeats.add(seat.i);
       if (seat.mood) {
@@ -7008,6 +7008,10 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       ribbonCtx.restore();
     }
   }
+  function ribbonReceiveMood(seat, expression) {
+    if (RIBBON.angrySeats) RIBBON.angrySeats.delete(seat.i);
+    showMood(seat, expression || "😍");
+  }
   function ribbonOutcome(caught, now) {
     var f = RIBBON.flight;
     if(!RIBBON.active || !f || f.resolved) return;
@@ -7037,7 +7041,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       G2.combo = RIBBON.combo;
       G2.maxCombo = RIBBON.bestCombo;
       ribbonFeedback(f,perfect?"★ 完美接住":"○ 接住了",perfect?"#ffe27a":"#77e8ae");
-      if(RIBBON.roundIndex===2&&RIBBON.angrySeats)RIBBON.angrySeats.delete(target.i);showMood(target, perfect ? "🤩" : "😍");if(target.mood)target.mood.userData.ribbonReaction=true;ribbonMaybeEgg(target);
+      ribbonReceiveMood(target, perfect ? "🤩" : "😍");ribbonMaybeEgg(target);
       SFX.found();
       toast((perfect ? "完美接住！★　" : "接到彩帶！　") + seatLabel(target) + "　+" + points);
     } else {
@@ -7045,7 +7049,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       RIBBON.combo = 0;
       if (caught) {
         ribbonFeedback(f,caught.intercepted?"× 前排伸手攔截":"× 被接走了","#ff8fc0");
-        showMood(caught.seat, "😮");if(caught.seat.mood)caught.seat.mood.userData.ribbonReaction=true;
+        ribbonReceiveMood(caught.seat);
         toast(seatLabel(caught.seat) + " 把彩帶接走了，沒有送到目標粉絲手上");
       } else if(f.blockedByActor){ribbonFeedback(f,"× 被站位成員擋住","#ff8fc0");toast("彩帶被站位成員擋住，請調整方向，避開成員再投擲。");} else {ribbonFeedback(f,"× 沒有接住","#ff8fc0");toast(f.power < RIBBON.window.lo ? "力度偏弱，下次請更快速向上滑動" : f.power > RIBBON.window.hi ? "力度過強，下次請減輕力度" : "方向偏離，下次請向上直滑，修正左右偏移");}
       SFX.miss();
@@ -7474,6 +7478,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if(!seat){f.recoveryUnavailable=true;f.retryKey=RIBBON.world.actorRevision()+':'+ribbonReceiverSnapshot().join(',');return;}
     f.velocity.set(0,0,0);f.postScorePickup=true;f.recoveredBy=seat.i;f.pickup=true;f.catchAge=0;f.catchFrom=f.roll.clone();
     f.receiver=RIBBON.crowd.receive(seat,f.roll,f);f.catchTo=f.receiver.hold.clone();
+    ribbonReceiveMood(seat);
     ribbonFeedback(f,"失手已結算 · 觀眾拾起彩帶","#ffce82");
   }
   function ribbonCatchReady(f){return !f||f.resolved!==false&&!f.recoveryPending&&(!f.catchTo||f.catchAge>=ribbonCatchDuration(f));}
