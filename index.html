@@ -6870,8 +6870,29 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.flight = null;
   }
   function ribbonClearAudience(restore){if(!RIBBON)return;if(RIBBON.crowd)RIBBON.crowd.clear(restore);if(RIBBON.angrySeats)RIBBON.angrySeats.clear();moodGroup.children.slice().forEach(function(sp){if(sp.userData.ribbonReaction){moodGroup.remove(sp);if(sp.userData.seat.mood===sp)sp.userData.seat.mood=null;}});}
-  function ribbonNewEgg(){RIBBON.egg={attempt:(RIBBON.roundIndex||0)*10+Math.floor(Math.random()*10),armed:Math.random()<.05,used:false};RIBBON.angrySeats=new Set();}
-  function ribbonMaybeEgg(target){var egg=RIBBON.egg;if(!egg||!egg.armed||egg.used||egg.attempt!==RIBBON.attempts-1||target.light||target.fan||target.towel)return;egg.used=true;var winners=new Set(RIBBON.results.slice((RIBBON.roundIndex||0)*10).filter(function(r){return r.ok;}).map(function(r){return r.seat;}));seats.forEach(function(s){if(s===target||!seatOcc(s)||winners.has(s.i)||RIBBON.roundIndex!==2&&s.pos.distanceTo(target.pos)>1.05)return;RIBBON.angrySeats.add(s.i);if(s.mood){moodGroup.remove(s.mood);s.mood=null;}});if(RIBBON.angrySeats.size)RIBBON.crowd.beginAnger(moodMaterial("😠").map);}
+  function ribbonNewEgg() {
+    RIBBON.egg = { checked: new Set() };
+    RIBBON.angrySeats = new Set();
+  }
+  function ribbonMaybeEgg(target) {
+    var egg = RIBBON.egg;
+    if (!egg || target.light || target.fan || egg.checked.has(RIBBON.attempts)) return;
+    egg.checked.add(RIBBON.attempts);
+    if (Math.random() >= .5) return;
+    var winners = new Set(RIBBON.results.slice((RIBBON.roundIndex || 0) * 10)
+      .filter(function(result) { return result.ok; })
+      .map(function(result) { return result.seat; }));
+    seats.forEach(function(seat) {
+      if (seat === target || !seatOcc(seat) || winners.has(seat.i)) return;
+      if (RIBBON.roundIndex !== 2 && seat.pos.distanceTo(target.pos) > 1.05) return;
+      RIBBON.angrySeats.add(seat.i);
+      if (seat.mood) {
+        moodGroup.remove(seat.mood);
+        seat.mood = null;
+      }
+    });
+    if (RIBBON.angrySeats.size) RIBBON.crowd.beginAnger(moodMaterial("😡").map);
+  }
 
 
   function ribbonInterceptionChance(){
