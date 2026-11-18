@@ -6888,7 +6888,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       .filter(function(result) { return result.ok; })
       .map(function(result) { return result.seat; }));
     seats.forEach(function(seat) {
-      if (seat === target || !seatOcc(seat) || winners.has(seat.i) || RIBBON.crowd.entries.has(seat.i)) return;
+      if (seat === target || !seatOcc(seat) || winners.has(seat.i) || RIBBON.crowd.entries.get(seat.i)?.caught) return;
       if (RIBBON.roundIndex !== 2 && seat.pos.distanceTo(target.pos) > 1.05) return;
       RIBBON.angrySeats.add(seat.i);
       if (seat.mood) {
@@ -7041,7 +7041,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       G2.combo = RIBBON.combo;
       G2.maxCombo = RIBBON.bestCombo;
       ribbonFeedback(f,perfect?"★ 完美接住":"○ 接住了",perfect?"#ffe27a":"#77e8ae");
-      ribbonReceiveMood(target, perfect ? "🤩" : "😍");ribbonMaybeEgg(target);
+      if(!f.pickup)ribbonReceiveMood(target, perfect ? "🤩" : "😍");ribbonMaybeEgg(target);
       SFX.found();
       toast((perfect ? "完美接住！★　" : "接到彩帶！　") + seatLabel(target) + "　+" + points);
     } else {
@@ -7049,7 +7049,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       RIBBON.combo = 0;
       if (caught) {
         ribbonFeedback(f,caught.intercepted?"× 前排伸手攔截":"× 被接走了","#ff8fc0");
-        ribbonReceiveMood(caught.seat);
+        if(!f.pickup)ribbonReceiveMood(caught.seat);
         toast(seatLabel(caught.seat) + " 把彩帶接走了，沒有送到目標粉絲手上");
       } else if(f.blockedByActor){ribbonFeedback(f,"× 被站位成員擋住","#ff8fc0");toast("彩帶被站位成員擋住，請調整方向，避開成員再投擲。");} else {ribbonFeedback(f,"× 沒有接住","#ff8fc0");toast(f.power < RIBBON.window.lo ? "力度偏弱，下次請更快速向上滑動" : f.power > RIBBON.window.hi ? "力度過強，下次請減輕力度" : "方向偏離，下次請向上直滑，修正左右偏移");}
       SFX.miss();
@@ -7218,6 +7218,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     ribbonSetPower(0);
     ribbonUpdateHud();
     updateHud();
+    canvas.focus({ preventScroll: true });
     RIBBON.collectionTask=ribbonExploreRecords(RIBBON.session).catch(function(error){console.warn("彩帶實績探索未完成",error);});
   }
   function ribbonFillPhotoTapes(){
@@ -7232,7 +7233,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     missing.forEach(function(owner){match(owner,new Set());});
     assigned.forEach(function(owner,id){var seat=seats[id],p=performers[owner];p.g.updateMatrixWorld(true);var f=ribbonMakeTrail(RIBBON_PALETTE[(RIBBON.paletteOffset+owner*5+(RIBBON.roundIndex||0)*3)%12]);
       Object.assign(f,{owner:owner,targetSeat:seat,decorative:true,anchor:p.elL.localToWorld(new THREE.Vector3(0,-.245,0)),velocity:new THREE.Vector3(),resolved:true,time:0,paid:0,acc:0,alpha:0,heading:0,hit:false,snag:false});
-      f.receiver=RIBBON.crowd.receive(seat,RIBBON.crowd.ensure(seat).hold,f);f.roll=f.receiver.hold.clone();f.catchFrom=f.roll.clone();f.catchTo=f.roll.clone();f.catchAge=.75;
+      f.receiver=RIBBON.crowd.receive(seat,RIBBON.crowd.ensure(seat).hold,f);ribbonReceiveMood(seat);f.roll=f.receiver.hold.clone();f.catchFrom=f.roll.clone();f.catchTo=f.roll.clone();f.catchAge=.75;
       var count=Math.min(RIBBON_MAX-1,Math.max(8,Math.ceil((f.anchor.distanceTo(f.roll)+1.5)/RIBBON_SEGMENT))),point=new THREE.Vector3();
       for(var n=0;n<=count;n++){var t=n/count;point.lerpVectors(f.anchor,f.roll,t);point.y+=.75*Math.sin(Math.PI*t);ribbonAddPoint(f,point);}f.paid=Math.min(30,count*RIBBON_SEGMENT);f.lastLen=RIBBON_SEGMENT;f.mesh.material.opacity=0;f.rollMesh.traverse(function(o){if(o.material){o.material.transparent=true;o.material.opacity=0;}});RIBBON.settled.push(f);
     });
@@ -7290,6 +7291,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.presentationReady=RIBBON.settled.length===0;
     $("ribbonSummary").hidden=!RIBBON.presentationReady;
     $("ribbonFinaleNote").hidden=RIBBON.presentationReady;
+    if (RIBBON.presentationReady) $("ribbonAgain").focus({ preventScroll: true });
     syncModeBar();updateHud();
   }
   function closeRibbonSummary() {
@@ -7314,7 +7316,10 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.target = null;
     RIBBON.used.clear();
     ribbonDisposeFlight();
-    if (typeof MODE === "undefined" || MODE === "game") $("startPanel").hidden = false;
+    if (typeof MODE === "undefined" || MODE === "game") {
+      $("startPanel").hidden = false;
+      $(selectedGame === "ribbon" ? "ribbonStart" : "gStart").focus({ preventScroll: true });
+    }
     updateHud();
   }
   function ribbonContinueRound() {
@@ -7328,11 +7333,13 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.windowCache=new Map();RIBBON.windowTasks=new Map();RIBBON.reachableRows={};RIBBON.recordsReady=false;
     $("ribbonSummary").hidden=true;$("ribbonPhoto").hidden=true;$("ribbonPhoto").removeAttribute("src");$("ribbonFinaleNote").hidden=true;$("ribbonNext").hidden=true;
     drag=null;ptrs={};pinch=null;S.yaw=0;S.pitch=0;S.fov=IDOL_FOV;
+    canvas.focus({ preventScroll: true });
     ribbonPrepareThrower();RIBBON.heldSpool=ribbonMakeSpool(RIBBON.color);RIBBON.heldSpool.visible=false;scene.add(RIBBON.heldSpool);
     RIBBON.nextAt=0;RIBBON.lastCd=0;RIBBON.pausedAt=0;RIBBON.cdStart=performance.now();RIBBON.lastFrame=RIBBON.cdStart;
     G2.on=false;G2.result=false;G2.phase="ribbon";S.blackout=false;
     $("app").classList.add("playing");$("modeBar").hidden=true;$("countdown").hidden=false;$("cdNum").textContent="3";$("ribbonHud").hidden=true;ribbonMark.hidden=true;
     ribbonSetPower(0);ribbonUpdateHud();updateCamera();updateHud();
+    canvas.focus({ preventScroll: true });
     RIBBON.collectionTask=ribbonExploreRecords(RIBBON.session).catch(function(error){console.warn("彩帶實績探索未完成",error);});
     return true;
   }
@@ -7478,7 +7485,6 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if(!seat){f.recoveryUnavailable=true;f.retryKey=RIBBON.world.actorRevision()+':'+ribbonReceiverSnapshot().join(',');return;}
     f.velocity.set(0,0,0);f.postScorePickup=true;f.recoveredBy=seat.i;f.pickup=true;f.catchAge=0;f.catchFrom=f.roll.clone();
     f.receiver=RIBBON.crowd.receive(seat,f.roll,f);f.catchTo=f.receiver.hold.clone();
-    ribbonReceiveMood(seat);
     ribbonFeedback(f,"失手已結算 · 觀眾拾起彩帶","#ffce82");
   }
   function ribbonCatchReady(f){return !f||f.resolved!==false&&!f.recoveryPending&&(!f.catchTo||f.catchAge>=ribbonCatchDuration(f));}
@@ -7486,7 +7492,10 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   function ribbonTickCatch(f,dt) {
     ribbonTickRecovery(f,dt);
     var duration=ribbonCatchDuration(f);if(!f.catchTo||f.catchAge>=duration)return;
-    f.catchAge=Math.min(duration,f.catchAge+dt);var u=f.pickup?Math.max(0,(f.catchAge-.2)/.75):f.catchAge/duration,t=u*u*(3-2*u);f.roll.lerpVectors(f.catchFrom,f.catchTo,t);
+    var previousCatchAge = f.catchAge;
+    f.catchAge=Math.min(duration,f.catchAge+dt);
+    if (f.receiver && f.pickup && previousCatchAge < .2 && f.catchAge >= .2) ribbonReceiveMood(f.receiver.seat);
+    var u=f.pickup?Math.max(0,(f.catchAge-.2)/.75):f.catchAge/duration,t=u*u*(3-2*u);f.roll.lerpVectors(f.catchFrom,f.catchTo,t);
     if(f.receiver){f.roll.y+=.05*Math.sin(u*Math.PI);RIBBON.crowd.pose(f.receiver,f.roll);if(f.pickup&&f.catchAge>=.2){var safe=f.receiver.hand.clone();for(var pass=0;pass<4;pass++){var contact=RIBBON.world.collide(safe,null,.035,f.owner,undefined,undefined,f.receiver.seat.i);RIBBON.crowd.pose(f.receiver,safe);safe.copy(f.receiver.hand);if(!contact.hit)break;}f.roll.copy(safe);}}
     if(f.postScorePickup&&f.nodes&&f.nodes.length>=2){ribbonAddTrail(f,f.roll);f.lastLen=Math.max(RIBBON_SEGMENT*.5,f.nodes[f.nodes.length-2].p.distanceTo(f.roll));}
   }
@@ -7510,7 +7519,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
             if (outcome.done) {
               f.resolved=true;
               if(!outcome.caught){f.recoveryPending=true;f.recoveryAge=0;f.recoveryAcc=0;}
-              else if(ribbonCanReceive(outcome.caught.seat)){f.pickup=!!outcome.caught.pickup;f.catchAge=0;f.catchFrom=f.roll.clone();f.receiver=RIBBON.crowd.receive(outcome.caught.seat,f.roll,f);f.catchTo=f.receiver.hold.clone();}
+              else if(ribbonCanReceive(outcome.caught.seat)){f.pickup=!!outcome.caught.pickup;f.catchAge=0;f.catchFrom=f.roll.clone();f.receiver=RIBBON.crowd.receive(outcome.caught.seat,f.roll,f);f.catchTo=f.receiver.hold.clone();if(!f.pickup)ribbonReceiveMood(outcome.caught.seat);}
               f.lastLen=Math.max(RIBBON_SEGMENT*.5,f.nodes[f.nodes.length-2].p.distanceTo(f.roll));
             }
           } else f.time += RIBBON_DT;
@@ -7558,6 +7567,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
           $("ribbonSummary").hidden=false;$("ribbonFinaleNote").hidden=true;
           $("ribbonExport").disabled=false;
           ribbonCapturePhoto();$("ribbonNext").disabled=false;
+          $(RIBBON.nextRound !== null ? "ribbonNext" : "ribbonAgain").focus({ preventScroll: true });
         }
       }
       ribbonDrawPreview(now); return;
@@ -7631,7 +7641,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     G2.team = +$("gTeam").value;
     G2.member = kind === "ribbon" ? Math.floor(Math.random() * TEAMS[G2.team].members.length) : +$("gMember").value;
     G2.dur = +document.querySelector("input[name=gTime]:checked").value;
-    G2.easy = document.querySelector("input[name=gDiff]:checked").value === "easy";
+    G2.easy = kind !== "ribbon" && document.querySelector("input[name=gDiff]:checked").value === "easy";
     S.seed = newSeed();
     colorAudience();
     G2.conv = {};
