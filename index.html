@@ -2041,9 +2041,9 @@ details.members tr.tbd td {
 </aside>
 </div>
 
-<script src="./ribbon-records.js?v=73d3067ed4e4"></script>
-<script src="./ribbon-crowd.js?v=b43b483de109"></script>
-<script src="./ribbon-world.js?v=b93561b60126"></script>
+<script src="./ribbon-records.js?v=4c72364c2736"></script>
+<script src="./ribbon-crowd.js?v=8e3d71cb69e7"></script>
+<script src="./ribbon-world.js?v=2db64908da7d"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 var GIF_B64 = "";
@@ -5473,18 +5473,22 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   async function ribbonExploreRecords(session) {
     var contexts=RIBBON.throwers,roster=RIBBON.roster.slice(),team=G2.team;
-    for(var slot=0;slot<roster.length;slot++)for(var row=0;row<4;row++) {
+    var rows='ABCDNOPQ';
+    for(var slot=0;slot<roster.length;slot++)for(var row=0;row<rows.length;row++) {
       if(!RIBBON.active || RIBBON.session!==session)return;
       if(roster[slot]===null)continue;
-      var candidates=contexts[slot].zone!=="front"?[]:seats.filter(function(s){return !s.side&&s.st===row&&s.i!==S.my&&seatOcc(s);});
-      candidates.sort(function(a,b){return Math.abs(a.pos.x-contexts[slot].eye.x)-Math.abs(b.pos.x-contexts[slot].eye.x);});
-      var found=false;
+      var label=rows[row],context=contexts[slot];
+      var candidates=seats.filter(function(s){return s.row===label&&ribbonTargetZone(s)===context.zone&&s.i!==S.my&&seatOcc(s);});
+      candidates.sort(function(a,b){return a.pos.distanceToSquared(context.eye)-b.pos.distanceToSquared(context.eye);});
+      var found=false,temporary=false;
       for(var i=0;i<Math.min(4,candidates.length);i++) {
-        var win=await ribbonWindowFor(session,slot,candidates[i],contexts[slot]);
+        if(!ribbonCanReceive(candidates[i])){temporary=true;continue;}
+        var win=await ribbonWindowFor(session,slot,candidates[i],context);
         if(!RIBBON.active || RIBBON.session!==session)return;
         if(win){found=true;break;}
       }
-      ribbonRecords.setAvailable(team,roster[slot],FRONT[row][0],found||RIBBON.reachableRows[slot*4+row]===true);
+      // Holding a ribbon is temporary; it must not erase a reachable collection cell.
+      if(found||!temporary)ribbonRecords.setAvailable(team,roster[slot],label,found||row<4&&RIBBON.reachableRows[slot*4+row]===true);
     }
     if(!RIBBON.active || RIBBON.session!==session)return;
     RIBBON.recordsReady=true;ribbonRecords.collection(team,roster.filter(function(m){return m!==null;}));ribbonRecords.save();
@@ -5493,7 +5497,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     var inRun=RIBBON.active||RIBBON.phase==="result",team=inRun?G2.team:+$("gTeam").value;
     var start=+$("gMember").value,roster=inRun?RIBBON.roster:Array.from({length:14},function(_,i){return i<TEAMS[team].members.length?(start+i)%TEAMS[team].members.length:null;});
     var summary=ribbonRecords.collection(team,roster.filter(function(m){return m!==null;})),snapshot=ribbonRecords.snapshot();
-    $("ribbonRecordSummary").textContent="最高命中 "+snapshot.bestHit+" 次 · 該次完美 "+snapshot.bestPerfect+" 次 · 累計送達 "+snapshot.hits+" 次／完美 "+snapshot.perfects+" 次 · 正面已探索 "+summary.known+"/"+summary.total+" 格";
+    $("ribbonRecordSummary").textContent="最高命中 "+snapshot.bestHit+" 次 · 該次完美 "+snapshot.bestPerfect+" 次 · 累計送達 "+snapshot.hits+" 次／完美 "+snapshot.perfects+" 次 · 已探索 "+summary.known+"/"+summary.total+" 格";
     var html='<table class="ribbon-record-grid"><thead><tr><th scope="col">排</th>'+roster.map(function(member){return '<th scope="col"><span>'+esc(ribbonCastMember(team,member).n)+'</span></th>';}).join('')+'</tr></thead><tbody>';
     'ABCDNOPQ'.split('').forEach(function(row){html+='<tr><th scope="row">'+row+(SIDE_NAME[row]?'（'+SIDE_NAME[row]+'）':'')+'</th>'+roster.map(function(member){var a=ribbonRecords.available(team,member,row),value=a===false?0:ribbonRecords.get(team,member,row);return '<td class="'+(value===2?'pf':value?'got':a===false?'no':'')+'" aria-label="'+esc(ribbonCastMember(team,member).n)+' '+row+'排 '+(value===2?'完美':value?'命中':a===null?'尚未探索':a?'可達':'本次不可達')+'">'+(value===2?'★':value?'●':a===null?'—':a?'○':'×')+'</td>';}).join('')+'</tr>';});
     $("ribbonRecordGrid").innerHTML=html+'</tbody></table>';
@@ -5908,7 +5912,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     seats.forEach(function(s){
       if(s.i === S.my || !seatOcc(s)) return;
       headWorld(s, ribbonHead);
-      var k=seatHeight(s)/170;IM.arm.getMatrixAt(s.i*2+1,ribbonAudienceMatrix);var shoulder=new THREE.Vector3(0,.15*k,0).applyMatrix4(ribbonAudienceMatrix),inverse=s.m.clone().invert();
+      var k=seatHeight(s)/170;IM.arm.getMatrixAt(s.i*2+1,ribbonAudienceMatrix);var shoulder=RibbonCrowd.shoulder(THREE,ribbonAudienceMatrix,k),inverse=s.m.clone().invert();
       var q={seat:s,x:ribbonHead.x,y:ribbonHead.y,z:ribbonHead.z,floor:s.pos.y,k:k,shoulder:shoulder,inverse:inverse,localShoulder:shoulder.clone().applyMatrix4(inverse)};RIBBON.catchBySeat.set(s.i,q);
       var key = Math.floor(q.x / 0.8) + ":" + Math.floor(q.z / 0.8);
       if(!RIBBON.catchGrid.has(key)) RIBBON.catchGrid.set(key, []);
@@ -6418,8 +6422,10 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   function ribbonTickSettled(dt) {
     RIBBON.settled.forEach(function(f){
       ribbonTickCatch(f,dt);
+      var bodyRevision=RIBBON.world&&RIBBON.world.bodyRevision?RIBBON.world.bodyRevision():0;
+      var bodiesMoved=f.bodyRevision!==bodyRevision;f.bodyRevision=bodyRevision;
       var moved = !f.sleepAnchor || f.sleepAnchor.distanceToSquared(f.anchor) > 1e-8 || f.sleepRoll.distanceToSquared(f.roll) > 1e-8;
-      if (moved) { f.asleep = false; f.calm = 0; f.settleAge = 0; }
+      if (moved || bodiesMoved) { f.asleep = false; f.calm = 0; f.settleAge = 0; }
       if (!f.sleepAnchor) { f.sleepAnchor = f.anchor.clone(); f.sleepRoll = f.roll.clone(); }
       f.sleepAnchor.copy(f.anchor); f.sleepRoll.copy(f.roll);
       if (!f.asleep) {

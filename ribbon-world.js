@@ -3,7 +3,7 @@
 (function(root) {
   'use strict';
   root.RibbonWorld = function(THREE, scene, instances, seats, room) {
-    var boxes = [], grid = new Map(), matrix = new THREE.Matrix4(),actorBoxes=[],actorGrid=new Map(),actorCache=new Map(),actorRevision=0,barriers=[];
+    var boxes = [], grid = new Map(), matrix = new THREE.Matrix4(),actorBoxes=[],actorGrid=new Map(),actorCache=new Map(),actorRevision=0,bodyRevision=0,barriers=[];
     function add(box) {
       if (box.isEmpty() || box.min.distanceToSquared(box.max)<1e-12) return;
       boxes.push(box);index(box,grid);
@@ -174,7 +174,7 @@
         }
       }return hit;
     }
-    function updateAudience(id,matrices){var changed=false;for(var i=0;i<boxes.length;i++){var old=boxes[i],transform=matrices[old.instanceName];if(old.audience!==id||!transform||old.transform.equals(transform))continue;var b=addMeshBounds(old.geometry,transform,old.blocksTarget,undefined,true);b.audience=id;b.instanceName=old.instanceName;b.instanceIndex=old.instanceIndex;boxes[i]=b;changed=true;}if(changed){grid=new Map();boxes.forEach(function(b){index(b,grid);});actorRevision++;}}
-    return {boxes:boxes, collide:collide,updateAudience:updateAudience,snapshotBodies:function(){return {grid:grid};},bodyCrosses:function(a,b){return bodySegment(a,b,false,false,0);},constrainBodySegment:bodySegment,blocked:blocked,pickupBlocked:function(from,to,seat,owner){return blocked(from,to,owner,null,seat);},setActors:setActors,barrierCrosses:barrierCrosses,dropRoute:dropRoute,actorBounds:function(){return actorBoxes;},actorRevision:function(){return actorRevision;},snapshotActors:function(){return {grid:actorGrid,boxes:actorBoxes,revision:actorRevision};}};
+    function updateAudience(id,matrices){var changed=false;for(var i=0;i<boxes.length;i++){var old=boxes[i],transform=matrices[old.instanceName];if(old.audience!==id||!transform||old.transform.equals(transform))continue;var b=addMeshBounds(old.geometry,transform,old.blocksTarget,undefined,true);b.audience=id;b.instanceName=old.instanceName;b.instanceIndex=old.instanceIndex;boxes[i]=b;changed=true;}if(changed){grid=new Map();boxes.forEach(function(b){index(b,grid);});actorRevision++;bodyRevision++;}}
+    return {bodyRevision:function(){return bodyRevision;},boxes:boxes, collide:collide,updateAudience:updateAudience,snapshotBodies:function(){return {grid:grid};},bodyCrosses:function(a,b){return bodySegment(a,b,false,false,0);},constrainBodySegment:bodySegment,blocked:blocked,pickupBlocked:function(from,to,seat,owner){return blocked(from,to,owner,null,seat);},setActors:setActors,barrierCrosses:barrierCrosses,dropRoute:dropRoute,actorBounds:function(){return actorBoxes;},actorRevision:function(){return actorRevision;},snapshotActors:function(){return {grid:actorGrid,boxes:actorBoxes,revision:actorRevision};}};
   };
 })(typeof window==='undefined'?globalThis:window);
