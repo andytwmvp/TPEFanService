@@ -6876,7 +6876,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   function ribbonMaybeEgg(target) {
     var egg = RIBBON.egg;
-    if (!egg || target.light || target.fan || egg.checked.has(RIBBON.attempts)) return;
+    if (!egg || target.light || target.fan || target.towel || egg.checked.has(RIBBON.attempts)) return;
     egg.checked.add(RIBBON.attempts);
     if (Math.random() >= .5) return;
     var winners = new Set(RIBBON.results.slice((RIBBON.roundIndex || 0) * 10)
