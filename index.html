@@ -2042,7 +2042,7 @@ details.members tr.tbd td {
 </div>
 
 <script src="./ribbon-records.js?v=73d3067ed4e4"></script>
-<script src="./ribbon-crowd.js?v=cae2422a3f0a"></script>
+<script src="./ribbon-crowd.js?v=b43b483de109"></script>
 <script src="./ribbon-world.js?v=b93561b60126"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
@@ -5400,10 +5400,16 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     owned.forEach(function(resource){resource.dispose();});RIBBON.castShared=null;RIBBON.stations=null;RIBBON.heldThrowers={};
     placePerformers(0);
   }
+  function ribbonReceiverSnapshot(){return RIBBON.crowd?Array.from(RIBBON.crowd.entries.values()).filter(function(e){return e.caught;}).map(function(e){return e.seat.i;}):[];}
+  function ribbonCanReceive(seat,receivers){if(receivers)return !receivers.includes(seat.i);var e=RIBBON.crowd&&RIBBON.crowd.entries.get(seat.i);return !e||!e.caught;}
+  function ribbonPickupRowAllowed(seat,point){
+    if(!seat.side)return seat.st===0||point.z>=seat.pos.z-ROW_PITCH/2;
+    var row=SIDES.find(function(r){return r[0]===seat.row;});return !!row&&(row[6]===0||Math.abs(point.x)>=Math.abs(seat.pos.x)-ROW_PITCH/2);
+  }
   function ribbonCandidateSeats() {
     var front = RIBBON.targets.filter(function(s) {
       var row = FRONT.findIndex(function(r) { return r[0] === s.row; });
-      return ribbonTargetZone(s)===RIBBON.stations[RIBBON.slot].zone && (s.side || row >= 0 && row <= 2) && s.i !== S.my;
+      return ribbonTargetZone(s)===RIBBON.stations[RIBBON.slot].zone && (s.side || row >= 0 && row <= 2) && s.i !== S.my && ribbonCanReceive(s);
     });
     return front;
   }
@@ -5434,7 +5440,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     options = options.concat(remaining);
     var included = new Set(options.map(function(s){return s.i;}));
     // Prefer this member's fans, then retry other real spectators as in the reference.
-    options = options.concat(seats.filter(function(s){return !included.has(s.i) && s.i!==S.my && seatOcc(s) && (s.side || s.st<=2) && ribbonTargetZone(s)===RIBBON.stations[RIBBON.slot].zone;}).sort(function(){return Math.random()-.5;}));
+    options = options.concat(seats.filter(function(s){return !included.has(s.i) && s.i!==S.my && ribbonCanReceive(s) && seatOcc(s) && (s.side || s.st<=2) && ribbonTargetZone(s)===RIBBON.stations[RIBBON.slot].zone;}).sort(function(){return Math.random()-.5;}));
     options=ribbonSideCandidateOrder(options,RIBBON.slot);
     if(RIBBON.egg&&RIBBON.egg.armed&&RIBBON.egg.attempt===RIBBON.attempts){var quiet=options.filter(function(s){return !s.light&&!s.fan&&!s.towel&&(G2.member===null||s.oshi===G2.member);}),quietIds=new Set(quiet.map(function(s){return s.i;}));options=quiet.concat(options.filter(function(s){return !quietIds.has(s.i);}));}
     for (var i = 0; i < options.length; i++) {
@@ -5449,8 +5455,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     return null;
   }
   async function ribbonWindowFor(session,slot,target,thrower) {
-    if(!RIBBON.active || RIBBON.session!==session)return null;
-    var key=RIBBON.attempts+":"+slot+":"+(thrower.station||"front")+":"+target.i+":"+(RIBBON.world.actorRevision?RIBBON.world.actorRevision():0),cache=RIBBON.windowCache,pending=RIBBON.windowTasks;
+    if(!RIBBON.active || RIBBON.session!==session||!ribbonCanReceive(target))return null;
+    var key=RIBBON.attempts+":"+slot+":"+(thrower.station||"front")+":"+target.i+":"+(RIBBON.world.actorRevision?RIBBON.world.actorRevision():0)+":"+ribbonReceiverSnapshot().join(",")+":"+(RIBBON.challenge?[RIBBON.challenge.active,RIBBON.challenge.seed].join(","):"none"),cache=RIBBON.windowCache,pending=RIBBON.windowTasks;
     if(cache.has(key))return cache.get(key);
     if(pending.has(key))return pending.get(key);
     var task=ribbonFindWindow(session,target,thrower).then(function(win){
@@ -5537,11 +5543,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       await new Promise(function(resolve){setTimeout(resolve,100)});
   }
   async function ribbonFindWindow(session, target, thrower) {
+    if(!ribbonCanReceive(target))return null;
     thrower=ribbonAimThrower(thrower || RIBBON.thrower,target);
+    var receivers=ribbonReceiverSnapshot();
     var actors=RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null,challenge=RIBBON.challenge?Object.assign({},RIBBON.challenge):null,bodies=RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null;
     if(!ribbonCandidateVisible(thrower,target,actors))return null;
     headWorld(target,ribbonHead);
     if(RIBBON.world.blocked && RIBBON.world.blocked(thrower.eye,ribbonHead,thrower.slot,actors))return null;
+    var searchState={receivers:receivers,bodies:bodies,challenge:challenge};
     var best = [], run = [], danger = 1.35;
     for (var i = 0; i <= 120; i++) {
       if(i % 8 === 0) {
@@ -5549,7 +5558,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
         if(!RIBBON.active || RIBBON.session !== session) return null;
       }
       var power = 1.35 * i / 120, shot = ribbonBuildLaunch(power, 0, target, thrower);
-      var f = {bodies:bodies,interceptors:ribbonInterceptors(shot,target,thrower,challenge), owner:thrower.slot,actors:actors,roll: shot.origin.clone(), velocity: shot.velocity.clone(), tilt: shot.tilt, paid: 0, apex: shot.origin.y, hit: false, time: 0 };
+      var f = {receivers:receivers,bodies:bodies,interceptors:ribbonInterceptors(shot,target,thrower,challenge), owner:thrower.slot,actors:actors,roll: shot.origin.clone(), velocity: shot.velocity.clone(), tilt: shot.tilt, paid: 0, apex: shot.origin.y, hit: false, time: 0 };
       var outcome = null;
       for (var k = 0; k < 960; k++) {
         var result = ribbonStepRoll(f, target);
@@ -5572,20 +5581,20 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     var aimLo=0, aimHi=0;
     for (var angle=-1;angle>=-30;angle--) {
       if(angle%4===0) {await ribbonYieldSearch(session);if(!RIBBON.active || RIBBON.session!==session)return null;}
-      if (!ribbonPredict(mid,angle,target,thrower,actors).ok) break;
+      if (!ribbonPredict(mid,angle,target,thrower,actors,searchState).ok) break;
       aimLo=angle;
     }
     for (var angle=1;angle<=30;angle++) {
       if(angle%4===0) {await ribbonYieldSearch(session);if(!RIBBON.active || RIBBON.session!==session)return null;}
-      if (!ribbonPredict(mid,angle,target,thrower,actors).ok) break;
+      if (!ribbonPredict(mid,angle,target,thrower,actors,searchState).ok) break;
       aimHi=angle;
     }
     if(aimLo > -3 || aimHi < 3) return null;
     return { lo:lo, hi:hi, mid:mid, aimLo:aimLo, aimHi:aimHi, danger:danger, pfLo: pf.length ? pf[0].u : null, pfHi: pf.length ? pf[pf.length-1].u : null };
   }
-  function ribbonPredict(power,angle,target,thrower,actors) {
+  function ribbonPredict(power,angle,target,thrower,actors,state) {
     var shot=ribbonBuildLaunch(power,angle,target,thrower);
-    var f={bodies:RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null,interceptors:ribbonInterceptors(shot,target,thrower||RIBBON.thrower),owner:(thrower||RIBBON.thrower).slot,actors:actors||(RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null),roll:shot.origin.clone(),velocity:shot.velocity.clone(),tilt:shot.tilt,paid:0,apex:shot.origin.y,hit:false,time:0}, result;
+    var f={receivers:state?state.receivers:ribbonReceiverSnapshot(),bodies:state?state.bodies:(RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null),interceptors:ribbonInterceptors(shot,target,thrower||RIBBON.thrower,state?state.challenge:undefined),owner:(thrower||RIBBON.thrower).slot,actors:actors||(RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null),roll:shot.origin.clone(),velocity:shot.velocity.clone(),tilt:shot.tilt,paid:0,apex:shot.origin.y,hit:false,time:0}, result;
     for(var i=0;i<960;i++){result=ribbonStepRoll(f,target);if(result.done)break;}
     return {ok:!!result.caught && result.caught.seat===target,perfect:!!result.caught && result.caught.seat===target && !f.hit && !result.caught.pickup && result.caught.distance<RIBBON_PHYSICS.perfect,hit:f.hit};
   }
@@ -5862,7 +5871,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   function ribbonLockInterception(){
     var key=RIBBON.attempts,decisions=RIBBON.interceptionDecisions;
     if(!decisions)return;
-    if(!decisions[key]){var chance=ribbonInterceptionChance();decisions[key]={chance:chance,active:chance>0&&Math.random()<chance,seed:Math.random(),receivers:RIBBON.crowd?Array.from(RIBBON.crowd.entries.values()).filter(function(e){return e.caught;}).map(function(e){return e.seat.i;}):[]};}
+    if(!decisions[key]){var chance=ribbonInterceptionChance();decisions[key]={chance:chance,active:chance>0&&Math.random()<chance,seed:Math.random(),receivers:ribbonReceiverSnapshot()};}
     RIBBON.challenge=decisions[key];
   }
   function ribbonInterceptors(shot,target,thrower,challenge){
@@ -5870,12 +5879,18 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if(!challenge||!challenge.active||!RIBBON.catchBySeat)return [];
     var dx=shot.velocity.x,dz=shot.velocity.z,speed=Math.hypot(dx,dz)||1;dx/=speed;dz/=speed;
     var targetPoint=headWorld(target,new THREE.Vector3()),end=(targetPoint.x-shot.origin.x)*dx+(targetPoint.z-shot.origin.z)*dz,choices=[];
-    RIBBON.catchBySeat.forEach(function(q){if(q.seat===target||challenge.receivers&&challenge.receivers.includes(q.seat.i))return;var x=q.x-shot.origin.x,z=q.z-shot.origin.z,along=x*dx+z*dz,lateral=Math.abs(x*dz-z*dx);if(along<.5||along>end-.4||lateral>.6*q.k)return;
-      var hand=new THREE.Vector3(.08*q.k,q.localShoulder.y+.48*q.k,q.localShoulder.z-.34*q.k).applyMatrix4(q.seat.m),n=Math.sin((q.seat.i+1)*12.9898+challenge.seed*43758.5453)*43758.5453;
-      choices.push({seat:q.seat,hand:hand,k:q.k,start:Math.max(0,(along-.9)/speed),key:n-Math.floor(n)});
-    });choices.sort(function(a,b){return a.key-b.key;});return choices.slice(0,1);
+    RIBBON.catchBySeat.forEach(function(q){if(q.seat===target||!ribbonCanReceive(q.seat,challenge.receivers))return;var x=q.x-shot.origin.x,z=q.z-shot.origin.z,along=x*dx+z*dz,lateral=Math.abs(x*dz-z*dx);if(along<.5||along>end-.4||lateral>.6*q.k)return;
+      var hand=new THREE.Vector3(.08*q.k,q.localShoulder.y+.48*q.k,q.localShoulder.z-.34*q.k).applyMatrix4(q.seat.m);
+      choices.push({seat:q.seat,hand:hand,k:q.k,start:Math.max(0,(along-.9)/speed),along:along});
+    });choices.sort(function(a,b){return a.along-b.along||a.seat.i-b.seat.i;});return choices;
   }
-  function ribbonCatchInterception(f){for(var i=0;i<(f.interceptors||[]).length;i++){var q=f.interceptors[i];if(f.time>=q.start+.18&&f.roll.distanceTo(q.hand)<.17*q.k&&f.roll.distanceTo(RIBBON.catchBySeat.get(q.seat.i).shoulder)<.615*q.k)return {seat:q.seat,distance:f.roll.distanceTo(q.hand),intercepted:true};}return null;}
+  function ribbonCatchInterception(f){
+    var best=null,nearest=Infinity;(f.interceptors||[]).forEach(function(q){
+      if(!ribbonCanReceive(q.seat,f.receivers)||f.liveReceivers&&!ribbonCanReceive(q.seat))return;
+      var center=RIBBON.catchBySeat.get(q.seat.i),distance=Math.hypot(f.roll.x-center.x,f.roll.y-center.y-.25,f.roll.z-center.z);
+      if(f.time>=q.start+.18&&f.roll.distanceTo(q.hand)<.17*q.k&&distance<nearest&&f.roll.distanceTo(center.shoulder)<.615*q.k){nearest=distance;best={seat:q.seat,distance:distance,intercepted:true};}
+    });return best;
+  }
   function ribbonTickAudience(now){
     var crowd=RIBBON.crowd;if(!crowd||document.hidden||RIBBON.pausedAt)return;var dt=Math.max(0,Math.min(.05,(now-(crowd.last||now))/1000));crowd.last=now;
     if(RIBBON.angrySeats)crowd.tickAnger(RIBBON.angrySeats,camera,RIBBON.fxTime||0,headWorld);
@@ -5900,7 +5915,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       RIBBON.catchGrid.get(key).push(q);
     });
   }
-  function ribbonCatchAt(p, targetSeat,owner,actors) {
+  function ribbonCatchAt(p, targetSeat,owner,actors,receivers,live) {
     if(owner===undefined)owner=RIBBON.slot;
     targetSeat = targetSeat || RIBBON.target;
     var best = null, bestD = Infinity, bx = Math.floor(p.x/0.8), bz = Math.floor(p.z/0.8);
@@ -5909,13 +5924,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       var bucket = RIBBON.catchGrid.get(x+":"+z) || [];
       for(var i=0;i<bucket.length;i++) {
         var q=bucket[i], dx=p.x-q.x, dz=p.z-q.z;
+        if(!ribbonCanReceive(q.seat,receivers)||live&&!ribbonCanReceive(q.seat))continue;
         if(Math.hypot(dx,dz)>RIBBON_PHYSICS.reachR || p.y<q.floor || p.y>q.y+RIBBON_PHYSICS.reachUp) continue;
         ribbonCatchLocal.copy(p).applyMatrix4(q.inverse);
         if(ribbonCatchLocal.z>q.seat.headZ-.12*q.k||p.distanceTo(q.shoulder)>.615*q.k)continue;
         ribbonHead.set(q.x,q.y+.25,q.z);
         if(RIBBON.world.blocked && RIBBON.world.blocked(p,ribbonHead,owner,actors))continue;
-        var distance=Math.hypot(dx,p.y-q.y-0.25,dz), score=q.seat===targetSeat?-1:Math.hypot(dx,dz);
-        if(score<bestD) {bestD=score;best={seat:q.seat,distance:distance};}
+        var distance=Math.hypot(dx,p.y-q.y-0.25,dz);
+        if(distance<bestD) {bestD=distance;best={seat:q.seat,distance:distance};}
       }
     }
     return best;
@@ -5941,6 +5957,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   function ribbonOutcome(caught, now) {
     var f = RIBBON.flight;
     if(!RIBBON.active || !f || f.resolved) return;
+    if(caught&&!ribbonCanReceive(caught.seat))caught=null;
     var target = RIBBON.target, ok = !!caught && caught.seat === target;
     var perfect = ok && caught.distance < RIBBON_PHYSICS.perfect && !caught.pickup && !f.hit && !f.snag;
     RIBBON.attempts++;
@@ -6009,13 +6026,15 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (f.roll.y > f.apex) f.apex = f.roll.y;
   }
   function ribbonStepRoll(f, target) {
+    if(!f.receivers)f.receivers=ribbonReceiverSnapshot();
     for(var half=0;half<2;half++) {
       ribbonAdvanceRoll(f, RIBBON_DT / 2);
       var owner=f.owner===undefined?RIBBON.slot:f.owner;
       var contact = RIBBON.world.collide(f.roll,f.velocity,RIBBON_PHYSICS.rollR,owner,f.actors,f.bodies);
       if (contact.hit) f.hit = true;
       if(contact.actor!==undefined)f.blockedByActor=true;
-      var caught=f.blockedByActor||contact.audience!==undefined?null:ribbonCatchInterception(f)||ribbonCatchAt(f.roll,target,owner,f.actors);
+      var caught=null;
+      if(!f.blockedByActor&&contact.audience===undefined){var intercepted=ribbonCatchInterception(f),nearby=ribbonCatchAt(f.roll,target,owner,f.actors,f.receivers,f.liveReceivers);caught=intercepted&&(!nearby||intercepted.seat===nearby.seat||intercepted.distance<nearby.distance)?intercepted:nearby;}
       if (caught) return { done:true, caught:caught };
       if (contact.landed && contact.actor===undefined) {
         f.landed=true;
@@ -6034,10 +6053,11 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
 
   function ribbonLaunch(power, alpha, now) {
     if(!RIBBON.active||RIBBON.phase!=="play"||RIBBON.flight||!RIBBON.window||!ribbonRequireVisibleTarget())return;
+    if(!ribbonCanReceive(RIBBON.target)){ribbonStartPlay(now);return;}
     var shot = ribbonBuildLaunch(power, alpha);
     if (!shot) return;
     var color = RIBBON.color, f = ribbonMakeTrail(color);
-    f.bodies=RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null;f.interceptors=ribbonInterceptors(shot,RIBBON.target,RIBBON.thrower);f.owner = RIBBON.slot;f.actors=RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null;
+    f.receivers=ribbonReceiverSnapshot();f.liveReceivers=true;f.bodies=RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null;f.interceptors=ribbonInterceptors(shot,RIBBON.target,RIBBON.thrower);f.owner = RIBBON.slot;f.actors=RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null;
     f.targetSeat = RIBBON.target;
     f.anchor = RIBBON.thrower.hold.clone();
     f.roll = shot.origin.clone();
@@ -6142,7 +6162,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.settled.forEach(function(f){if(f.receiver)taken.add(f.receiver.seat.i);});
     var missing=RIBBON.stations.map(function(_,i){return i;}).filter(function(i){return !owners.has(i);}),lists=new Map(),assigned=new Map();
     missing.forEach(function(owner){var station=RIBBON.stations[owner],hold=performers[owner].elL.localToWorld(new THREE.Vector3(0,-.245,0));
-      var candidates=seats.filter(function(seat){if(!seatOcc(seat)||seat.i===S.my||taken.has(seat.i))return false;var q=RIBBON.catchBySeat.get(seat.i),point=new THREE.Vector3(.06*q.k,q.localShoulder.y+.08*q.k,Math.min(-.36*q.k,q.localShoulder.z-.32*q.k)).applyMatrix4(seat.m),angle=wrapAng(Math.atan2(point.x-station.position.x,point.z-station.position.z)-station.heading);if(Math.abs(angle)>Math.PI/4)return false;return !RIBBON.world.blocked(hold,point,owner);});
+      var candidates=seats.filter(function(seat){if(!seatOcc(seat)||seat.i===S.my||taken.has(seat.i)||!ribbonCanReceive(seat))return false;var q=RIBBON.catchBySeat.get(seat.i),point=new THREE.Vector3(.06*q.k,q.localShoulder.y+.08*q.k,Math.min(-.36*q.k,q.localShoulder.z-.32*q.k)).applyMatrix4(seat.m),angle=wrapAng(Math.atan2(point.x-station.position.x,point.z-station.position.z)-station.heading);if(Math.abs(angle)>Math.PI/4)return false;return !RIBBON.world.blocked(hold,point,owner);});
       for(var i=candidates.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),q=candidates[i];candidates[i]=candidates[j];candidates[j]=q;}lists.set(owner,candidates);
     });
     function match(owner,seen){var candidates=lists.get(owner);for(var i=0;i<candidates.length;i++){var seat=candidates[i];if(seen.has(seat.i))continue;seen.add(seat.i);var old=assigned.get(seat.i);if(old===undefined||match(old,seen)){assigned.set(seat.i,owner);return true;}}return false;}
@@ -6324,7 +6344,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       ribbonCtx.save();
       ribbonCtx.beginPath();
       var open = false;
-      var predicted = {bodies:RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null,interceptors:ribbonInterceptors(shot,RIBBON.target,RIBBON.thrower),owner:RIBBON.slot,actors:RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null, roll: shot.origin.clone(), velocity: shot.velocity.clone(), tilt: shot.tilt, paid: 0, apex: shot.origin.y, hit: false, time: 0 };
+      var predicted = {receivers:ribbonReceiverSnapshot(),bodies:RIBBON.world.snapshotBodies?RIBBON.world.snapshotBodies():null,interceptors:ribbonInterceptors(shot,RIBBON.target,RIBBON.thrower),owner:RIBBON.slot,actors:RIBBON.world.snapshotActors?RIBBON.world.snapshotActors():null, roll: shot.origin.clone(), velocity: shot.velocity.clone(), tilt: shot.tilt, paid: 0, apex: shot.origin.y, hit: false, time: 0 };
       for (var step = 0; step <= 960; step++) {
         var result = step ? ribbonStepRoll(predicted, RIBBON.target) : {done:false};
         var stopped = result.done;
@@ -6359,7 +6379,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   function ribbonRecoveryCandidate(f) {
     var best=null,nearest=Infinity;
     RIBBON.catchBySeat.forEach(function(q){
-      var held=RIBBON.crowd.entries.get(q.seat.i);if(held&&held.caught)return;
+      var held=RIBBON.crowd.entries.get(q.seat.i);if(!ribbonCanReceive(q.seat)||!ribbonPickupRowAllowed(q.seat,f.roll))return;
       var distance=Math.hypot(f.roll.x-q.x,f.roll.y-q.floor,f.roll.z-q.z);if(distance>=nearest)return;
       var pivot=.45+.1*q.k,bend=q.seat.m.clone().multiply(new THREE.Matrix4().makeTranslation(0,pivot,.05)).multiply(new THREE.Matrix4().makeRotationX(-Math.PI/2)).multiply(new THREE.Matrix4().makeTranslation(0,-pivot,-.05)).multiply(q.inverse);
       var shoulder;if(held)shoulder=held.baseShoulders[1].clone();else {IM.arm.getMatrixAt(q.seat.i*2+1,ribbonAudienceMatrix);shoulder=new THREE.Vector3().setFromMatrixPosition(ribbonAudienceMatrix).add(new THREE.Vector3(0,.15*q.k,0));}shoulder.applyMatrix4(bend);
@@ -6413,7 +6433,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
             if (outcome.done) {
               f.resolved=true;
               if(!outcome.caught){f.recoveryPending=true;f.recoveryAge=0;f.recoveryAcc=0;}
-              else {f.pickup=!!outcome.caught.pickup;f.catchAge=0;f.catchFrom=f.roll.clone();f.receiver=RIBBON.crowd.receive(outcome.caught.seat,f.roll,f);f.catchTo=f.receiver.hold.clone();}
+              else if(ribbonCanReceive(outcome.caught.seat)){f.pickup=!!outcome.caught.pickup;f.catchAge=0;f.catchFrom=f.roll.clone();f.receiver=RIBBON.crowd.receive(outcome.caught.seat,f.roll,f);f.catchTo=f.receiver.hold.clone();}
               f.lastLen=Math.max(RIBBON_SEGMENT*.5,f.nodes[f.nodes.length-2].p.distanceTo(f.roll));
             }
           } else f.time += RIBBON_DT;
