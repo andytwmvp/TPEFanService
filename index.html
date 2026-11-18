@@ -2041,9 +2041,9 @@ details.members tr.tbd td {
 </aside>
 </div>
 
-<script src="./ribbon-records.js?v=4c72364c2736"></script>
-<script src="./ribbon-crowd.js?v=8e3d71cb69e7"></script>
-<script src="./ribbon-world.js?v=2db64908da7d"></script>
+<script src="./ribbon-records.js?v=4bf7388c2d5e"></script>
+<script src="./ribbon-crowd.js?v=9f715de0521d"></script>
+<script src="./ribbon-world.js?v=297c8056df40"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 var GIF_B64 = "";
@@ -3781,6 +3781,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (arms.length || towels.length) {
       IM.fore.instanceMatrix.needsUpdate = true;
       IM.hand.instanceMatrix.needsUpdate = true;
+      if(RIBBON.world&&(RIBBON.active||RIBBON.phase==="result"))RIBBON.world.syncArms();
     }
   }
   function headWorld(s, out) {
@@ -5473,7 +5474,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   async function ribbonExploreRecords(session) {
     var contexts=RIBBON.throwers,roster=RIBBON.roster.slice(),team=G2.team;
-    var rows='ABCDNOPQ';
+    var rows='ABCNOPQ';
     for(var slot=0;slot<roster.length;slot++)for(var row=0;row<rows.length;row++) {
       if(!RIBBON.active || RIBBON.session!==session)return;
       if(roster[slot]===null)continue;
@@ -5481,14 +5482,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       var candidates=seats.filter(function(s){return s.row===label&&ribbonTargetZone(s)===context.zone&&s.i!==S.my&&seatOcc(s);});
       candidates.sort(function(a,b){return a.pos.distanceToSquared(context.eye)-b.pos.distanceToSquared(context.eye);});
       var found=false,temporary=false;
-      for(var i=0;i<Math.min(4,candidates.length);i++) {
+      for(var i=0;i<candidates.length;i++) {
         if(!ribbonCanReceive(candidates[i])){temporary=true;continue;}
         var win=await ribbonWindowFor(session,slot,candidates[i],context);
         if(!RIBBON.active || RIBBON.session!==session)return;
         if(win){found=true;break;}
       }
       // Holding a ribbon is temporary; it must not erase a reachable collection cell.
-      if(found||!temporary)ribbonRecords.setAvailable(team,roster[slot],label,found||row<4&&RIBBON.reachableRows[slot*4+row]===true);
+      if(found||!temporary)ribbonRecords.setAvailable(team,roster[slot],label,found||'ABC'.includes(label)&&RIBBON.reachableRows[slot*4+'ABC'.indexOf(label)]===true);
     }
     if(!RIBBON.active || RIBBON.session!==session)return;
     RIBBON.recordsReady=true;ribbonRecords.collection(team,roster.filter(function(m){return m!==null;}));ribbonRecords.save();
@@ -5499,7 +5500,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     var summary=ribbonRecords.collection(team,roster.filter(function(m){return m!==null;})),snapshot=ribbonRecords.snapshot();
     $("ribbonRecordSummary").textContent="最高命中 "+snapshot.bestHit+" 次 · 該次完美 "+snapshot.bestPerfect+" 次 · 累計送達 "+snapshot.hits+" 次／完美 "+snapshot.perfects+" 次 · 已探索 "+summary.known+"/"+summary.total+" 格";
     var html='<table class="ribbon-record-grid"><thead><tr><th scope="col">排</th>'+roster.map(function(member){return '<th scope="col"><span>'+esc(ribbonCastMember(team,member).n)+'</span></th>';}).join('')+'</tr></thead><tbody>';
-    'ABCDNOPQ'.split('').forEach(function(row){html+='<tr><th scope="row">'+row+(SIDE_NAME[row]?'（'+SIDE_NAME[row]+'）':'')+'</th>'+roster.map(function(member){var a=ribbonRecords.available(team,member,row),value=a===false?0:ribbonRecords.get(team,member,row);return '<td class="'+(value===2?'pf':value?'got':a===false?'no':'')+'" aria-label="'+esc(ribbonCastMember(team,member).n)+' '+row+'排 '+(value===2?'完美':value?'命中':a===null?'尚未探索':a?'可達':'本次不可達')+'">'+(value===2?'★':value?'●':a===null?'—':a?'○':'×')+'</td>';}).join('')+'</tr>';});
+    'ABCDNOPQ'.split('').forEach(function(row){html+='<tr><th scope="row">'+row+(row==='D'?'（歷史）':'')+(SIDE_NAME[row]?'（'+SIDE_NAME[row]+'）':'')+'</th>'+roster.map(function(member){var a=row==='D'?false:ribbonRecords.available(team,member,row),value=row==='D'?ribbonRecords.get(team,member,row):a===false?0:ribbonRecords.get(team,member,row);return '<td class="'+(value===2?'pf':value?'got':a===false?'no':'')+'" aria-label="'+esc(ribbonCastMember(team,member).n)+' '+row+'排 '+(value===2?'完美':value?'命中':row==='D'?'歷史記錄（不列入新收藏）':a===null?'尚未探索':a?'可達':'本次不可達')+'">'+(value===2?'★':value?'●':row==='D'?'—':a===null?'—':a?'○':'×')+'</td>';}).join('')+'</tr>';});
     $("ribbonRecordGrid").innerHTML=html+'</tbody></table>';
     $("ribbonTitles").innerHTML=ribbonRecords.titles.map(function(title){return '<div class="'+(snapshot.titles.includes(title[0])?'on':'')+'">'+esc(title[1])+'<small>'+esc(title[2])+'</small></div>';}).join('');
     $("ribbonStorageStatus").textContent=ribbonRecords.warning();
@@ -5913,7 +5914,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       if(s.i === S.my || !seatOcc(s)) return;
       headWorld(s, ribbonHead);
       var k=seatHeight(s)/170;IM.arm.getMatrixAt(s.i*2+1,ribbonAudienceMatrix);var shoulder=RibbonCrowd.shoulder(THREE,ribbonAudienceMatrix,k),inverse=s.m.clone().invert();
-      var q={seat:s,x:ribbonHead.x,y:ribbonHead.y,z:ribbonHead.z,floor:s.pos.y,k:k,shoulder:shoulder,inverse:inverse,localShoulder:shoulder.clone().applyMatrix4(inverse)};RIBBON.catchBySeat.set(s.i,q);
+      var q={seat:s,x:ribbonHead.x,y:ribbonHead.y,z:ribbonHead.z,floor:s.pos.y,k:k,shoulder:shoulder,hold:RibbonCrowd.hold(THREE,s,k,shoulder),inverse:inverse,localShoulder:shoulder.clone().applyMatrix4(inverse)};RIBBON.catchBySeat.set(s.i,q);
       var key = Math.floor(q.x / 0.8) + ":" + Math.floor(q.z / 0.8);
       if(!RIBBON.catchGrid.has(key)) RIBBON.catchGrid.set(key, []);
       RIBBON.catchGrid.get(key).push(q);
@@ -6029,12 +6030,17 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     f.paid += speed * dt;
     if (f.roll.y > f.apex) f.apex = f.roll.y;
   }
+  var ribbonContactPoint=new THREE.Vector3();
   function ribbonStepRoll(f, target) {
     if(!f.receivers)f.receivers=ribbonReceiverSnapshot();
     for(var half=0;half<2;half++) {
       ribbonAdvanceRoll(f, RIBBON_DT / 2);
       var owner=f.owner===undefined?RIBBON.slot:f.owner;
-      var contact = RIBBON.world.collide(f.roll,f.velocity,RIBBON_PHYSICS.rollR,owner,f.actors,f.bodies);
+      var beforeContact=ribbonContactPoint.copy(f.roll),preIntercept=ribbonCatchInterception(f),contact = RIBBON.world.collide(f.roll,f.velocity,RIBBON_PHYSICS.rollR,owner,f.actors,f.liveReceivers?undefined:f.bodies);
+      if(!contact.obstacle&&contact.audience!==undefined&&['hand','fore','arm'].includes(contact.part)){
+        var nearbyGrip=ribbonCatchAt(beforeContact,target,owner,f.actors,f.receivers,f.liveReceivers),grasp=preIntercept&&(!nearbyGrip||preIntercept.seat===nearbyGrip.seat||preIntercept.distance<nearbyGrip.distance)?preIntercept:nearbyGrip;
+        if(grasp&&grasp.seat.i===contact.audience){f.roll.copy(beforeContact);return {done:true,caught:grasp};}
+      }
       if (contact.hit) f.hit = true;
       if(contact.actor!==undefined)f.blockedByActor=true;
       var caught=null;
@@ -6092,7 +6098,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.active = false;
     RIBBON.phase = "idle";
     ribbonRestoreCast();
-    RIBBON.photoURL = null;
+    RIBBON.photoURL = null;RIBBON.photoAttempted=false;
     $("ribbonFinaleNote").hidden = true;
     RIBBON.target = null; RIBBON.window = null; RIBBON.world = null; RIBBON.thrower = null; RIBBON.pausedAt = 0;
     ribbonMark.hidden = true;
@@ -6166,7 +6172,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.settled.forEach(function(f){if(f.receiver)taken.add(f.receiver.seat.i);});
     var missing=RIBBON.stations.map(function(_,i){return i;}).filter(function(i){return !owners.has(i);}),lists=new Map(),assigned=new Map();
     missing.forEach(function(owner){var station=RIBBON.stations[owner],hold=performers[owner].elL.localToWorld(new THREE.Vector3(0,-.245,0));
-      var candidates=seats.filter(function(seat){if(!seatOcc(seat)||seat.i===S.my||taken.has(seat.i)||!ribbonCanReceive(seat))return false;var q=RIBBON.catchBySeat.get(seat.i),point=new THREE.Vector3(.06*q.k,q.localShoulder.y+.08*q.k,Math.min(-.36*q.k,q.localShoulder.z-.32*q.k)).applyMatrix4(seat.m),angle=wrapAng(Math.atan2(point.x-station.position.x,point.z-station.position.z)-station.heading);if(Math.abs(angle)>Math.PI/4)return false;return !RIBBON.world.blocked(hold,point,owner);});
+      var candidates=seats.filter(function(seat){if(!seatOcc(seat)||seat.i===S.my||taken.has(seat.i)||!ribbonCanReceive(seat))return false;var q=RIBBON.catchBySeat.get(seat.i),point=q.hold,angle=wrapAng(Math.atan2(point.x-station.position.x,point.z-station.position.z)-station.heading);if(Math.abs(angle)>Math.PI/4)return false;return !RIBBON.world.blocked(hold,point,owner);});
       for(var i=candidates.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),q=candidates[i];candidates[i]=candidates[j];candidates[j]=q;}lists.set(owner,candidates);
     });
     function match(owner,seen){var candidates=lists.get(owner);for(var i=0;i<candidates.length;i++){var seat=candidates[i];if(seen.has(seat.i))continue;seen.add(seat.i);var old=assigned.get(seat.i);if(old===undefined||match(old,seen)){assigned.set(seat.i,owner);return true;}}return false;}
@@ -6381,19 +6387,30 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   // Visual recovery starts only after the scored outcome is immutable.
   function ribbonRecoveryCandidate(f) {
-    var best=null,nearest=Infinity;
+    var best=null,nearest=Infinity,pose=null;
     RIBBON.catchBySeat.forEach(function(q){
       var held=RIBBON.crowd.entries.get(q.seat.i);if(!ribbonCanReceive(q.seat)||!ribbonPickupRowAllowed(q.seat,f.roll))return;
       var distance=Math.hypot(f.roll.x-q.x,f.roll.y-q.floor,f.roll.z-q.z);if(distance>=nearest)return;
-      var pivot=.45+.1*q.k,bend=q.seat.m.clone().multiply(new THREE.Matrix4().makeTranslation(0,pivot,.05)).multiply(new THREE.Matrix4().makeRotationX(-Math.PI/2)).multiply(new THREE.Matrix4().makeTranslation(0,-pivot,-.05)).multiply(q.inverse);
-      var shoulder;if(held)shoulder=held.baseShoulders[1].clone();else {IM.arm.getMatrixAt(q.seat.i*2+1,ribbonAudienceMatrix);shoulder=new THREE.Vector3().setFromMatrixPosition(ribbonAudienceMatrix).add(new THREE.Vector3(0,.15*q.k,0));}shoulder.applyMatrix4(bend);
-      if(shoulder.distanceTo(f.roll)>.61*q.k||RIBBON.world.pickupBlocked(f.roll,shoulder,q.seat.i,f.owner))return;
-      nearest=distance;best=q.seat;
+      var base=held?held.baseShoulders[1]:q.shoulder,choice=null,pivot=new THREE.Vector3(0,.45+.1*q.k,.05).applyMatrix4(q.seat.m);
+      if(f.roll.distanceTo(pivot)>base.distanceTo(pivot)+.61*q.k)return;
+      for(var bend of [Math.PI/2,Math.PI/3,Math.PI/6,0]){for(var degrees of [0,-10,10,-20,20,-30,30]){
+        var yaw=degrees*Math.PI/180,transform=RibbonCrowd.pickupTransform(THREE,q.seat,q.k,1,yaw,bend),shoulder=base.clone().applyMatrix4(transform);
+        if(shoulder.distanceTo(f.roll)>.61*q.k||RIBBON.world.pickupBlocked(f.roll,shoulder,q.seat.i,f.owner))continue;
+        choice={yaw:yaw,bend:bend};break;
+      }if(choice)break;}
+      if(choice){nearest=distance;best=q.seat;pose=choice;}
     });
+    if(pose){f.pickupYaw=pose.yaw;f.pickupBend=pose.bend;}
     return best;
   }
   function ribbonTickRecovery(f,dt) {
-    if(!f.recoveryPending)return;
+    if(!f.recoveryPending){
+      if(!f.recoveryUnavailable||!f.landed||RIBBON.photoAttempted)return;
+      f.retryAge=(f.retryAge||0)+dt;if(f.retryAge<.5)return;f.retryAge=0;
+      var key=RIBBON.world.actorRevision()+':'+ribbonReceiverSnapshot().join(',');if(f.retryKey===key)return;f.retryKey=key;
+      var retry=ribbonRecoveryCandidate(f);if(!retry)return;
+      f.recoveryUnavailable=false;f.recoveryPending=true;
+    }
     f.recoveryAge=(f.recoveryAge||0)+dt;f.recoveryAcc=(f.recoveryAcc||0)+dt;
     while(!f.landed&&f.recoveryAcc>=RIBBON_DT){
       f.recoveryAcc-=RIBBON_DT;ribbonAdvanceRoll(f,RIBBON_DT);
@@ -6405,7 +6422,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     f.recoveryPending=false;f.asleep=false;f.calm=0;
     if(!f.landed){f.recoveryUnavailable=true;return;}
     var seat=ribbonRecoveryCandidate(f);
-    if(!seat){f.recoveryUnavailable=true;return;}
+    if(!seat){f.recoveryUnavailable=true;f.retryKey=RIBBON.world.actorRevision()+':'+ribbonReceiverSnapshot().join(',');return;}
     f.velocity.set(0,0,0);f.postScorePickup=true;f.recoveredBy=seat.i;f.pickup=true;f.catchAge=0;f.catchFrom=f.roll.clone();
     f.receiver=RIBBON.crowd.receive(seat,f.roll,f);f.catchTo=f.receiver.hold.clone();
     ribbonFeedback(f,"失手已結算 · 觀眾拾起彩帶","#ffce82");
@@ -6416,14 +6433,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     ribbonTickRecovery(f,dt);
     var duration=ribbonCatchDuration(f);if(!f.catchTo||f.catchAge>=duration)return;
     f.catchAge=Math.min(duration,f.catchAge+dt);var u=f.pickup?Math.max(0,(f.catchAge-.2)/.75):f.catchAge/duration,t=u*u*(3-2*u);f.roll.lerpVectors(f.catchFrom,f.catchTo,t);
-    if(f.receiver){f.roll.y+=.05*Math.sin(u*Math.PI);RIBBON.crowd.pose(f.receiver,f.roll);if(f.pickup&&f.catchAge>=.2){var safe=f.receiver.hand.clone();for(var pass=0;pass<4;pass++){var contact=RIBBON.world.collide(safe,null,.035,f.owner);RIBBON.crowd.pose(f.receiver,safe);safe.copy(f.receiver.hand);if(!contact.hit)break;}f.roll.copy(safe);}}
+    if(f.receiver){f.roll.y+=.05*Math.sin(u*Math.PI);RIBBON.crowd.pose(f.receiver,f.roll);if(f.pickup&&f.catchAge>=.2){var safe=f.receiver.hand.clone();for(var pass=0;pass<4;pass++){var contact=RIBBON.world.collide(safe,null,.035,f.owner,undefined,undefined,f.receiver.seat.i);RIBBON.crowd.pose(f.receiver,safe);safe.copy(f.receiver.hand);if(!contact.hit)break;}f.roll.copy(safe);}}
     if(f.postScorePickup&&f.nodes&&f.nodes.length>=2){ribbonAddTrail(f,f.roll);f.lastLen=Math.max(RIBBON_SEGMENT*.5,f.nodes[f.nodes.length-2].p.distanceTo(f.roll));}
   }
   function ribbonTickSettled(dt) {
     RIBBON.settled.forEach(function(f){
       ribbonTickCatch(f,dt);
       var bodyRevision=RIBBON.world&&RIBBON.world.bodyRevision?RIBBON.world.bodyRevision():0;
-      var bodiesMoved=f.bodyRevision!==bodyRevision;f.bodyRevision=bodyRevision;
+      var bodiesMoved=f.bodyRevision!==bodyRevision&&(!f.asleep||!RIBBON.world.touchesChanged||RIBBON.world.touchesChanged(f.nodes,f.bodyRevision));f.bodyRevision=bodyRevision;
       var moved = !f.sleepAnchor || f.sleepAnchor.distanceToSquared(f.anchor) > 1e-8 || f.sleepRoll.distanceToSquared(f.roll) > 1e-8;
       if (moved || bodiesMoved) { f.asleep = false; f.calm = 0; f.settleAge = 0; }
       if (!f.sleepAnchor) { f.sleepAnchor = f.anchor.clone(); f.sleepRoll = f.roll.clone(); }
