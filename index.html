@@ -1207,8 +1207,7 @@ details.members tr.tbd td {
 }
 .result.compact .rstats,
 .result.compact .rtitle,
-.result.compact #rWhere,
-.result.compact #rClose {
+.result.compact #rWhere {
   display: none;
 }
 .result.compact .ract button {
@@ -1908,6 +1907,7 @@ details.members tr.tbd td {
       <div id="rGrid" class="rgrid" hidden></div>
       <div class="ract">
         <button type="button" class="primary" id="rAgain">再玩一次</button>
+        <button type="button" id="rBack" hidden>返回統計</button>
         <button type="button" id="rWhere">看粉絲在哪裡</button>
         <button type="button" id="rClose" class="ghost" aria-label="關閉">✕</button>
       </div>
@@ -6660,6 +6660,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     $("fanAim").hidden = false;
     gHud.hidden = false;
     updateGameHud(now);
+    canvas.focus({ preventScroll: true });
     SFX.go();
     toast("找出帶著你應援道具的粉絲，點一下就給他一個飛吻！");
   }
@@ -6833,6 +6834,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (all) SFX.win();
     else SFX.end();
     showResult(all, early);
+    $("rAgain").focus({ preventScroll: true });
     drawMap();
   }
   function esc(v) {
@@ -7209,6 +7211,33 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     var c = lookCenter(new THREE.Vector3()).sub(eyePos(eye));
     return { yaw: Math.atan2(0 - c.x, -c.z), pitch: Math.atan2(c.y, Math.hypot(c.x, c.z)), fov: IDOL_FOV };
   }
+  function showFullResult() {
+    clearFanZoom();
+    gRes.classList.remove("compact");
+    app.classList.remove("rcompact");
+    $("rBack").hidden = true;
+    S.fov = IDOL_FOV;
+    resetLook();
+    updateCamera();
+    updateMarks();
+    $("rWhere").focus({ preventScroll: true });
+  }
+  function showResultScene() {
+    gRes.classList.add("compact");
+    app.classList.add("rcompact");
+    $("rBack").hidden = false;
+    updateMarks();
+  }
+  $("rBack").addEventListener("click", showFullResult);
+  gRes.addEventListener("keydown", function(e) {
+    if (e.key === "Escape" && gRes.classList.contains("compact")) {
+      e.preventDefault();
+      showFullResult();
+    }
+  });
+  $("missMarks").addEventListener("keydown", function(e) {
+    if (e.key === "Escape") { e.preventDefault(); showFullResult(); }
+  });
   function viewFan(s) {
     zoomQ = [];
     zoomAnim = null;
@@ -7222,7 +7251,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     var H = canvas.clientHeight, f = H / 2 / Math.tan(fov * fovFactor() * Math.PI / 360);
     if (!gRes.hidden) pitch -= Math.atan((gRes.offsetHeight + 16) / 2 / f);
     setFocus(s);
-    zoomQ = [{ to: { yaw, pitch, fov }, dur: 900 }, { wait: 2e3 }, { to: homeView(), dur: 900, done: clearFocus }];
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      S.yaw = yaw;
+      S.pitch = pitch;
+      S.fov = fov;
+      updateCamera();
+    } else {
+      zoomQ = [{ to: { yaw, pitch, fov }, dur: 900 }, { wait: 2e3 }, { to: homeView(), dur: 900, done: clearFocus }];
+    }
   }
   function nextZoom(now) {
     var q = zoomQ.shift();
@@ -7302,7 +7338,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     drawMap();
   }
   function updateMarks() {
-    var box = $("missMarks"), show = G2.phase === "result";
+    var box = $("missMarks"), show = G2.phase === "result" && gRes.classList.contains("compact");
     if (!show) {
       if (!box.hidden) {
         box.hidden = true;
@@ -7323,8 +7359,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
         e.className = "mark";
         e.setAttribute("aria-label", "查看 " + seatLabel(s) + " 未找到的粉絲");
         e.addEventListener("click", function() {
-          gRes.classList.add("compact");
-          app.classList.add("rcompact");
+          showResultScene();
           viewFan(s);
         });
         e.innerHTML = '<span class="lab">😢 ' + s.row + "排" + s.num + '號</span><span class="arw"></span>';
@@ -7400,8 +7435,12 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       }
     }
     gRes.hidden = true;
+    $("rBack").hidden = true;
     if (G2.phase === "result" || G2.result) clearFanSession();
-    if (IDOL && !G2.on && G2.phase !== "countdown" && (typeof MODE === "undefined" || MODE === "game")) $("startPanel").hidden = false;
+    if (IDOL && !G2.on && G2.phase !== "countdown" && (typeof MODE === "undefined" || MODE === "game")) {
+      $("startPanel").hidden = false;
+      if (!RIBBON.active && RIBBON.phase !== "result") $("gStart").focus({ preventScroll: true });
+    }
   }
   $("gStart").addEventListener("click", function() {
     if (!$("gamePicker").open) $("gamePicker").showModal();
@@ -7604,8 +7643,9 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   $("rAgain").addEventListener("click", startGame);
   $("rClose").addEventListener("click", closeResult);
   $("rWhere").addEventListener("click", function() {
-    gRes.classList.add("compact");
-    app.classList.add("rcompact");
+    showResultScene();
+    var first = $("missMarks").querySelector("button");
+    if (first) first.focus({ preventScroll: true });
     toast("點畫面上沒被找到的粉絲（或紅色箭頭），鏡頭會轉過去看他");
   });
   $("gStop").addEventListener("click", function() {
@@ -7867,6 +7907,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   canvas.addEventListener("pointerdown", function(e) {
     var p = elLocal(canvas, e.clientX, e.clientY);
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    clearFanZoom();
     ptrs[e.pointerId] = p;
     canvas.setPointerCapture(e.pointerId);
     if (Object.keys(ptrs).length === 2 && (S.overview || gameZoomOK())) {
@@ -7936,6 +7977,12 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       }
       return;
     }
+    if (e.key === "Escape" && G2.phase === "result" && gRes.classList.contains("compact")) {
+      e.preventDefault();
+      showFullResult();
+      return;
+    }
+    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) clearFanZoom();
     var st = 0.042, hit = true;
     if (S.overview) {
       if (e.key === "ArrowLeft") S.oAz += st;
