@@ -2361,6 +2361,9 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     $("fail").textContent = "3D 畫面被瀏覽器暫停了（常見於手機切到背景太久）。請重新整理頁面。";
     $("fail").style.display = "grid";
   });
+  canvas.addEventListener("webglcontextrestored", function() {
+    $("fail").style.display = "none";
+  });
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -4366,12 +4369,15 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     out.set(0, SEAT_H + 0.463 * S.h / 100, 0.04).applyAxisAngle(YAX, s.rot).add(s.pos);
     return out;
   }
+  function lookCenter(out) {
+    if (stageGameView()) return out.set(0, 1.2 + frontElev(4), ROW_Z0 + 4 * ROW_PITCH);
+    if (S.cam && S.cam.idol) return out.set(0, 1.5, 7);
+    return out.set(0, S.stageH + 1.2, -STAGE_D * 0.35);
+  }
   function resetLook() {
     eyePos(eye);
     camera.position.copy(eye);
-    if (stageGameView()) lookT.set(0, 1.2 + frontElev(4), ROW_Z0 + 4 * ROW_PITCH);
-    else if (S.cam && S.cam.idol) lookT.set(0, 1.5, 7);
-    else lookT.set(0, S.stageH + 1.2, -STAGE_D * 0.35);
+    lookCenter(lookT);
     camera.lookAt(lookT);
     S.yaw = camera.rotation.y;
     S.pitch = camera.rotation.x;
@@ -4420,6 +4426,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       camera.fov = S.fov * fovFactor();
     }
     camera.updateProjectionMatrix();
+    camera.updateMatrixWorld(true);
   }
   function updateHud() {
     var s = seats[S.my];
@@ -4839,12 +4846,15 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   });
   $("btnReset").addEventListener("click", function() {
     if (RIBBON.active) { ribbonFaceTarget(); return; }
+    clearFanZoom();
     if (!S.cam) S.fov = 40;
+    else if (S.cam.idol) S.fov = IDOL_FOV;
     if (S.overview) {
       S.overview = false;
       me.visible = false;
     }
     resetLook();
+    updateCamera();
     updateHud();
     drawMap();
   });
@@ -6574,6 +6584,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (RIBBON.phase === "result") closeRibbonSummary();
     initAudio();
     closeResult();
+    if (G2.on || G2.phase === "countdown" || fxList.length) clearFanSession();
     $("startPanel").hidden = true;
     G2.team = +$("gTeam").value;
     G2.member = +$("gMember").value;
@@ -6779,7 +6790,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     toast("轉推成功！" + seatLabel(s) + " 的觀眾改成支持你了");
     updateGameHud(performance.now());
   }
-  function endGame(all) {
+  function endGame(all, early) {
     if (G2.phase !== "play" && G2.phase !== "countdown") return;
     G2.on = false;
     G2.result = true;
@@ -6793,7 +6804,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     gHud.hidden = true;
     if (all) SFX.win();
     else SFX.end();
-    showResult(all);
+    showResult(all, early);
     drawMap();
   }
   function esc(v) {
@@ -6973,7 +6984,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (s.side) return "舞台" + SIDE_NAME[s.row] + "・" + s.row + "排 " + s.num + "號";
     return "正面・" + s.row + "排 " + s.num + "號";
   }
-  function showResult(all) {
+  function showResult(all, early) {
     var m = TEAMS[G2.team].members[G2.member], miss = G2.fans.length - G2.found;
     var tot = G2.fans.length || 1, ratio = G2.found / tot, rv = 0.75 * ratio + 0.25 * Math.min(1, G2.maxCombo / tot);
     var rank = rv >= 0.72 ? "ㄅ" : rv >= 0.52 ? "ㄆ" : rv >= 0.3 ? "ㄇ" : "ㄈ";
@@ -6982,7 +6993,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     $("rBadge").dataset.rank = rank;
     gRes.classList.remove("compact");
     app.classList.remove("rcompact");
-    $("rTitle").textContent = all ? "全部找到了！" : "時間到";
+    $("rTitle").textContent = all ? "全部找到了！" : early ? "提前結束" : "時間到";
     eyePos(eye);
     var dists = G2.fans.filter(function(q) {
       return q.found;
@@ -7167,8 +7178,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   var zoomAnim = null, zoomSeat = null, zoomQ = [];
   function homeView() {
-    var c = new THREE.Vector3(0, 1.5, 7).sub(eyePos(eye));
-    return { yaw: Math.atan2(-c.x, -c.z), pitch: Math.atan2(c.y, Math.hypot(c.x, c.z)), fov: IDOL_FOV };
+    var c = lookCenter(new THREE.Vector3()).sub(eyePos(eye));
+    return { yaw: Math.atan2(0 - c.x, -c.z), pitch: Math.atan2(c.y, Math.hypot(c.x, c.z)), fov: IDOL_FOV };
   }
   function viewFan(s) {
     zoomQ = [];
@@ -7208,8 +7219,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     if (zoomSeat === s) {
       zoomSeat = null;
       clearFocus();
-      var t = new THREE.Vector3(0, 1.5, 7).sub(eyePos(eye));
-      to = { yaw: Math.atan2(-t.x, -t.z), pitch: Math.atan2(t.y, Math.hypot(t.x, t.z)), fov: IDOL_FOV };
+      to = homeView();
     } else {
       zoomSeat = s;
       cell.classList.add("sel");
@@ -7227,8 +7237,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       }
       to = { yaw, pitch, fov };
     }
-    var c = new THREE.Vector3(0, 1.5, 7).sub(eyePos(eye));
-    var home = { yaw: Math.atan2(-c.x, -c.z), pitch: Math.atan2(c.y, Math.hypot(c.x, c.z)), fov: IDOL_FOV };
+    var home = homeView();
     home.yaw = S.yaw + wrapAng(home.yaw - S.yaw);
     var far = Math.abs(home.yaw - S.yaw) + Math.abs(home.pitch - S.pitch) + Math.abs(home.fov - S.fov) / 60 > 0.05;
     if (zoomSeat && far) {
@@ -7321,21 +7330,44 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       }
     });
   }
-  function closeResult() {
+  function clearFanZoom() {
     zoomQ = [];
     zoomAnim = null;
+    zoomSeat = null;
+    gRes.querySelectorAll(".cell.sel").forEach(function(cell) { cell.classList.remove("sel"); });
+    clearFocus();
+  }
+  function clearFanSession() {
+    var rebuild = G2.extra || Object.keys(G2.conv).length > 0;
+    G2.on = false;
+    G2.result = false;
+    G2.phase = "idle";
+    G2.pausedAt = 0;
+    G2.extra = false;
+    G2.conv = {};
+    G2.fans = [];
+    clearMoods();
+    fxList.forEach(function(f) {
+      fxGroup.remove(f.sp);
+      f.sp.material.dispose();
+    });
+    fxList.length = 0;
+    seats.forEach(function(s) { s.amp = 1; s.found = false; });
+    if (rebuild) updateAudience();
+  }
+  function closeResult() {
+    var restoreView = zoomAnim || zoomSeat || zoomQ.length || S.fov < 40;
+    clearFanZoom();
     gRes.classList.remove("compact");
     app.classList.remove("rcompact");
-    clearFocus();
-    if (zoomSeat || S.fov < 40) {
-      zoomSeat = null;
+    if (restoreView) {
       if (S.cam && S.cam.idol) {
         S.fov = IDOL_FOV;
         resetLook();
       }
     }
     gRes.hidden = true;
-    if (G2.phase === "result") G2.phase = "idle";
+    if (G2.phase === "result" || G2.result) clearFanSession();
     if (IDOL && !G2.on && G2.phase !== "countdown" && (typeof MODE === "undefined" || MODE === "game")) $("startPanel").hidden = false;
   }
   $("gStart").addEventListener("click", function() {
@@ -7544,7 +7576,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     toast("點畫面上沒被找到的粉絲（或紅色箭頭），鏡頭會轉過去看他");
   });
   $("gStop").addEventListener("click", function() {
-    endGame(false);
+    endGame(false, true);
   });
   function onAudienceChanged() {
     ribbonClearAudience(false);
@@ -7566,13 +7598,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
         toast("觀眾設定改變了，這一局已結束");
         if (IDOL) $("startPanel").hidden = false;
       }
-      G2.result = false;
-      G2.fans = [];
-      clearMoods();
-      seats.forEach(function(s) {
-        s.amp = 1;
-        s.found = false;
-      });
+      closeResult();
+      if (G2.extra) clearFanSession();
     }
   }
   function renderMemberTable() {
@@ -7599,16 +7626,25 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     btn.type = "button";
     btn.className = "fsel-btn";
     btn.setAttribute("aria-haspopup", "listbox");
-    btn.setAttribute("aria-label", sel.getAttribute("aria-label") || "");
+    var label = sel.getAttribute("aria-label");
+    if (!label && wrap.parentElement.tagName === "LABEL") {
+      label = Array.from(wrap.parentElement.childNodes).filter(function(node) {
+        return node.nodeType === Node.TEXT_NODE;
+      }).map(function(node) { return node.textContent; }).join("").trim();
+    }
+    if (sel.id) btn.setAttribute("aria-controls", sel.id + "-options");
+    btn.setAttribute("aria-expanded", "false");
     var list = document.createElement("div");
     list.className = "fsel-list";
     list.setAttribute("role", "listbox");
+    if (sel.id) list.id = sel.id + "-options";
     list.hidden = true;
     wrap.appendChild(btn);
     wrap.appendChild(list);
     function sync() {
       var o = sel.options[sel.selectedIndex];
       btn.textContent = o ? o.text : "";
+      if (label) btn.setAttribute("aria-label", label + (o ? "：" + o.text : ""));
     }
     function close() {
       list.hidden = true;
@@ -7637,20 +7673,34 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       list.hidden = false;
       btn.setAttribute("aria-expanded", "true");
       var on = list.querySelector(".on");
-      if (on) list.scrollTop = on.offsetTop - 60;
+      (on || list.firstElementChild)?.focus();
     }
     btn.addEventListener("click", function() {
       if (list.hidden) open();
       else close();
     });
     wrap.addEventListener("keydown", function(e) {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && !list.hidden) {
+        e.preventDefault();
         close();
         btn.focus();
+        return;
       }
+      if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) return;
+      e.preventDefault();
+      if (list.hidden) { open(); return; }
+      var options = Array.from(list.children);
+      var index = options.indexOf(document.activeElement);
+      if (e.key === "Home") index = 0;
+      else if (e.key === "End") index = options.length - 1;
+      else index = Math.max(0, Math.min(options.length - 1, index + (e.key === "ArrowDown" ? 1 : -1)));
+      if (options[index]) options[index].focus();
     });
     document.addEventListener("pointerdown", function(e) {
       if (!wrap.contains(e.target)) close();
+    });
+    wrap.addEventListener("focusout", function(e) {
+      if (e.relatedTarget && !wrap.contains(e.relatedTarget)) close();
     });
     new MutationObserver(sync).observe(sel, { childList: true });
     sel.syncFancy = sync;
@@ -7783,6 +7833,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }, true);
   canvas.addEventListener("pointerdown", function(e) {
     var p = elLocal(canvas, e.clientX, e.clientY);
+    if (e.pointerType === "mouse" && e.button !== 0) return;
     ptrs[e.pointerId] = p;
     canvas.setPointerCapture(e.pointerId);
     if (Object.keys(ptrs).length === 2 && (S.overview || gameZoomOK())) {
@@ -7790,7 +7841,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       drag = null;
       return;
     }
-    drag = { x: p.x, y: p.y, sx: p.x, sy: p.y };
+    drag = Object.keys(ptrs).length === 1 ? { id: e.pointerId, x: p.x, y: p.y, sx: p.x, sy: p.y } : null;
   });
   canvas.addEventListener("pointermove", function(e) {
     var p = elLocal(canvas, e.clientX, e.clientY);
@@ -7804,7 +7855,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       }
       return;
     }
-    if (!drag) return;
+    if (!drag || drag.id !== e.pointerId) return;
     var dx = p.x - drag.x, dy = p.y - drag.y;
     drag.x = p.x;
     drag.y = p.y;
@@ -7825,7 +7876,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }
   canvas.addEventListener("pointerup", function(e) {
     var p = elLocal(canvas, e.clientX, e.clientY);
-    var tap = drag && Math.hypot(p.x - drag.sx, p.y - drag.sy) < (TOUCH ? 14 : 8);
+    var tap = drag && drag.id === e.pointerId && (e.pointerType !== "mouse" || e.button === 0) && Math.hypot(p.x - drag.sx, p.y - drag.sy) < (TOUCH ? 14 : 8);
     if (tap && G2.on) onGameClick(p.x, p.y);
     else if (tap && G2.phase === "result" && gRes.classList.contains("compact")) {
       var fs = pickSeat(p.x, p.y);
@@ -7834,6 +7885,9 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     endDrag(e);
   });
   canvas.addEventListener("pointercancel", endDrag);
+  canvas.addEventListener("lostpointercapture", function(e) {
+    if (ptrs[e.pointerId]) endDrag(e);
+  });
   canvas.addEventListener("wheel", function(e) {
     e.preventDefault();
     if (S.overview) setOR(S.oR + e.deltaY * 0.012);
@@ -7842,7 +7896,13 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   canvas.addEventListener("keydown", function(e) {
     if (RIBBON.active) return;
     var st = 0.042, hit = true;
-    if (e.key === "ArrowLeft") S.yaw += st;
+    if (S.overview) {
+      if (e.key === "ArrowLeft") S.oAz += st;
+      else if (e.key === "ArrowRight") S.oAz -= st;
+      else if (e.key === "ArrowUp") S.oEl = Math.min(1.5, S.oEl + st);
+      else if (e.key === "ArrowDown") S.oEl = Math.max(0.08, S.oEl - st);
+      else hit = false;
+    } else if (e.key === "ArrowLeft") S.yaw += st;
     else if (e.key === "ArrowRight") S.yaw -= st;
     else if (e.key === "ArrowUp") S.pitch = Math.min(1.4, S.pitch + st);
     else if (e.key === "ArrowDown") S.pitch = Math.max(-1.4, S.pitch - st);
@@ -7861,7 +7921,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       var gesture=RIBBON.gesture;
       if(gesture && (gesture.width!==w || gesture.height!==h)) {ribbonCancelGesture();ribbonSetPower(0);}
       updateCamera();camera.updateMatrixWorld(true);
-    } else camera.updateProjectionMatrix();
+    } else updateCamera();
   }
   if (window.ResizeObserver) new ResizeObserver(resize).observe($("view"));
   else window.addEventListener("resize", resize);
@@ -7883,6 +7943,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     wavePens(t);
     tickGif(now);
     updateLights(t);
+    tickZoom(now);
     updateCamera();
     tickGame(now);
     ribbonTick(now);
@@ -7891,7 +7952,6 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     updateFx(now);
     tickAudio();
     updateMarks();
-    tickZoom(now);
     tickFocus(now);
     if (IDOL) {
       syncModeBar();
