@@ -71,6 +71,7 @@ const root=path.resolve(__dirname,'..');
   async function rulesCase(pattern,expectedCount,cleared,label) {
     t.closeRibbonSummary();t.startGame('ribbon');await t.ribbonStartPlay(performance.now());
     for(let n=0;n<pattern.length;n++) {
+      if(n)await t.ribbonStartPlay(performance.now());
       t.ribbonLaunch(r.window.mid,0,performance.now());const flight=r.flight;
       t.ribbonOutcome(pattern[n]?{seat:r.target,distance:.1}:null,performance.now());
       t.ribbonOutcome(null,performance.now());check(r.attempts===n+1,'one settlement per throw '+label+' '+n);

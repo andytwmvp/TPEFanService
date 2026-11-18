@@ -27,7 +27,7 @@ const root=path.resolve(__dirname,'..');
    }
    out.push({name:'both actual TPE pillars physically block maximum-speed rolls from four directions',pass:pillars.length===2&&columnCases.every(c=>c.hit&&!c.crossed&&c.bounced),columns:pillars.length,cases:columnCases});
    const near={i:-11,headZ:0},far={i:-12,headZ:0};r.catchGrid=new Map([['0:0',[{seat:near,x:.1,y:1.05,z:0,floor:0,k:1,inverse:new THREE.Matrix4().makeTranslation(0,0,-.3),shoulder:new THREE.Vector3(.2,1,0)},{seat:far,x:.2,y:1.25,z:0,floor:0,k:1,inverse:new THREE.Matrix4().makeTranslation(0,0,-.3),shoulder:new THREE.Vector3(.2,1,0)}]]]);
-   const catchResult=t.ribbonCatchAt(new THREE.Vector3(0,1.5,0),{i:-99});out.push({name:'other spectators ranked by horizontal reach with separate real hand distance',pass:catchResult.seat===near&&Math.abs(catchResult.distance-Math.hypot(.1,.2))<1e-8});
+   const catchResult=t.ribbonCatchAt(new THREE.Vector3(0,1.5,0),{i:-99});out.push({name:'other spectators ranked by actual 3D catch distance without target priority',pass:catchResult.seat===far&&Math.abs(catchResult.distance-.2)<1e-8});
    r.catchGrid=actualGrid;
    t.ribbonLaunch(r.window.mid,0,performance.now());const interrupted=r.flight,start=interrupted.roll.clone();t.finishRibbonGame();
    for(let i=0;i<190;i++)t.ribbonTick(r.lastFrame+17);
