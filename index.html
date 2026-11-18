@@ -3702,6 +3702,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   var gpos = glowGeo.attributes.position, gcol = glowGeo.attributes.color, gv = new THREE.Vector3();
   var lastT = 0;
   function wavePens(t) {
+    if(RIBBON&&(RIBBON.active||RIBBON.phase==="result"))t=(RIBBON.waveStart||0)+(RIBBON.fxTime||0);
     lastT = t;
     var b = t * 132 / 60, anyRainbow = false, np = 0, PI = Math.PI;
     arms.forEach(function(r) {
@@ -5147,7 +5148,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   document.addEventListener("visibilitychange", function() {
     var now = performance.now();
     if (document.hidden) {
-      if (RIBBON.active || RIBBON.phase === "result") { RIBBON.pausedAt = now; ribbonCancelGesture(); }
+      if (RIBBON.active || RIBBON.phase === "result") { RIBBON.pausedAt = now; ribbonCancelGesture();ribbonSetPower(0); }
       if (G2.phase === "play" || G2.phase === "countdown") G2.pausedAt = now;
     } else if (RIBBON.pausedAt) {
       var ribbonPause = now - RIBBON.pausedAt;
@@ -5155,7 +5156,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       if (RIBBON.phase === "countdown") RIBBON.cdStart += ribbonPause;
       if (RIBBON.nextAt) RIBBON.nextAt += ribbonPause;
       if (RIBBON.flight && RIBBON.flight.removeAt) RIBBON.flight.removeAt += ribbonPause;
-      RIBBON.lastFrame = now;
+      RIBBON.lastFrame = now;if(RIBBON.crowd)RIBBON.crowd.last=now;
     } else if (G2.pausedAt) {
       var dt = now - G2.pausedAt;
       G2.pausedAt = 0;
@@ -6133,7 +6134,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     RIBBON.thrower = null;RIBBON.throwers=null;RIBBON.heldHeadings={};RIBBON.heldThrowers={};
     RIBBON.attempts = RIBBON.hits = RIBBON.perfect = RIBBON.misses = 0;
     RIBBON.combo = RIBBON.bestCombo = RIBBON.score = 0;
-    RIBBON.interceptionDecisions={};RIBBON.challenge=null;RIBBON.cleared=false;RIBBON.roundIndex=0;RIBBON.nextRound=null;RIBBON.runRecorded=false;RIBBON.throwColors=[];RIBBON.paletteOffset=Math.floor(Math.random()*RIBBON_PALETTE.length);RIBBON.results = [];RIBBON.effects=[];RIBBON.fxTime=0;RIBBON.runTitles=ribbonRecords.snapshot().titles;ribbonNewEgg();
+    RIBBON.interceptionDecisions={};RIBBON.challenge=null;RIBBON.cleared=false;RIBBON.roundIndex=0;RIBBON.nextRound=null;RIBBON.runRecorded=false;RIBBON.throwColors=[];RIBBON.paletteOffset=Math.floor(Math.random()*RIBBON_PALETTE.length);RIBBON.results = [];RIBBON.effects=[];RIBBON.waveStart=lastT||0;RIBBON.fxTime=0;RIBBON.runTitles=ribbonRecords.snapshot().titles;ribbonNewEgg();
     ribbonPrepareThrower();
     RIBBON.used.clear();
     RIBBON.windowCache = new Map();RIBBON.windowTasks=new Map();RIBBON.reachableRows={};RIBBON.recordsReady=false;
@@ -6271,7 +6272,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     ribbonCancelGesture();ribbonClearAudience();ribbonDisposeHeld();ribbonDisposeFlight();ribbonDisposeSettled();
     RIBBON.photoURL=null;RIBBON.photoAttempted=false;RIBBON.presentationReady=false;RIBBON.resultFrom=null;RIBBON.resultView=null;
     RIBBON.target=null;RIBBON.window=null;RIBBON.thrower=null;RIBBON.heldHeadings={};RIBBON.heldThrowers={};RIBBON.used.clear();
-    RIBBON.effects=[];RIBBON.fxTime=0;RIBBON.finishReason="";RIBBON.cleared=false;ribbonNewEgg();
+    RIBBON.effects=[];RIBBON.waveStart=lastT||0;RIBBON.fxTime=0;RIBBON.finishReason="";RIBBON.cleared=false;ribbonNewEgg();
     RIBBON.windowCache=new Map();RIBBON.windowTasks=new Map();RIBBON.reachableRows={};RIBBON.recordsReady=false;
     $("ribbonSummary").hidden=true;$("ribbonPhoto").hidden=true;$("ribbonPhoto").removeAttribute("src");$("ribbonFinaleNote").hidden=true;$("ribbonNext").hidden=true;
     drag=null;ptrs={};pinch=null;S.yaw=0;S.pitch=0;S.fov=IDOL_FOV;

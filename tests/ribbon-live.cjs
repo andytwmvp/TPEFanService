@@ -6,6 +6,7 @@ async function swipe(page,mobile,power){
  try{if(mobile){await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}],timestamp:time});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y+(end-y)*.75,id:1}],timestamp:time+duration*.75});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:end,id:1}],timestamp:time+duration});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[],timestamp:time+duration});}else{await cdp.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1,timestamp:time});await cdp.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y:y+(end-y)*.75,button:'left',buttons:1,timestamp:time+duration*.75});await cdp.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y:end,button:'left',buttons:0,clickCount:1,timestamp:time+duration});}}finally{await cdp.detach();}
 }
 (async()=>{
+ if(process.env.RIBBON_VERIFY_PAUSE)return require('./ribbon-background.cjs').run(process.argv[2]);
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  try{for(const mobile of process.env.RIBBON_MOBILE_ONLY?[true]:[false,true]){
   const page=await browser.newPage({viewport:mobile?{width:390,height:844}:{width:1100,height:760},hasTouch:mobile,isMobile:mobile,deviceScaleFactor:Number(process.env.RIBBON_DPR||.5)}),errors=[],zones=new Set();let previousWho=null,hits=0;
