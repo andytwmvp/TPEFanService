@@ -901,6 +901,30 @@ details.members tr.tbd td {
 #gl:focus-visible + #fanAim:not([hidden]) {
   display: block;
 }
+#missMarks {
+  inset: auto 8px 120px auto;
+  width: min(190px, calc(100% - 16px));
+  max-height: calc(100% - 200px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: auto;
+}
+#missMarks[hidden] { display: none; }
+#missMarks button.mark {
+  position: static;
+  transform: none !important;
+  flex: none;
+  min-height: 40px;
+  align-items: stretch;
+}
+#missMarks .arw { display: none; }
+@media (max-width: 600px) {
+  #app .result.compact { width: calc(100% - 16px); }
+  #app .result.compact .rpanel { box-sizing: border-box; width: 100%; min-width: 0; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  #app .result.compact .ract { width: 100%; min-width: 0; flex: 1 1 100%; flex-wrap: wrap; justify-content: center; }
+}
 .marks {
   position: absolute;
   inset: 0;
@@ -7367,34 +7391,11 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
         return { el: e, s };
       });
     }
-    var W = canvas.clientWidth, H = canvas.clientHeight, right = W;
-    var bottom = !gRes.hidden && gRes.classList.contains("compact") ? H - gRes.offsetHeight - 20 : H;
-    markEls.forEach(function(o) {
-      headWorld(o.s, ndc);
-      ndc.y += 0.62;
-      ndc.project(camera);
-      var behind = ndc.z > 1, nx = behind ? -ndc.x : ndc.x, ny = behind ? -ndc.y : ndc.y;
-      var px = (nx + 1) / 2 * W, py = (1 - ny) / 2 * H;
-      var inside = !behind && px > 20 && px < right - 20 && py > 40 && py < bottom - 10;
-      var arw = o.el.lastChild;
-      if (inside) {
-        o.el.classList.remove("edge");
-        arw.style.transform = "";
-        o.el.style.transform = "translate(" + px + "px," + py + "px) translate(-50%,-100%)";
-      } else {
-        var cx = right / 2, cy = bottom / 2, vx = px - cx, vy = py - cy;
-        if (behind || Math.abs(vx) + Math.abs(vy) < 1) {
-          vx = nx || 0.01;
-          vy = -ny || 0.01;
-        }
-        var kx = (right / 2 - 46) / Math.max(1e-3, Math.abs(vx)), ky = (bottom / 2 - 46) / Math.max(1e-3, Math.abs(vy)), kk = Math.min(kx, ky);
-        var ex = cx + vx * kk, ey = cy + vy * kk, ang = Math.atan2(vy, vx) * 180 / Math.PI - 90;
-        o.el.classList.add("edge");
-        arw.style.transform = "rotate(" + ang + "deg)";
-        o.el.style.transform = "translate(" + ex + "px," + ey + "px) translate(-50%,-50%)";
-      }
-    });
+    var bottom = gRes.offsetHeight + 24;
+    box.style.bottom = bottom + "px";
+    box.style.maxHeight = Math.max(60, canvas.clientHeight - bottom - 100) + "px";
   }
+
   function clearFanZoom() {
     zoomQ = [];
     zoomAnim = null;
