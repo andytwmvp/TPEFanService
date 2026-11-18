@@ -8,6 +8,7 @@
 - `assets/styles.css` 管理既有介面與響應式樣式。
 - `assets/media.js` 保存既有內嵌影像、音訊與素材載入流程。
 - `src/app/manifest.json` 定義應用程式的組裝順序。
+- `src/app/06-ribbon-input.js` 封裝純手勢計算；視窗高度與物理設定由呼叫端傳入，不讀取 DOM 或遊戲狀態。
 - `src/app/` 依環境、劇場、觀眾及演出者、鏡頭、音訊、飯灑設定與特殊觀眾、彩帶、飯灑流程、結果與匯出、導航與輸入、主迴圈分檔。
 - `ribbon-world.js`、`ribbon-crowd.js`、`ribbon-records.js` 分別提供碰撞、觀眾姿勢及實績持久化。
 - `assets/app.js` 是部署用產物，由原始碼組裝而成。
@@ -20,7 +21,7 @@
 python3 scripts/build.py
 ```
 
-組裝需要 Python 3 與 Node.js（建議 22）。Python 使用標準函式庫，Node.js 負責 JavaScript 語法檢查，不需 npm 安裝。所有驗證成功後才更新部署產物與 HTML 資源雜湊。提交時包含原始碼及部署產物。預覽可使用：
+組裝需要 Python 3 與 Node.js（建議 22）。Python 使用標準函式庫，Node.js 負責 JavaScript 語法檢查，不需 npm 安裝。組裝分為來源讀取、純內容產生、語法驗證、一致性檢查與寫入五個階段。所有驗證成功後才暫存部署產物，再逐檔以原子替換更新；保留原檔權限並清理暫存檔。多檔替換不具交易性，中途遇到 I/O 錯誤時應重新組裝並執行 `--check`。提交時包含原始碼及部署產物。預覽可使用：
 
 ```sh
 python3 -m http.server 8080

@@ -5,6 +5,7 @@
   "03-camera-and-scene-controls.js",
   "04-audio.js",
   "05-fan-configuration-and-specials.js",
+  "06-ribbon-input.js",
   "06-ribbon-game.js",
   "07-fan-game.js",
   "08-results-and-export.js",
