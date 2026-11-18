@@ -884,6 +884,23 @@ details.members tr.tbd td {
     padding: 4px;
   }
 }
+#fanAim {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #18101e;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+#gl:focus-visible + #fanAim:not([hidden]) {
+  display: block;
+}
 .marks {
   position: absolute;
   inset: 0;
@@ -1203,7 +1220,10 @@ details.members tr.tbd td {
 .result.compact .ract {
   flex: none;
 }
-.mark {
+.marks button.mark {
+  background: transparent;
+  border: 0;
+  padding: 0;
   pointer-events: auto;
   cursor: pointer;
 }
@@ -1769,7 +1789,8 @@ details.members tr.tbd td {
 
 <div id="app">
 <div id="view">
-  <canvas id="gl" tabindex="0" aria-label="從座位看向舞台的 3D 視野，拖曳可轉動視角"></canvas>
+  <canvas id="gl" tabindex="0" aria-label="3D 視野。拖曳或按方向鍵轉動視角。找粉絲時，對準畫面中央後按 Enter 或空白鍵選取。"></canvas>
+  <span id="fanAim" aria-hidden="true" hidden></span>
   <div class="hud tl">
     <div class="chip"><b id="hudSeat">F排 5號</b><br><small id="hudInfo"></small></div>
     <div class="btns">
@@ -6636,6 +6657,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     G2.on = true;
     G2.end = now + G2.dur * 1e3;
     G2.lastTick = 0;
+    $("fanAim").hidden = false;
     gHud.hidden = false;
     updateGameHud(now);
     SFX.go();
@@ -6728,6 +6750,11 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     return mine || best;
   }
   function onGameClick(cx, cy) {
+    if (!G2.on || G2.pausedAt || document.hidden) return;
+    if (performance.now() >= G2.end) {
+      endGame(G2.found === G2.fans.length);
+      return;
+    }
     var s = pickSeat(cx, cy);
     if (!s) return;
     if (isTarget(s)) {
@@ -6795,6 +6822,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     G2.on = false;
     G2.result = true;
     G2.phase = "result";
+    $("fanAim").hidden = true;
     S.blackout = false;
     $("countdown").hidden = true;
     G2.fans.forEach(function(s) {
@@ -7290,8 +7318,10 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
       box.hidden = false;
       box.innerHTML = "";
       markEls = miss.map(function(s) {
-        var e = document.createElement("div");
+        var e = document.createElement("button");
+        e.type = "button";
         e.className = "mark";
+        e.setAttribute("aria-label", "查看 " + seatLabel(s) + " 未找到的粉絲");
         e.addEventListener("click", function() {
           gRes.classList.add("compact");
           app.classList.add("rcompact");
@@ -7338,6 +7368,7 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     clearFocus();
   }
   function clearFanSession() {
+    $("fanAim").hidden = true;
     var rebuild = G2.extra || Object.keys(G2.conv).length > 0;
     G2.on = false;
     G2.result = false;
@@ -7354,6 +7385,8 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
     fxList.length = 0;
     seats.forEach(function(s) { s.amp = 1; s.found = false; });
     if (rebuild) updateAudience();
+    updateMarks();
+    drawMap();
   }
   function closeResult() {
     var restoreView = zoomAnim || zoomSeat || zoomQ.length || S.fov < 40;
@@ -7895,6 +7928,14 @@ var BGM_B64 = "AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAOCNtb292AAAAbG12aGQAAAAAA
   }, { passive: false });
   canvas.addEventListener("keydown", function(e) {
     if (RIBBON.active) return;
+    if (G2.on && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      if (!e.repeat) {
+        updateCamera();
+        onGameClick(canvas.clientWidth / 2, canvas.clientHeight / 2);
+      }
+      return;
+    }
     var st = 0.042, hit = true;
     if (S.overview) {
       if (e.key === "ArrowLeft") S.oAz += st;
