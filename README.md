@@ -36,23 +36,12 @@
 
 實績與 12 個稱號儲存在本機瀏覽器，新增 N／O／P／Q 側席送達／完美記錄；全收集與一人全排涵蓋 A–C、N／O／P／Q 七排中已確認的全部可達格；D 排保留為歷史記錄，不列入新收藏。「後排完美」可由 C 排取得，既有 D 排成就仍保留，未完成探索時不提前頒發。兩輪全中為前 20 投全中，三輪全中為 30 投全中；舊版誤頒的相關稱號會重新判定，保留累計及收藏記錄。虛擬站位的投擲仍計入當次分數與過關判定，但不冒用真實成員的收藏格。禁用儲存時會顯示提示。離開彩帶模式會移除本模式新增的模型與資源，還原原遊戲的八個模型。
 
-## 開發與驗證
+## 維護說明
 
-```sh
-npm ci
-# Linux 安裝 Chromium，或設定 CHROMIUM_PATH 指向可用的 Chromium。
-npm test
-# Pages 部署後，直接驗證公開站（不攔截正式資源）：
-node tests/pages-smoke.cjs
-RIBBON_VERIFY_ZONES=1 node tests/ribbon-live.cjs
-# 直接控制 Chromium 分頁，驗證飛行、接取等待與結果的背景暫停：
-RIBBON_VERIFY_PAUSE=1 node tests/ribbon-live.cjs
-```
-
-測試透過攔截 HTML 在記憶體中加入測試介面，正式檔案不暴露測試 API。流程測試停止自動 RAF，直接驅動固定步進與 visibility 事件；UI 測試使用 WebGL、Chromium 原生滑鼠／觸控輸入、桌面及手機 viewport，輸出 `tests/artifacts/`。這些測試不代表實體手機或硬體 GPU 驗收。
+本專案為靜態網站，不需要 npm 安裝或建置。測試程式、測試截圖、日誌與開發依賴僅保留在本機，不納入版本控制。
 
 `ribbon-crowd.js` 重用現有觀眾的手臂實例，處理接取、姿勢還原與單一 instanced mesh 的全場表情；清場會釋放新增幾何與材質。
 
 `ribbon-world.js` 從 TPE 畫面實際的舞台、平台、座椅、觀眾肢體、柱牆與燈具網格建立空間索引與旋轉包圍盒窄相碰撞。預覽、搜尋和真實投擲共用 `ribbonStepRoll`。彩帶節點以 1/120 秒固定步進運作；接取後穩定或九秒後休眠，保留幾何，在端點移動或附近觀眾身體碰撞範圍更新時喚醒，遠處動作不喚醒彩帶，鏡頭位置改變時更新展示網格。
 
-詳細驗證與差異見 [VALIDATION.md](VALIDATION.md)，原站來源與授權狀態見 [SOURCES.md](SOURCES.md)。
+目前以軟體 WebGL 驗證桌面與手機尺寸；尚未完成實體手機與硬體 GPU 驗收。場景碰撞使用模型包圍體近似，超出安全伸手範圍的彩帶保留地面。原站來源與授權狀態見 [SOURCES.md](SOURCES.md)。
