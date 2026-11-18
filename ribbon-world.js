@@ -57,7 +57,7 @@
     room.platforms.children.forEach(function(child){ addMeshBounds(child.geometry,child.matrixWorld); });
     ['pad','back','torso','head','hair'].forEach(function(name){
       var im=instances[name];if(!im)return;im.geometry.computeBoundingBox();
-      seats.forEach(function(_,i){ im.getMatrixAt(i,matrix); var person=addMeshBounds(im.geometry,matrix);if(name==='torso'||name==='head'||name==='hair'){person.audience=i;person.instanceName=name;person.instanceIndex=i;} });
+      seats.forEach(function(_,i){ im.getMatrixAt(i,matrix); var person=addMeshBounds(im.geometry,matrix);person.instanceIndex=i;if(name==='torso'||name==='head'||name==='hair'){person.audience=i;person.instanceName=name;person.instanceIndex=i;} });
     });
     var empty=[], axes=['x','y','z'], faceAxis=['x','x','y','y','z','z'];
     var low=[-room.width/2,0,room.z-room.depth/2], high=[room.width/2,room.height,room.z+room.depth/2];
@@ -108,11 +108,11 @@
       return contact;
     }
     var sightStart=new THREE.Vector3(),sightEnd=new THREE.Vector3();
-    function blocked(from,to,ignoreActor,snapshot) {
+    function blocked(from,to,ignoreActor,snapshot,pickupSeat) {
       for(var group=0;group<2;group++){
       var list=group?(snapshot?snapshot.boxes:actorBoxes):boxes;
       for(var i=0;i<list.length;i++) {
-        var b=list[i];if(!b.blocksTarget||b.actor!==undefined&&b.actor===ignoreActor)continue;
+        var b=list[i];if((pickupSeat===undefined?!b.blocksTarget:b.instanceIndex===pickupSeat)||b.actor!==undefined&&b.actor===ignoreActor)continue;
         if(Math.max(from.x,to.x)<b.min.x||Math.min(from.x,to.x)>b.max.x||Math.max(from.y,to.y)<b.min.y||Math.min(from.y,to.y)>b.max.y||Math.max(from.z,to.z)<b.min.z||Math.min(from.z,to.z)>b.max.z)continue;
         sightStart.copy(from).applyMatrix4(b.inverse);sightEnd.copy(to).applyMatrix4(b.inverse);
         var near=0,far=1;
@@ -175,6 +175,6 @@
       }return hit;
     }
     function updateAudience(id,matrices){var changed=false;for(var i=0;i<boxes.length;i++){var old=boxes[i],transform=matrices[old.instanceName];if(old.audience!==id||!transform||old.transform.equals(transform))continue;var b=addMeshBounds(old.geometry,transform,old.blocksTarget,undefined,true);b.audience=id;b.instanceName=old.instanceName;b.instanceIndex=old.instanceIndex;boxes[i]=b;changed=true;}if(changed){grid=new Map();boxes.forEach(function(b){index(b,grid);});actorRevision++;}}
-    return {boxes:boxes, collide:collide,updateAudience:updateAudience,snapshotBodies:function(){return {grid:grid};},bodyCrosses:function(a,b){return bodySegment(a,b,false,false,0);},constrainBodySegment:bodySegment,blocked:blocked,setActors:setActors,barrierCrosses:barrierCrosses,dropRoute:dropRoute,actorBounds:function(){return actorBoxes;},actorRevision:function(){return actorRevision;},snapshotActors:function(){return {grid:actorGrid,boxes:actorBoxes,revision:actorRevision};}};
+    return {boxes:boxes, collide:collide,updateAudience:updateAudience,snapshotBodies:function(){return {grid:grid};},bodyCrosses:function(a,b){return bodySegment(a,b,false,false,0);},constrainBodySegment:bodySegment,blocked:blocked,pickupBlocked:function(from,to,seat,owner){return blocked(from,to,owner,null,seat);},setActors:setActors,barrierCrosses:barrierCrosses,dropRoute:dropRoute,actorBounds:function(){return actorBoxes;},actorRevision:function(){return actorRevision;},snapshotActors:function(){return {grid:actorGrid,boxes:actorBoxes,revision:actorRevision};}};
   };
 })(typeof window==='undefined'?globalThis:window);
